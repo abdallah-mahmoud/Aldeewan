@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocalization } from '../context/LocalizationContext';
 import { useData } from '../context/DataContext';
 import type { Screen, LedgerEntryType } from '../types';
-import { FilePlus2, CreditCard, PlusCircle, Scale } from 'lucide-react';
+import { FilePlus2, CreditCard, PlusCircle, Scale, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 
 
 interface ActionButtonProps {
@@ -23,6 +23,29 @@ const ActionButton: React.FC<ActionButtonProps> = ({ label, Icon, onClick }) => 
     </button>
 );
 
+interface StatCardProps {
+    label: string;
+    value: number;
+    Icon: React.ElementType;
+    colorClass: string;
+}
+
+const StatCard: React.FC<StatCardProps> = ({ label, value, Icon, colorClass }) => {
+    const { formatCurrency } = useLocalization();
+    return (
+        <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-lg flex items-center space-x-3 rtl:space-x-reverse ring-1 ring-black/5 dark:ring-white/10">
+            <div className={`p-2 rounded-full bg-opacity-10 ${colorClass.replace('text-', 'bg-')}`}>
+                <Icon className={`w-6 h-6 ${colorClass}`} />
+            </div>
+            <div>
+                <p className="text-sm text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{label}</p>
+                <p className="text-xl font-bold text-light-on-surface dark:text-dark-on-surface">{formatCurrency(value)}</p>
+            </div>
+        </div>
+    );
+};
+
+
 interface HomeScreenProps {
     setActiveScreen: (screen: Screen) => void;
     onAddCashEntry: () => void;
@@ -30,24 +53,19 @@ interface HomeScreenProps {
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ setActiveScreen, onAddCashEntry, onAddLedgerEntry }) => {
-    const { t, formatCurrency } = useLocalization();
+    const { t } = useLocalization();
     const { homeScreenTotals } = useData();
-    const { totalReceivable, totalPayable } = homeScreenTotals;
+    const { totalReceivable, totalPayable, monthlyIncome, monthlyExpense } = homeScreenTotals;
 
     return (
         <div className="space-y-6">
-            <div className="bg-light-surface dark:bg-dark-surface rounded-lg shadow-sm p-4 ring-1 ring-black/5 dark:ring-white/10">
-                 <h2 className="text-base font-semibold mb-3 text-light-on-surface-secondary dark:text-dark-on-surface-secondary text-center">{t('tagline')}</h2>
-                 <div className="grid grid-cols-2 gap-4 text-center">
-                    <div>
-                        <p className="text-sm text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{t('totalReceivable')}</p>
-                        <p className="text-2xl font-bold text-brand-green">{formatCurrency(totalReceivable)}</p>
-                    </div>
-                    <div>
-                        <p className="text-sm text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{t('totalPayable')}</p>
-                        <p className="text-2xl font-bold text-brand-red">{formatCurrency(totalPayable)}</p>
-                    </div>
-                 </div>
+             <h2 className="text-lg font-semibold text-center text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{t('tagline')}</h2>
+            
+            <div className="grid grid-cols-2 gap-4">
+                <StatCard label={t('totalReceivable')} value={totalReceivable} Icon={ArrowDownCircle} colorClass="text-brand-green" />
+                <StatCard label={t('totalPayable')} value={totalPayable} Icon={ArrowUpCircle} colorClass="text-brand-red" />
+                <StatCard label={t('monthlyIncome')} value={monthlyIncome} Icon={ArrowDownCircle} colorClass="text-brand-green" />
+                <StatCard label={t('monthlyExpense')} value={monthlyExpense} Icon={ArrowUpCircle} colorClass="text-brand-red" />
             </div>
 
             <div>

@@ -15,7 +15,12 @@ interface DataContextType {
     updateCashEntry: (id: string, data: Partial<Omit<CashEntry, 'id'>>) => void;
     deleteCashEntry: (id: string) => void;
     getPersonBalance: (personId: string) => number;
-    homeScreenTotals: { totalReceivable: number, totalPayable: number };
+    homeScreenTotals: { 
+        totalReceivable: number, 
+        totalPayable: number,
+        monthlyIncome: number,
+        monthlyExpense: number,
+    };
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -91,9 +96,27 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 totalPayable += balance;
             }
         });
+        
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
 
-        return { totalReceivable, totalPayable };
-    }, [persons, getPersonBalance]);
+        let monthlyIncome = 0;
+        let monthlyExpense = 0;
+
+        cashEntries.forEach(entry => {
+            const entryDate = new Date(entry.date);
+            if (entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear) {
+                if (entry.type === CashEntryType.INCOME) {
+                    monthlyIncome += entry.amount;
+                } else if (entry.type === CashEntryType.EXPENSE) {
+                    monthlyExpense += entry.amount;
+                }
+            }
+        });
+
+        return { totalReceivable, totalPayable, monthlyIncome, monthlyExpense };
+    }, [persons, cashEntries, getPersonBalance]);
 
 
     const value = {

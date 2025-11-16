@@ -26,6 +26,8 @@ const translations: Record<Language, Record<string, string>> = {
     quickActions: 'إجراءات سريعة',
     totalReceivable: 'إجمالي المستحق',
     totalPayable: 'إجمالي الدفع',
+    monthlyIncome: 'دخل الشهر',
+    monthlyExpense: 'مصروفات الشهر',
     // Navigation
     home: 'الرئيسية',
     ledger: 'السجل',
@@ -100,6 +102,8 @@ const translations: Record<Language, Record<string, string>> = {
     quickActions: 'Quick Actions',
     totalReceivable: 'Total Receivable',
     totalPayable: 'Total Payable',
+    monthlyIncome: 'This Month\'s Income',
+    monthlyExpense: 'This Month\'s Expense',
     // Navigation
     home: 'Home',
     ledger: 'Ledger',
