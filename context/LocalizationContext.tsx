@@ -214,16 +214,23 @@ export const LocalizationProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const formatDate = useCallback((dateString: string) => {
     const locale = language === 'ar' ? 'ar-EG-u-nu-latn' : 'en-GB';
-    // When dealing with 'YYYY-MM-DD', create the date as UTC to avoid timezone shifts.
-    const date = new Date(dateString);
-    const userTimezoneOffset = date.getTimezoneOffset() * 60000;
-    const dateInUTC = new Date(date.getTime() + userTimezoneOffset);
+    
+    // By splitting the string and constructing the date, we create a date
+    // at midnight in the user's local timezone, avoiding UTC-related off-by-one errors.
+    const parts = dateString.split('-');
+    if (parts.length !== 3) return dateString; // Fallback for invalid format
+
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed in JS Date
+    const day = parseInt(parts[2], 10);
+
+    const date = new Date(year, month, day);
 
     return new Intl.DateTimeFormat(locale, {
         day: '2-digit',
         month: 'short',
         year: 'numeric'
-    }).format(dateInUTC);
+    }).format(date);
   }, [language]);
 
 
