@@ -1,0 +1,76 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlDeewan - الدِّيوانُ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              dark: {
+                background: '#13131F',
+                surface: '#20202F',
+                primary: '#5EEAD4',
+                'primary-muted': 'rgba(94, 234, 212, 0.1)',
+                'on-surface': '#E5E7EB',
+                'on-surface-secondary': '#9CA3AF',
+              },
+              light: {
+                 background: '#F9FAFB',
+                 surface: '#FFFFFF',
+                 primary: '#14B8A6',
+                 'primary-muted': 'rgba(20, 184, 166, 0.1)',
+                 'on-surface': '#111827',
+                 'on-surface-secondary': '#6B7280',
+              },
+              brand: {
+                 green: '#22C55E',
+                 red: '#EF4444',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        font-family: 'Tajawal', sans-serif;
+      }
+    </style>
+  <script>
+    (function() {
+      const theme = localStorage.getItem('theme') || 'system';
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (theme === 'dark' || (theme === 'system' && systemPrefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.417.0",
+    "lucide-react/": "https://aistudiocdn.com/lucide-react@^0.417.0/"
+  }
+}
+</script>
+</head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
