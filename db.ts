@@ -1,7 +1,7 @@
-// FIX: Switched from a default to a named import for the Dexie class.
-// This resolves an issue where subclassing Dexie did not correctly inherit
-// its methods like `.version()` and `.transaction()` at compile time.
-import { Dexie } from 'dexie';
+// FIX: Switched from a named to a default import for the Dexie class.
+// When subclassing, the Dexie class constructor is needed, which is the default export.
+// The named import `{ Dexie }` provides the type, not the implementation.
+import Dexie from 'dexie';
 import type { Table } from 'dexie';
 import type { Person, Transaction } from './types';
 
