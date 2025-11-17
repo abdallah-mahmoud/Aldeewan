@@ -1,137 +1,100 @@
-import React, { createContext, useState, useContext, useMemo, useCallback } from 'react';
-import type { Person, LedgerEntry, CashEntry } from '../types';
-import { PersonRole, LedgerEntryType, CashEntryType } from '../types';
-import { mockPersons, mockLedgerEntries, mockCashEntries } from '../data/mockData';
+import React, { createContext, useContext, useCallback, useEffect, useState } from 'react';
+import { db } from '../db';
+import type { Person, Transaction } from '../types';
+import { mockPersons, mockTransactions } from '../data/mockData';
 
 interface DataContextType {
-    persons: Person[];
-    ledgerEntries: LedgerEntry[];
-    cashEntries: CashEntry[];
-    addPerson: (data: Omit<Person, 'id' | 'createdAt'>) => void;
-    addLedgerEntry: (data: Omit<LedgerEntry, 'id'>) => void;
-    updateLedgerEntry: (id: string, data: Partial<Omit<LedgerEntry, 'id' | 'personId'>>) => void;
-    deleteLedgerEntry: (id: string) => void;
-    addCashEntry: (data: Omit<CashEntry, 'id'>) => void;
-    updateCashEntry: (id: string, data: Partial<Omit<CashEntry, 'id'>>) => void;
-    deleteCashEntry: (id: string) => void;
-    getPersonBalance: (personId: string) => number;
-    homeScreenTotals: { 
-        totalReceivable: number, 
-        totalPayable: number,
-        monthlyIncome: number,
-        monthlyExpense: number,
-    };
+    addPerson: (data: Omit<Person, 'id' | 'createdAt'>) => Promise<string>;
+    addTransaction: (data: Omit<Transaction, 'id'>) => Promise<void>;
+    updateTransaction: (id: string, data: Partial<Omit<Transaction, 'id'>>) => Promise<void>;
+    deleteTransaction: (id: string) => Promise<void>;
+    getTransactionsByDateRange: (startDate: string, endDate: string) => Promise<Transaction[]>;
+    isAppLoading: boolean;
+    needsOnboarding: boolean;
+    seedDatabase: () => Promise<void>;
+    completeOnboarding: () => void;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [persons, setPersons] = useState<Person[]>(mockPersons);
-    const [ledgerEntries, setLedgerEntries] = useState<LedgerEntry[]>(mockLedgerEntries);
-    const [cashEntries, setCashEntries] = useState<CashEntry[]>(mockCashEntries);
+    const [isAppLoading, setIsAppLoading] = useState(true);
+    const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
-    const addPerson = useCallback((data: Omit<Person, 'id' | 'createdAt'>) => {
+    useEffect(() => {
+        const checkFirstLaunch = async () => {
+            try {
+                const personCount = await db.persons.count();
+                if (personCount === 0) {
+                    setNeedsOnboarding(true);
+                }
+            } catch (error) {
+                console.error("Failed to check database:", error);
+            } finally {
+                setIsAppLoading(false);
+            }
+        };
+        checkFirstLaunch();
+    }, []);
+
+    const seedDatabase = useCallback(async () => {
+        try {
+            await db.transaction('rw', db.persons, db.transactions, async () => {
+                await db.persons.bulkAdd(mockPersons);
+                await db.transactions.bulkAdd(mockTransactions);
+            });
+            console.log("Database seeded with mock data.");
+        } catch (error) {
+            console.error("Failed to seed database:", error);
+        }
+    }, []);
+
+    const completeOnboarding = useCallback(() => {
+        setNeedsOnboarding(false);
+    }, []);
+    
+    const addPerson = useCallback(async (data: Omit<Person, 'id' | 'createdAt'>): Promise<string> => {
         const newPerson: Person = {
             ...data,
-            id: `p${Date.now()}`,
+            id: crypto.randomUUID(),
             createdAt: new Date().toISOString(),
         };
-        setPersons(prev => [newPerson, ...prev]);
+        await db.persons.add(newPerson);
+        return newPerson.id;
     }, []);
 
-    const addLedgerEntry = useCallback((data: Omit<LedgerEntry, 'id'>) => {
-        const newEntry: LedgerEntry = {
+    const addTransaction = useCallback(async (data: Omit<Transaction, 'id'>) => {
+        const newTransaction: Transaction = {
             ...data,
-            id: `l${Date.now()}`,
+            id: crypto.randomUUID(),
         };
-        setLedgerEntries(prev => [newEntry, ...prev]);
+        await db.transactions.add(newTransaction);
     }, []);
     
-    const updateLedgerEntry = useCallback((id: string, data: Partial<Omit<LedgerEntry, 'id' | 'personId'>>) => {
-        setLedgerEntries(prev => prev.map(e => e.id === id ? { ...e, ...data } : e));
+    const updateTransaction = useCallback(async (id: string, data: Partial<Omit<Transaction, 'id'>>) => {
+        await db.transactions.update(id, data);
     }, []);
 
-    const deleteLedgerEntry = useCallback((id: string) => {
-        setLedgerEntries(prev => prev.filter(e => e.id !== id));
+    const deleteTransaction = useCallback(async (id: string) => {
+        await db.transactions.delete(id);
     }, []);
 
-    const addCashEntry = useCallback((data: Omit<CashEntry, 'id'>) => {
-        const newEntry: CashEntry = {
-            ...data,
-            id: `c${Date.now()}`,
-        };
-        setCashEntries(prev => [newEntry, ...prev]);
+    const getTransactionsByDateRange = useCallback(async (startDate: string, endDate: string) => {
+        const start = new Date(`${startDate}T00:00:00Z`).toISOString();
+        const end = new Date(`${endDate}T23:59:59Z`).toISOString();
+        return db.transactions.where('date').between(start, end).toArray();
     }, []);
 
-    const updateCashEntry = useCallback((id: string, data: Partial<Omit<CashEntry, 'id'>>) => {
-        setCashEntries(prev => prev.map(e => e.id === id ? { ...e, ...data } : e));
-    }, []);
-
-    const deleteCashEntry = useCallback((id: string) => {
-        setCashEntries(prev => prev.filter(e => e.id !== id));
-    }, []);
-
-    const getPersonBalance = useCallback((personId: string) => {
-        return ledgerEntries
-            .filter(entry => entry.personId === personId)
-            .reduce((balance, entry) => {
-                if (entry.type === LedgerEntryType.DEBT) {
-                    return balance + entry.amount;
-                } else if (entry.type === LedgerEntryType.PAYMENT) {
-                    return balance - entry.amount;
-                }
-                return balance;
-            }, 0);
-    }, [ledgerEntries]);
-    
-    const homeScreenTotals = useMemo(() => {
-        let totalReceivable = 0;
-        let totalPayable = 0;
-
-        persons.forEach(person => {
-            const balance = getPersonBalance(person.id);
-            if (person.role === PersonRole.CUSTOMER && balance > 0) {
-                totalReceivable += balance;
-            } else if (person.role === PersonRole.SUPPLIER && balance > 0) {
-                totalPayable += balance;
-            }
-        });
-        
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-
-        let monthlyIncome = 0;
-        let monthlyExpense = 0;
-
-        cashEntries.forEach(entry => {
-            const entryDate = new Date(entry.date);
-            if (entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear) {
-                if (entry.type === CashEntryType.INCOME) {
-                    monthlyIncome += entry.amount;
-                } else if (entry.type === CashEntryType.EXPENSE) {
-                    monthlyExpense += entry.amount;
-                }
-            }
-        });
-
-        return { totalReceivable, totalPayable, monthlyIncome, monthlyExpense };
-    }, [persons, cashEntries, getPersonBalance]);
-
-
-    const value = {
-        persons,
-        ledgerEntries,
-        cashEntries,
+    const value: DataContextType = {
         addPerson,
-        addLedgerEntry,
-        updateLedgerEntry,
-        deleteLedgerEntry,
-        addCashEntry,
-        updateCashEntry,
-        deleteCashEntry,
-        getPersonBalance,
-        homeScreenTotals,
+        addTransaction,
+        updateTransaction,
+        deleteTransaction,
+        getTransactionsByDateRange,
+        isAppLoading,
+        needsOnboarding,
+        seedDatabase,
+        completeOnboarding,
     };
 
     return <DataContext.Provider value={value}>{children}</DataContext.Provider>;

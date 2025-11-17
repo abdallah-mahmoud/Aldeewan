@@ -1,5 +1,5 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { updateStatusBar } from '../utils/native';
 
 type Theme = 'light' | 'dark' | 'system';
 
@@ -25,22 +25,29 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const applyTheme = (t: Theme) => {
       localStorage.setItem('theme', t);
-      if (t === 'dark' || (t === 'system' && systemPrefersDark.matches)) {
+      const isDark = t === 'dark' || (t === 'system' && systemPrefersDark.matches);
+      
+      if (isDark) {
         root.classList.add('dark');
       } else {
         root.classList.remove('dark');
       }
+      // Update native status bar
+      updateStatusBar(isDark);
     };
 
     applyTheme(theme);
 
     const mediaQueryListener = (e: MediaQueryListEvent) => {
       if (theme === 'system') {
-        if (e.matches) {
+        const isDark = e.matches;
+        if (isDark) {
             root.classList.add('dark');
         } else {
             root.classList.remove('dark');
         }
+        // Update native status bar on system theme change
+        updateStatusBar(isDark);
       }
     };
 

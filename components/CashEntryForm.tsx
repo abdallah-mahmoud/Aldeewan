@@ -1,44 +1,90 @@
 import React, { useState } from 'react';
 import { useLocalization } from '../context/LocalizationContext';
-import type { CashEntry } from '../types';
-import { CashEntryType } from '../types';
+import type { Transaction } from '../types';
+import { TransactionType } from '../types';
 import DatePicker from './DatePicker';
 
-interface CashEntryFormProps {
-    entry: CashEntry | null;
-    onSave: (entryData: Omit<CashEntry, 'id'>) => void;
+interface CashTransactionFormProps {
+    entry: Transaction | null;
+    onSave: (entryData: Omit<Transaction, 'id'>) => void;
     onCancel: () => void;
 }
-const CashEntryForm: React.FC<CashEntryFormProps> = ({ entry, onSave, onCancel }) => {
-    const { t } = useLocalization();
-    const [type, setType] = useState(entry?.type || CashEntryType.INCOME);
+export const CashTransactionForm: React.FC<CashTransactionFormProps> = ({ entry, onSave, onCancel }) => {
+    const { t, getTodayDateString } = useLocalization();
+    const [type, setType] = useState(entry?.type || TransactionType.CASH_INCOME);
     const [category, setCategory] = useState(entry?.category || '');
     const [amount, setAmount] = useState(entry?.amount || '');
-    const [date, setDate] = useState(entry ? new Date(entry.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]);
+    const [date, setDate] = useState(entry ? new Date(entry.date).toISOString().split('T')[0] : getTodayDateString());
     const [note, setNote] = useState(entry?.note || '');
+    const [errors, setErrors] = useState<{ category?: string; amount?: string }>({});
+
+    const isIncome = type === TransactionType.CASH_INCOME || type === TransactionType.CASH_SALE;
+
+    const validate = () => {
+        const newErrors: { category?: string; amount?: string } = {};
+        if (category.trim() === '') {
+            newErrors.category = t('error_category_required');
+        }
+        if (Number(amount) <= 0) {
+            newErrors.amount = t('error_amount_positive');
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        if (!category || !amount || !date) return;
-        onSave({ type, category, amount: Number(amount), date: new Date(date).toISOString(), note });
+        if (validate()) {
+            // By saving the date as noon UTC, we prevent timezone shifts from changing the date.
+            const dateToSave = new Date(`${date}T12:00:00Z`).toISOString();
+            const transactionType = type === TransactionType.CASH_SALE ? (isIncome ? TransactionType.CASH_SALE : TransactionType.CASH_EXPENSE) : type;
+            onSave({ type: transactionType, category, amount: Number(amount), date: dateToSave, note });
+        }
     }
 
     return (
         <form onSubmit={handleSubmit} className="space-y-4 p-4">
             <div>
                 <label className="block text-sm font-medium mb-1">{t('type')}</label>
-                <select value={type} onChange={e => setType(e.target.value as CashEntryType)} className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none">
-                    <option value={CashEntryType.INCOME}>{t('income')}</option>
-                    <option value={CashEntryType.EXPENSE}>{t('expense')}</option>
+                <select 
+                    value={isIncome ? 'income' : 'expense'} 
+                    onChange={e => setType(e.target.value === 'income' ? TransactionType.CASH_INCOME : TransactionType.CASH_EXPENSE)} 
+                    className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none"
+                >
+                    <option value='income'>{t('income')}</option>
+                    <option value='expense'>{t('expense')}</option>
                 </select>
             </div>
             <div>
                 <label className="block text-sm font-medium mb-1">{t('category')}</label>
-                <input type="text" value={category} onChange={e => setCategory(e.target.value)} required className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none" />
+                <input 
+                    type="text" 
+                    value={category} 
+                    onChange={e => { setCategory(e.target.value); if (errors.category) setErrors(p => ({...p, category: undefined})); }} 
+                    required 
+                    className={`w-full p-2 border rounded-lg bg-light-background dark:bg-dark-background outline-none ${
+                        errors.category 
+                        ? 'border-brand-red focus:ring-brand-red' 
+                        : 'border-black/10 dark:border-white/10 focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary'
+                    }`}
+                />
+                {errors.category && <p className="text-sm text-brand-red mt-1">{errors.category}</p>}
             </div>
             <div>
                 <label className="block text-sm font-medium mb-1">{t('amount')}</label>
-                <input type="number" step="any" value={amount} onChange={e => setAmount(e.target.value)} required className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none" />
+                <input 
+                    type="number" 
+                    step="any" 
+                    value={amount} 
+                    onChange={e => { setAmount(e.target.value); if (errors.amount) setErrors(p => ({...p, amount: undefined})); }} 
+                    required 
+                    className={`w-full p-2 border rounded-lg bg-light-background dark:bg-dark-background outline-none ${
+                        errors.amount 
+                        ? 'border-brand-red focus:ring-brand-red' 
+                        : 'border-black/10 dark:border-white/10 focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary'
+                    }`}
+                />
+                {errors.amount && <p className="text-sm text-brand-red mt-1">{errors.amount}</p>}
             </div>
             <div>
                 <label className="block text-sm font-medium mb-1">{t('date')}</label>
@@ -55,5 +101,3 @@ const CashEntryForm: React.FC<CashEntryFormProps> = ({ entry, onSave, onCancel }
         </form>
     )
 }
-
-export default CashEntryForm;

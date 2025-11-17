@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useLocalization } from '../context/LocalizationContext';
-import { useData } from '../context/DataContext';
-import type { Screen, LedgerEntryType } from '../types';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../db';
+import { calculatePersonBalance } from '../utils/calculations';
+import type { Screen, LedgerFlowType } from '../types';
+import { TransactionType } from '../types';
 import { FilePlus2, CreditCard, PlusCircle, Scale, ArrowDownCircle, ArrowUpCircle } from 'lucide-react';
 
 
@@ -49,12 +52,53 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, Icon, colorClass }) =
 interface HomeScreenProps {
     setActiveScreen: (screen: Screen) => void;
     onAddCashEntry: () => void;
-    onAddLedgerEntry: (type: LedgerEntryType) => void;
+    onAddLedgerEntry: (type: LedgerFlowType) => void;
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ setActiveScreen, onAddCashEntry, onAddLedgerEntry }) => {
     const { t } = useLocalization();
-    const { homeScreenTotals } = useData();
+    const persons = useLiveQuery(() => db.persons.toArray(), []) || [];
+    const transactions = useLiveQuery(() => db.transactions.toArray(), []) || [];
+
+    const homeScreenTotals = useMemo(() => {
+        let totalReceivable = 0;
+        let totalPayable = 0;
+
+        persons.forEach(person => {
+            const balance = calculatePersonBalance(person, transactions);
+            if (balance > 0) {
+                if (person.role === 'customer') {
+                    totalReceivable += balance;
+                } else if (person.role === 'supplier') {
+                    totalPayable += balance;
+                }
+            }
+        });
+        
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        let monthlyIncome = 0;
+        let monthlyExpense = 0;
+
+        const incomeTypes = [TransactionType.CASH_SALE, TransactionType.PAYMENT_RECEIVED, TransactionType.CASH_INCOME];
+        const expenseTypes = [TransactionType.PAYMENT_MADE, TransactionType.CASH_EXPENSE];
+
+        transactions.forEach(t => {
+            const entryDate = new Date(t.date);
+            if (entryDate.getMonth() === currentMonth && entryDate.getFullYear() === currentYear) {
+                if (incomeTypes.includes(t.type)) {
+                    monthlyIncome += t.amount;
+                } else if (expenseTypes.includes(t.type)) {
+                    monthlyExpense += t.amount;
+                }
+            }
+        });
+
+        return { totalReceivable, totalPayable, monthlyIncome, monthlyExpense };
+    }, [persons, transactions]);
+
     const { totalReceivable, totalPayable, monthlyIncome, monthlyExpense } = homeScreenTotals;
 
     return (
