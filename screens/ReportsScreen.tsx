@@ -145,7 +145,7 @@ const PersonStatementReport: React.FC<{ onBack: () => void }> = ({ onBack }) => 
     return (
         <div className="space-y-4">
              <div className="flex items-center gap-2">
-                <button onClick={onBack} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5"><ArrowLeft/></button>
+                <button onClick={onBack} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('back')}><ArrowLeft/></button>
                 <h2 className="text-xl font-bold">{t('personStatement')}</h2>
             </div>
             <div className="p-4 bg-light-surface dark:bg-dark-surface rounded-lg ring-1 ring-black/5 dark:ring-white/10 space-y-3">
@@ -197,7 +197,7 @@ const CashFlowReport: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     return (
         <div className="space-y-4">
             <div className="flex items-center gap-2">
-                <button onClick={onBack} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5"><ArrowLeft/></button>
+                <button onClick={onBack} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('back')}><ArrowLeft/></button>
                 <h2 className="text-xl font-bold">{t('cashFlowReport')}</h2>
             </div>
             <DateRangePicker startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} />
@@ -271,7 +271,7 @@ const DataExportReport: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     return (
         <div className="space-y-4">
             <div className="flex items-center gap-2">
-                <button onClick={onBack} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5"><ArrowLeft/></button>
+                <button onClick={onBack} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('back')}><ArrowLeft/></button>
                 <h2 className="text-xl font-bold">{t('fullDataExport')}</h2>
             </div>
              <div className="p-4 bg-light-surface dark:bg-dark-surface rounded-lg ring-1 ring-black/5 dark:ring-white/10 space-y-3">

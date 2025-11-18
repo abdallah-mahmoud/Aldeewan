@@ -82,7 +82,7 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ transaction, 
                 </p>
             </div>
             <div className="relative">
-                <button onClick={() => setMenuOpen(p => !p)} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5">
+                <button onClick={() => setMenuOpen(p => !p)} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('transaction_options')}>
                     <MoreVertical className="w-5 h-5 text-light-on-surface-secondary dark:text-dark-on-surface-secondary"/>
                 </button>
                 {menuOpen && (
@@ -404,7 +404,7 @@ const PersonDetailView: React.FC<PersonDetailViewProps> = ({ person, balance, on
         <div className="space-y-4">
             <div className="flex items-start justify-between">
                 <div className="flex items-center gap-4">
-                    <button onClick={onBack} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5"><ArrowLeft/></button>
+                    <button onClick={onBack} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('back')}><ArrowLeft/></button>
                     <div>
                         <h1 className="text-xl font-bold text-light-on-surface dark:text-dark-on-surface">{person.name}</h1>
                         <p className="text-sm text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{t('ledgerOf')} {t(person.role)}</p>

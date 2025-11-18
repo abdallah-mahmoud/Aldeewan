@@ -55,7 +55,7 @@ const TransactionListItem: React.FC<{ transaction: Transaction; onEdit: (transac
             <div className="flex items-center gap-2">
                 <p className={`font-bold text-lg ${amountColor}`}>{formatCurrency(transaction.amount)}</p>
                  <div className="relative">
-                    <button onClick={() => setMenuOpen(p => !p)} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5">
+                    <button onClick={() => setMenuOpen(p => !p)} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 " aria-label={t('transaction_options')}>
                         <MoreVertical className="w-5 h-5 text-light-on-surface-secondary dark:text-dark-on-surface-secondary"/>
                     </button>
                     {menuOpen && (
@@ -285,15 +285,21 @@ const CashbookScreen: React.FC = () => {
             <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="bg-light-surface dark:bg-dark-surface ring-1 ring-black/5 dark:ring-white/10 p-3 rounded-lg">
                     <p className="text-xs text-light-on-surface-secondary dark:text-dark-on-surface-secondary truncate">{t('totalIncome')}</p>
-                    <p className="text-xl font-bold text-brand-green">{formatCurrency(totalIncome)}</p>
+                    <p className={`font-bold text-brand-green ${formatCurrency(totalIncome).length > 10 ? 'text-lg' : 'text-xl'}`}>
+    {formatCurrency(totalIncome)}
+</p>
                 </div>
                 <div className="bg-light-surface dark:bg-dark-surface ring-1 ring-black/5 dark:ring-white/10 p-3 rounded-lg">
                     <p className="text-xs text-light-on-surface-secondary dark:text-dark-on-surface-secondary truncate">{t('totalExpense')}</p>
-                    <p className="text-xl font-bold text-brand-red">{formatCurrency(totalExpense)}</p>
+                    <p className={`font-bold text-brand-red ${formatCurrency(totalExpense).length > 10 ? 'text-lg' : 'text-xl'}`}>
+    {formatCurrency(totalExpense)}
+</p>
                 </div>
                 <div className="bg-light-surface dark:bg-dark-surface ring-1 ring-black/5 dark:ring-white/10 p-3 rounded-lg">
                     <p className="text-xs text-light-on-surface-secondary dark:text-dark-on-surface-secondary truncate">{t('netFlow')}</p>
-                    <p className={`text-xl font-bold ${netFlow >= 0 ? 'text-light-primary dark:text-dark-primary' : 'text-orange-500'}`}>{formatCurrency(netFlow)}</p>
+                    <p className={`font-bold ${netFlow >= 0 ? 'text-light-primary dark:text-dark-primary' : 'text-orange-500'} ${formatCurrency(netFlow).length > 10 ? 'text-lg' : 'text-xl'}`}>
+    {formatCurrency(netFlow)}
+</p>
                 </div>
             </div>
 
@@ -334,7 +340,7 @@ const CashbookScreen: React.FC = () => {
                 )}
             </div>
 
-            <button onClick={() => handleOpenForm(null)} className="fixed bottom-24 end-4 bg-light-primary dark:bg-dark-primary hover:opacity-90 text-white dark:text-dark-background rounded-full p-4 shadow-lg z-10 transition-transform hover:scale-110">
+            <button onClick={() => handleOpenForm(null)} className="fixed bottom-24 end-4 bg-light-primary dark:bg-dark-primary hover:opacity-90 text-white dark:text-dark-background rounded-full p-4 shadow-lg z-10 transition-transform hover:scale-110" aria-label={t('add_cash_entry')}>
                 <Plus className="w-6 h-6" />
             </button>
             

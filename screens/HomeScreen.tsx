@@ -35,6 +35,16 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ label, value, Icon, colorClass }) => {
     const { formatCurrency } = useLocalization();
+    const formattedValue = formatCurrency(value);
+    
+    // Determine text size based on length to prevent wrapping
+    let valueTextSize = 'text-xl';
+    if (formattedValue.length > 15) {
+        valueTextSize = 'text-base'; // For very long numbers
+    } else if (formattedValue.length > 10) {
+        valueTextSize = 'text-lg'; // For medium numbers
+    }
+
     return (
         <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-lg flex items-center space-x-3 rtl:space-x-reverse ring-1 ring-black/5 dark:ring-white/10">
             <div className={`p-2 rounded-full bg-opacity-10 ${colorClass.replace('text-', 'bg-')}`}>
@@ -42,7 +52,7 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, Icon, colorClass }) =
             </div>
             <div>
                 <p className="text-sm text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{label}</p>
-                <p className="text-xl font-bold text-light-on-surface dark:text-dark-on-surface">{formatCurrency(value)}</p>
+                <p className={`${valueTextSize} font-bold text-light-on-surface dark:text-dark-on-surface`}>{formattedValue}</p>
             </div>
         </div>
     );
