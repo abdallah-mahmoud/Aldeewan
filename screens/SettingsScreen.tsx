@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useLocalization } from '../context/LocalizationContext';
 import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../context/ToastContext';
@@ -24,10 +24,11 @@ const timezoneOptions = [
 
 interface SettingsScreenProps {
     setActiveScreen: (screen: Screen) => void;
+    setHeaderTitle: (title: string) => void;
 }
 
-const SettingsScreen: React.FC<SettingsScreenProps> = ({ setActiveScreen }) => {
-    const { t, appCurrency, setAppCurrency, appTimezone, setAppTimezone } = useLocalization();
+const SettingsScreen: React.FC<SettingsScreenProps> = ({ setActiveScreen, setHeaderTitle }) => {
+    const { t, language, setLanguage, appCurrency, setAppCurrency, appTimezone, setAppTimezone } = useLocalization();
     const { theme, setTheme } = useTheme();
     const { showToast } = useToast();
 
@@ -108,9 +109,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ setActiveScreen }) => {
     };
 
 
+    useEffect(() => {
+    setHeaderTitle(t('settings'));
+}, [setHeaderTitle, t]);
+
     return (
         <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-light-on-surface dark:text-dark-on-surface">{t('settings')}</h1>
+           
             
             <div className="bg-light-surface dark:bg-dark-surface rounded-lg shadow-sm p-4 ring-1 ring-black/5 dark:ring-white/10">
                 <h2 className="text-lg font-semibold mb-3 text-light-on-surface dark:text-dark-on-surface">{t('theme')}</h2>
@@ -132,6 +137,35 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ setActiveScreen }) => {
                     ))}
                 </div>
             </div>
+            {/* --- Start of New Language Settings Block --- */}
+<div className="bg-light-surface dark:bg-dark-surface rounded-lg shadow-sm p-4 ring-1 ring-black/5 dark:ring-white/10">
+    <h2 id="language-group-label" className="text-lg font-semibold mb-3 text-light-on-surface dark:text-dark-on-surface">Language / اللغة</h2>
+    <div role="group" aria-labelledby="language-group-label" className="flex flex-row space-x-2 rtl:space-x-reverse bg-light-background dark:bg-dark-background p-1 rounded-lg">
+        <button
+            onClick={() => setLanguage('ar')}
+            className={`w-full py-2 px-4 rounded-md font-semibold transition-colors ${
+                language === 'ar'
+                    ? 'bg-light-primary dark:bg-dark-primary text-white dark:text-dark-background shadow'
+                    : 'hover:bg-black/5 dark:hover:bg-white/5 text-light-on-surface-secondary dark:text-dark-on-surface-secondary'
+            }`}
+            aria-pressed={(language === 'ar').toString()}
+        >
+            العربية
+        </button>
+        <button
+            onClick={() => setLanguage('en')}
+            className={`w-full py-2 px-4 rounded-md font-semibold transition-colors ${
+                language === 'en'
+                    ? 'bg-light-primary dark:bg-dark-primary text-white dark:text-dark-background shadow'
+                    : 'hover:bg-black/5 dark:hover:bg-white/5 text-light-on-surface-secondary dark:text-dark-on-surface-secondary'
+            }`}
+            aria-pressed={(language === 'en').toString()}
+        >
+            English
+        </button>
+    </div>
+</div>
+{/* --- End of New Language Settings Block --- */}
 
              <div className="bg-light-surface dark:bg-dark-surface rounded-lg shadow-sm p-4 ring-1 ring-black/5 dark:ring-white/10">
                 <h2 className="text-lg font-semibold mb-3 text-light-on-surface dark:text-dark-on-surface">{t('currency')}</h2>

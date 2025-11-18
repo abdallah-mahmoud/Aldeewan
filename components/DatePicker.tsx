@@ -4,11 +4,13 @@ interface DatePickerProps {
     value: string; // Expects 'YYYY-MM-DD'
     onChange: (value: string) => void;
     required?: boolean;
+    id?: string;
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ value, onChange, required = false }) => {
+const DatePicker: React.FC<DatePickerProps> = ({ value, onChange, required = false, id }) => {
     return (
         <input
+        id={id}
             type="date"
             value={value}
             onChange={(e) => onChange(e.target.value)}

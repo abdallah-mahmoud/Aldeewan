@@ -48,15 +48,17 @@ const PersonListItem: React.FC<{ person: Person, balance: number, onClick: () =>
     );
 };
 
+// --- Correct replacement for LedgerScreen.tsx ---
 interface TransactionListItemProps {
     transaction: Transaction;
     runningBalance: number;
     onEdit: (transaction: Transaction) => void;
     onDelete: (id: string) => void;
+    isMenuOpen: boolean;
+    onToggleMenu: () => void;
 }
-const TransactionListItem: React.FC<TransactionListItemProps> = ({ transaction, runningBalance, onEdit, onDelete }) => {
+const TransactionListItem: React.FC<TransactionListItemProps> = ({ transaction, runningBalance, onEdit, onDelete, isMenuOpen, onToggleMenu }) => {
     const { t, formatCurrency, formatDate } = useLocalization();
-    const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
     const debitTypes = [TransactionType.SALE_ON_CREDIT, TransactionType.PURCHASE_ON_CREDIT];
@@ -66,12 +68,14 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ transaction, 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                setMenuOpen(false);
+                onToggleMenu();
             }
         };
-        document.addEventListener("mousedown", handleClickOutside);
+        if (isMenuOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+    }, [isMenuOpen, onToggleMenu]);
 
     return (
         <div className="bg-light-surface dark:bg-dark-surface rounded-lg shadow-sm p-3 flex items-center justify-between ring-1 ring-black/5 dark:ring-white/10">
@@ -84,13 +88,13 @@ const TransactionListItem: React.FC<TransactionListItemProps> = ({ transaction, 
                 </p>
             </div>
             <div className="relative">
-                <button onClick={() => setMenuOpen(p => !p)} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('transaction_options')}>
+                <button onClick={onToggleMenu} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('transaction_options')}>
                     <MoreVertical className="w-5 h-5 text-light-on-surface-secondary dark:text-dark-on-surface-secondary"/>
                 </button>
-                {menuOpen && (
+                {isMenuOpen && (
                     <div ref={menuRef} className="absolute top-full end-0 mt-1 w-40 bg-light-surface dark:bg-dark-surface rounded-md shadow-lg ring-1 ring-black/5 dark:ring-white/10 z-20">
-                        <button onClick={() => { onEdit(transaction); setMenuOpen(false); }} className="w-full text-start flex items-center gap-2 px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5"><Edit className="w-4 h-4" /> {t('edit')}</button>
-                        <button onClick={() => { onDelete(transaction.id); setMenuOpen(false); }} className="w-full text-start flex items-center gap-2 px-3 py-2 text-sm text-brand-red hover:bg-black/5 dark:hover:bg-white/5"><Trash2 className="w-4 h-4" /> {t('delete')}</button>
+                        <button onClick={() => { onEdit(transaction); onToggleMenu(); }} className="w-full text-start flex items-center gap-2 px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5"><Edit className="w-4 h-4" /> {t('edit')}</button>
+                        <button onClick={() => { onDelete(transaction.id); onToggleMenu(); }} className="w-full text-start flex items-center gap-2 px-3 py-2 text-sm text-brand-red hover:bg-black/5 dark:hover:bg-white/5"><Trash2 className="w-4 h-4" /> {t('delete')}</button>
                     </div>
                 )}
             </div>
@@ -114,9 +118,11 @@ const FilterButton: React.FC<{ label: string; isActive: boolean; onClick: () => 
 interface LedgerScreenProps {
     selectedPersonId: string | null;
     setSelectedPersonId: (id: string | null) => void;
+    setHeaderTitle: (title: string) => void; 
 }
 
-const LedgerScreen: React.FC<LedgerScreenProps> = ({ selectedPersonId, setSelectedPersonId }) => {
+const LedgerScreen: React.FC<LedgerScreenProps> = ({ selectedPersonId, setSelectedPersonId, setHeaderTitle }) => {
+    
     const { t } = useLocalization();
     const { addPerson } = useData();
     const { showToast } = useToast();
@@ -171,6 +177,15 @@ const LedgerScreen: React.FC<LedgerScreenProps> = ({ selectedPersonId, setSelect
         setIsAddPersonModalOpen(false);
         showToast(t('toast_person_added'), 'success');
     };
+    // Add this block inside the LedgerScreen component
+useEffect(() => {
+    const person = persons.find(p => p.id === selectedPersonId);
+    if (person) {
+        setHeaderTitle(`${t('ledgerOf')} ${person.name}`);
+    } else {
+        setHeaderTitle(t('customersAndSuppliers'));
+    }
+}, [selectedPersonId, persons, setHeaderTitle, t]);
     
     // Virtualization for main list
     const parentRef = useRef<HTMLDivElement>(null);
@@ -192,7 +207,7 @@ const LedgerScreen: React.FC<LedgerScreenProps> = ({ selectedPersonId, setSelect
 
     return (
         <div className="space-y-4">
-            <h1 className="text-2xl font-bold text-light-on-surface dark:text-dark-on-surface">{t('customersAndSuppliers')}</h1>
+           
             <div className="relative">
                  <input
                     type="text"
@@ -273,6 +288,7 @@ interface PersonDetailViewProps {
     onBack: () => void;
 }
 const PersonDetailView: React.FC<PersonDetailViewProps> = ({ person, balance, onBack }) => {
+    const [openMenuId, setOpenMenuId] = useState<string | null>(null);
     const { t, formatCurrency, formatDate } = useLocalization();
     const { addTransaction, updateTransaction, deleteTransaction } = useData();
     const { showToast } = useToast();
@@ -370,13 +386,9 @@ const PersonDetailView: React.FC<PersonDetailViewProps> = ({ person, balance, on
     return (
         <div className="space-y-4">
             <div className="flex items-start justify-between">
-                <div className="flex items-center gap-4">
-                    <button onClick={onBack} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('back')}><ArrowLeft/></button>
-                    <div>
-                        <h1 className="text-xl font-bold text-light-on-surface dark:text-dark-on-surface">{person.name}</h1>
-                        <p className="text-sm text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{t('ledgerOf')} {t(person.role)}</p>
-                    </div>
-                </div>
+                <div className="mb-4"> {/* We keep a div for spacing */}
+    <p className="text-sm text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{t('ledgerOf')} {t(person.role)}</p>
+</div>
                  <div className="flex items-center gap-2">
                     <button onClick={handleShareStatement} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('share')}>
                         <Share2 className="w-5 h-5 text-light-on-surface-secondary dark:text-dark-on-surface-secondary"/>
@@ -394,28 +406,40 @@ const PersonDetailView: React.FC<PersonDetailViewProps> = ({ person, balance, on
                  ) : (
                      <div style={{ height: `${txVirtualizer.getTotalSize()}px`, width: '100%', position: 'relative' }}>
                         {txVirtualizer.getVirtualItems().map(virtualItem => {
-                            const txWithBalance = personTransactionsWithBalance[virtualItem.index];
-                            return (
-                                <div 
-                                    key={virtualItem.key}
-                                    style={{
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 0,
-                                        width: '100%',
-                                        transform: `translateY(${virtualItem.start}px)`,
-                                        paddingBottom: '0.75rem',
-                                    }}
-                                >
-                                    <TransactionListItem 
-                                        transaction={txWithBalance} 
-                                        runningBalance={txWithBalance.runningBalance}
-                                        onEdit={setEditingTransaction} 
-                                        onDelete={setDeletingTransactionId} 
-                                    />
-                                </div>
-                            )
-                        })}
+    const txWithBalance = personTransactionsWithBalance[virtualItem.index];
+    
+    // --- START: Added Logic ---
+    const isMenuOpen = openMenuId === txWithBalance.id;
+    const handleToggleMenu = () => {
+        setOpenMenuId(isMenuOpen ? null : txWithBalance.id);
+    };
+    // --- END: Added Logic ---
+
+    return (
+        <div 
+            key={virtualItem.key}
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualItem.start}px)`,
+                paddingBottom: '0.75rem',
+                zIndex: isMenuOpen ? 10 : 1, // <-- THE FIX IS HERE
+            }}
+        >
+            <TransactionListItem 
+                transaction={txWithBalance} 
+                runningBalance={txWithBalance.runningBalance}
+                onEdit={setEditingTransaction} 
+                onDelete={setDeletingTransactionId}
+                // --- Pass the new props down ---
+                isMenuOpen={isMenuOpen}
+                onToggleMenu={handleToggleMenu}
+            />
+        </div>
+    )
+})}
                      </div>
                  )}
             </div>
@@ -489,8 +513,8 @@ const PersonTransactionForm: React.FC<PersonTransactionFormProps> = ({ transacti
     return (
         <form onSubmit={handleSubmit} className="space-y-4 p-4">
             <div>
-                <label className="block text-sm font-medium mb-1">{t('type')}</label>
-                <select value={type} onChange={e => setType(e.target.value as TransactionType)} className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none">
+                <label htmlFor="cash-entry-type" className="block text-sm font-medium mb-1">{t('type')}</label>
+                <select id="cash-entry-type" value={type} onChange={e => setType(e.target.value as TransactionType)} className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none">
                     {person.role === PersonRole.CUSTOMER ? (
                         <>
                             <option value={TransactionType.SALE_ON_CREDIT}>{t('sale_on_credit')}</option>
@@ -505,8 +529,8 @@ const PersonTransactionForm: React.FC<PersonTransactionFormProps> = ({ transacti
                 </select>
             </div>
             <div>
-                <label className="block text-sm font-medium mb-1">{t('amount')}</label>
-                <input 
+                <label htmlFor="ledger-entry-amount" className="block text-sm font-medium mb-1">{t('amount')}</label>
+                <input id="ledger-entry-amount" 
                     type="number" 
                     step="any" 
                     value={amount} 
@@ -521,18 +545,18 @@ const PersonTransactionForm: React.FC<PersonTransactionFormProps> = ({ transacti
                  {amountError && <p className="text-sm text-brand-red mt-1">{amountError}</p>}
             </div>
             <div>
-                <label className="block text-sm font-medium mb-1">{t('date')}</label>
-                <DatePicker value={date} onChange={setDate} required />
+                <label htmlFor="transaction-date" className="block text-sm font-medium mb-1">{t('date')}</label>
+                <DatePicker id="transaction-date" value={date} onChange={setDate} required />
             </div>
             {isCreditType && (
                 <div>
-                    <label className="block text-sm font-medium mb-1">{t('dueDate')} ({t('note')})</label>
-                    <DatePicker value={dueDate} onChange={setDueDate} />
+                    <label htmlFor="transaction-due-date" className="block text-sm font-medium mb-1">{t('dueDate')} ({t('note')})</label>
+                    <DatePicker id="transaction-due-date" value={dueDate} onChange={setDueDate} />
                 </div>
             )}
             <div>
-                <label className="block text-sm font-medium mb-1">{t('note')}</label>
-                <textarea value={note} onChange={e => setNote(e.target.value)} rows={2} className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none" />
+                <label htmlFor="ledger-entry-note" className="block text-sm font-medium mb-1">{t('note')}</label>
+                <textarea id="ledger-entry-note" value={note} onChange={e => setNote(e.target.value)} rows={2} className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none" />
             </div>
             <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={onCancel} className="px-4 py-2 rounded-lg font-semibold hover:bg-black/5 dark:hover:bg-white/5">{t('cancel')}</button>

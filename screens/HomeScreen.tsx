@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useLocalization } from '../context/LocalizationContext';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
@@ -11,7 +11,7 @@ import { FilePlus2, CreditCard, PlusCircle, Scale, ArrowDownCircle, ArrowUpCircl
 interface ActionButtonProps {
     label: string;
     Icon: React.ElementType;
-    onClick: () => void;
+    onClick: () => void; 
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({ label, Icon, onClick }) => (
@@ -59,9 +59,10 @@ interface HomeScreenProps {
     setActiveScreen: (screen: Screen) => void;
     onAddCashEntry: () => void;
     onAddLedgerEntry: (type: LedgerFlowType) => void;
+     setHeaderTitle: (title: string) => void;
 }
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ setActiveScreen, onAddCashEntry, onAddLedgerEntry }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ setActiveScreen, onAddCashEntry, onAddLedgerEntry, setHeaderTitle }) => {
     const { t } = useLocalization();
     const persons = useLiveQuery(() => db.persons.toArray(), []) || [];
     const transactions = useLiveQuery(() => db.transactions.toArray(), []) || [];
@@ -106,6 +107,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setActiveScreen, onAddCashEntry
     }, [persons, transactions]);
 
     const { totalReceivable, totalPayable, monthlyIncome, monthlyExpense } = homeScreenTotals;
+    useEffect(() => {
+    setHeaderTitle(t('home'));
+}, [setHeaderTitle, t]);
 
     return (
         <div className="space-y-6">

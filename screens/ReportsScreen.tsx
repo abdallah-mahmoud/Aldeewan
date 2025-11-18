@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocalization } from '../context/LocalizationContext';
 import { useData } from '../context/DataContext';
 import { useToast } from '../context/ToastContext';
@@ -67,12 +67,12 @@ const DateRangePicker: React.FC<{ startDate: string, setStartDate: (d: string) =
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-medium mb-1">{t('startDate')}</label>
-                    <DatePicker value={startDate} onChange={setStartDate} required />
+                    <label htmlFor="report-start-date" className="block text-sm font-medium mb-1">{t('startDate')}</label>
+                    <DatePicker id="report-start-date" value={startDate} onChange={setStartDate} required />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium mb-1">{t('endDate')}</label>
-                    <DatePicker value={endDate} onChange={setEndDate} required />
+                    <label htmlFor="report-end-date" className="block text-sm font-medium mb-1">{t('endDate')}</label>
+                    <DatePicker id="report-end-date" value={endDate} onChange={setEndDate} required />
                 </div>
             </div>
         </div>
@@ -158,13 +158,10 @@ const PersonStatementReport: React.FC<{ onBack: () => void }> = ({ onBack }) => 
 
     return (
         <div className="space-y-4">
-             <div className="flex items-center gap-2">
-                <button onClick={onBack} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('back')}><ArrowLeft/></button>
-                <h2 className="text-xl font-bold">{t('personStatement')}</h2>
-            </div>
+             
             <div className="p-4 bg-light-surface dark:bg-dark-surface rounded-lg ring-1 ring-black/5 dark:ring-white/10 space-y-3">
-                <label className="block text-sm font-medium">{t('selectPerson')}</label>
-                 <select value={personId} onChange={e => setPersonId(e.target.value)} required className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none">
+                <label htmlFor="person-statement-select" className="block text-sm font-medium">{t('selectPerson')}</label>
+                 <select id="person-statement-select" value={personId} onChange={e => setPersonId(e.target.value)} required className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none">
                     <option value="" disabled>{`-- ${t('selectPerson')} --`}</option>
                     {persons.map(p => <option key={p.id} value={p.id}>{p.name} ({t(p.role)})</option>)}
                 </select>
@@ -210,10 +207,7 @@ const CashFlowReport: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center gap-2">
-                <button onClick={onBack} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('back')}><ArrowLeft/></button>
-                <h2 className="text-xl font-bold">{t('cashFlowReport')}</h2>
-            </div>
+            
             <DateRangePicker startDate={startDate} setStartDate={setStartDate} endDate={endDate} setEndDate={setEndDate} />
             <button onClick={generateReport} className="w-full py-3 px-4 rounded-lg font-semibold bg-light-primary dark:bg-dark-primary text-white dark:text-dark-background hover:opacity-90">{t('generate')}</button>
             
@@ -284,10 +278,7 @@ const DataExportReport: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 
     return (
         <div className="space-y-4">
-            <div className="flex items-center gap-2">
-                <button onClick={onBack} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('back')}><ArrowLeft/></button>
-                <h2 className="text-xl font-bold">{t('fullDataExport')}</h2>
-            </div>
+            
              <div className="p-4 bg-light-surface dark:bg-dark-surface rounded-lg ring-1 ring-black/5 dark:ring-white/10 space-y-3">
                  <button onClick={exportAllTransactions} className="w-full flex items-center justify-center gap-2 bg-black/5 dark:bg-white/5 font-bold py-3 px-4 rounded-lg hover:bg-black/10 dark:hover:bg-white/10">
                     <Sheet className="w-5 h-5" />
@@ -307,11 +298,22 @@ const DataExportReport: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 interface ReportsScreenProps {
     activeReport: ReportType | null;
     setActiveReport: (report: ReportType | null) => void;
+    setHeaderTitle: (title: string) => void;
 }
 
-const ReportsScreen: React.FC<ReportsScreenProps> = ({ activeReport, setActiveReport }) => {
+const ReportsScreen: React.FC<ReportsScreenProps> = ({ activeReport, setActiveReport, setHeaderTitle }) => {
     const { t } = useLocalization();
-
+    useEffect(() => {
+    if (activeReport === 'person') {
+        setHeaderTitle(t('personStatement'));
+    } else if (activeReport === 'cashflow') {
+        setHeaderTitle(t('cashFlowReport'));
+    } else if (activeReport === 'export') {
+        setHeaderTitle(t('fullDataExport'));
+    } else {
+        setHeaderTitle(t('generateReports'));
+    }
+}, [activeReport, setHeaderTitle, t]);
     if (activeReport === 'person') {
         return <PersonStatementReport onBack={() => setActiveReport(null)} />;
     }
@@ -324,7 +326,7 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ activeReport, setActiveRe
 
     return (
         <div className="space-y-4">
-            <h1 className="text-2xl font-bold text-light-on-surface dark:text-dark-on-surface">{t('generateReports')}</h1>
+            
              <p className="text-light-on-surface-secondary dark:text-dark-on-surface-secondary">
                 {t('selectReportType')}
             </p>

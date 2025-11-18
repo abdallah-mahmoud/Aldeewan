@@ -89,8 +89,8 @@ export const PersonTransactionForm: React.FC<PersonTransactionFormProps> = ({ fl
                     </select>
                 </div>
                 <div>
-                    <label className="block text-sm font-medium mb-1">{t('amount')}</label>
-                    <input 
+                    <label htmlFor="ledger-entry-amount" className="block text-sm font-medium mb-1">{t('amount')}</label>
+                    <input id="ledger-entry-amount"
                         type="number" 
                         step="any" 
                         value={amount} 
@@ -105,12 +105,12 @@ export const PersonTransactionForm: React.FC<PersonTransactionFormProps> = ({ fl
                     {amountError && <p className="text-sm text-brand-red mt-1">{amountError}</p>}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium mb-1">{t('date')}</label>
-                    <DatePicker value={date} onChange={setDate} required />
+                    <label htmlFor="ledger-entry-date" className="block text-sm font-medium mb-1">{t('date')}</label>
+                    <DatePicker id="ledger-entry-date" value={date} onChange={setDate} required />
                 </div>
                 <div>
-                    <label className="block text-sm font-medium mb-1">{t('note')}</label>
-                    <textarea value={note} onChange={e => setNote(e.target.value)} rows={2} className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none" />
+                    <label htmlFor="ledger-entry-note" className="block text-sm font-medium mb-1">{t('note')}</label>
+                    <textarea id="ledger-entry-note" value={note} onChange={e => setNote(e.target.value)} rows={2} className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none" />
                 </div>
                 <div className="flex justify-end gap-2 pt-2">
                     <button type="button" onClick={onCancel} className="px-4 py-2 rounded-lg font-semibold hover:bg-black/5 dark:hover:bg-white/5">{t('cancel')}</button>

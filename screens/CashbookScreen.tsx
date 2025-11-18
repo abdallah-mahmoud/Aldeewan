@@ -14,13 +14,24 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { useVirtualizer } from '@tanstack/react-virtual';
 
+interface CashbookScreenProps {
+    setHeaderTitle: (title: string) => void;
+}
 const incomeTypes = [TransactionType.CASH_SALE, TransactionType.PAYMENT_RECEIVED, TransactionType.CASH_INCOME];
 const expenseTypes = [TransactionType.PAYMENT_MADE, TransactionType.CASH_EXPENSE];
 const cashTypes = [...incomeTypes, ...expenseTypes];
 
-const TransactionListItem: React.FC<{ transaction: Transaction; onEdit: (transaction: Transaction) => void; onDelete: (id: string) => void; }> = ({ transaction, onEdit, onDelete }) => {
+// --- Correct replacement for CashbookScreen.tsx ---
+interface TransactionListItemProps {
+    transaction: Transaction;
+    onEdit: () => void;
+    onDelete: () => void;
+    isMenuOpen: boolean;
+    onToggleMenu: () => void;
+}
+
+const TransactionListItem: React.FC<TransactionListItemProps> = ({ transaction, onEdit, onDelete, isMenuOpen, onToggleMenu }) => {
     const { t, formatCurrency, formatDate } = useLocalization();
-    const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     
     const isIncome = incomeTypes.includes(transaction.type);
@@ -32,12 +43,14 @@ const TransactionListItem: React.FC<{ transaction: Transaction; onEdit: (transac
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-                setMenuOpen(false);
+                onToggleMenu();
             }
         };
-        document.addEventListener("mousedown", handleClickOutside);
+        if (isMenuOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
         return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+    }, [isMenuOpen, onToggleMenu]);
 
     const title = transaction.category || t(transaction.type);
 
@@ -55,13 +68,13 @@ const TransactionListItem: React.FC<{ transaction: Transaction; onEdit: (transac
             <div className="flex items-center gap-2">
                 <p className={`font-bold text-lg ${amountColor}`}>{formatCurrency(transaction.amount)}</p>
                  <div className="relative">
-                    <button onClick={() => setMenuOpen(p => !p)} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 " aria-label={t('transaction_options')}>
+                    <button onClick={onToggleMenu} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('transaction_options')}>
                         <MoreVertical className="w-5 h-5 text-light-on-surface-secondary dark:text-dark-on-surface-secondary"/>
                     </button>
-                    {menuOpen && (
+                    {isMenuOpen && (
                         <div ref={menuRef} className="absolute top-full end-0 mt-1 w-32 bg-light-surface dark:bg-dark-surface rounded-md shadow-lg ring-1 ring-black/5 dark:ring-white/10 z-20">
-                            <button onClick={() => { onEdit(transaction); setMenuOpen(false); }} className="w-full text-start flex items-center gap-2 px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5"><Edit className="w-4 h-4" /> {t('edit')}</button>
-                            <button onClick={() => { onDelete(transaction.id); setMenuOpen(false); }} className="w-full text-start flex items-center gap-2 px-3 py-2 text-sm text-brand-red hover:bg-black/5 dark:hover:bg-white/5"><Trash2 className="w-4 h-4" /> {t('delete')}</button>
+                            <button onClick={() => { onEdit(); }} className="w-full text-start flex items-center gap-2 px-3 py-2 text-sm hover:bg-black/5 dark:hover:bg-white/5"><Edit className="w-4 h-4" /> {t('edit')}</button>
+                            <button onClick={() => { onDelete(); }} className="w-full text-start flex items-center gap-2 px-3 py-2 text-sm text-brand-red hover:bg-black/5 dark:hover:bg-white/5"><Trash2 className="w-4 h-4" /> {t('delete')}</button>
                         </div>
                     )}
                 </div>
@@ -84,7 +97,7 @@ const FilterButton: React.FC<{ label: string; isActive: boolean; onClick: () => 
 );
 
 
-const CashbookScreen: React.FC = () => {
+const CashbookScreen: React.FC<CashbookScreenProps> = ({ setHeaderTitle }) => {
     const { t, formatCurrency } = useLocalization();
     const { addTransaction, updateTransaction, deleteTransaction } = useData();
     const { showToast } = useToast();
@@ -109,7 +122,7 @@ const CashbookScreen: React.FC = () => {
         startDate: '',
         endDate: '',
     });
-
+const [openMenuId, setOpenMenuId] = useState<string | null>(null);
     useEffect(() => {
         handleFilterChange('searchTerm', debouncedSearchTerm);
     }, [debouncedSearchTerm]);
@@ -214,10 +227,14 @@ const CashbookScreen: React.FC = () => {
         overscan: 5,
     });
 
+    useEffect(() => {
+    setHeaderTitle(t('incomeAndExpenses'));
+}, [setHeaderTitle, t]);
+
     return (
         <div className="space-y-4">
             <div className="flex justify-between items-center">
-                 <h1 className="text-2xl font-bold text-light-on-surface dark:text-dark-on-surface">{t('incomeAndExpenses')}</h1>
+                 
                  <button 
                     onClick={() => setFilterPanelOpen(p => !p)} 
                     className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5 relative"
@@ -256,12 +273,12 @@ const CashbookScreen: React.FC = () => {
                          {filters.dateOption === 'custom' && (
                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3">
                                 <div>
-                                    <label className="block text-xs font-medium mb-1">{t('startDate')}</label>
-                                    <DatePicker value={filters.startDate} onChange={(v) => handleFilterChange('startDate', v)} required />
+                                    <label htmlFor="cashbook-filter-start-date" className="block text-xs font-medium mb-1">{t('startDate')}</label>
+                                    <DatePicker id="cashbook-filter-start-date" value={filters.startDate} onChange={(v) => handleFilterChange('startDate', v)} required />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium mb-1">{t('endDate')}</label>
-                                    <DatePicker value={filters.endDate} onChange={(v) => handleFilterChange('endDate', v)} required />
+                                    <label htmlFor="cashbook-filter-end-date" className="block text-xs font-medium mb-1">{t('endDate')}</label>
+                                    <DatePicker id="cashbook-filter-end-date" value={filters.endDate} onChange={(v) => handleFilterChange('endDate', v)} required />
                                 </div>
                             </div>
                          )}
@@ -320,19 +337,27 @@ const CashbookScreen: React.FC = () => {
                     <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, width: '100%', position: 'relative' }}>
                         {rowVirtualizer.getVirtualItems().map(virtualItem => {
                             const transaction = filteredCashTransactions[virtualItem.index];
-                            return (
-                                <div
-                                    key={virtualItem.key}
-                                    style={{
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 0,
-                                        width: '100%',
-                                        transform: `translateY(${virtualItem.start}px)`,
-                                        paddingBottom: '0.75rem',
+                            const isMenuOpen = openMenuId === transaction.id;
+    const handleToggleMenu = () => {
+        setOpenMenuId(isMenuOpen ? null : transaction.id);
+    };
+
+    return (
+        <div
+            key={virtualItem.key}
+            style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                transform: `translateY(${virtualItem.start}px)`,
+                paddingBottom: '0.75rem',
+                zIndex: isMenuOpen ? 10 : 1
                                     }}
                                 >
-                                    <TransactionListItem transaction={transaction} onEdit={() => handleOpenForm(transaction)} onDelete={() => setDeletingTransactionId(transaction.id)} />
+                                    <TransactionListItem transaction={transaction} onEdit={() => handleOpenForm(transaction)} onDelete={() => setDeletingTransactionId(transaction.id)} isMenuOpen={false} onToggleMenu={function (): void {
+                throw new Error('Function not implemented.');
+            } } />
                                 </div>
                             );
                         })}

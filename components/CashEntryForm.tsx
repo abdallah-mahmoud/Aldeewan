@@ -45,8 +45,8 @@ export const CashTransactionForm: React.FC<CashTransactionFormProps> = ({ entry,
     return (
         <form onSubmit={handleSubmit} className="space-y-4 p-4">
             <div>
-                <label className="block text-sm font-medium mb-1">{t('type')}</label>
-                <select 
+                <label htmlFor="cash-entry-type" className="block text-sm font-medium mb-1">{t('type')}</label>
+                <select id="cash-entry-type"
                     value={isIncome ? 'income' : 'expense'} 
                     onChange={e => setType(e.target.value === 'income' ? TransactionType.CASH_INCOME : TransactionType.CASH_EXPENSE)} 
                     className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none"
@@ -56,8 +56,8 @@ export const CashTransactionForm: React.FC<CashTransactionFormProps> = ({ entry,
                 </select>
             </div>
             <div>
-                <label className="block text-sm font-medium mb-1">{t('category')}</label>
-                <input 
+                <label htmlFor="cash-entry-category" className="block text-sm font-medium mb-1">{t('category')}</label>
+                <input id="cash-entry-category"
                     type="text" 
                     value={category} 
                     onChange={e => { setCategory(e.target.value); if (errors.category) setErrors(p => ({...p, category: undefined})); }} 
@@ -71,8 +71,8 @@ export const CashTransactionForm: React.FC<CashTransactionFormProps> = ({ entry,
                 {errors.category && <p className="text-sm text-brand-red mt-1">{errors.category}</p>}
             </div>
             <div>
-                <label className="block text-sm font-medium mb-1">{t('amount')}</label>
-                <input 
+                <label htmlFor="cash-entry-amount" className="block text-sm font-medium mb-1">{t('amount')}</label>
+                <input id="cash-entry-amount"
                     type="number" 
                     step="any" 
                     value={amount} 
@@ -87,12 +87,12 @@ export const CashTransactionForm: React.FC<CashTransactionFormProps> = ({ entry,
                 {errors.amount && <p className="text-sm text-brand-red mt-1">{errors.amount}</p>}
             </div>
             <div>
-                <label className="block text-sm font-medium mb-1">{t('date')}</label>
-                <DatePicker value={date} onChange={setDate} required />
+                <label htmlFor="cash-entry-date" className="block text-sm font-medium mb-1">{t('date')}</label>
+                <DatePicker id="cash-entry-date" value={date} onChange={setDate} required />
             </div>
             <div>
-                <label className="block text-sm font-medium mb-1">{t('note')}</label>
-                <textarea value={note} onChange={e => setNote(e.target.value)} rows={2} className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none" />
+                <label htmlFor="cash-entry-note" className="block text-sm font-medium mb-1">{t('note')}</label>
+                <textarea id="cash-entry-note" value={note} onChange={e => setNote(e.target.value)} rows={2} className="w-full p-2 border border-black/10 dark:border-white/10 rounded-lg bg-light-background dark:bg-dark-background outline-none" />
             </div>
             <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={onCancel} className="px-4 py-2 rounded-lg font-semibold hover:bg-black/5 dark:hover:bg-white/5">{t('cancel')}</button>

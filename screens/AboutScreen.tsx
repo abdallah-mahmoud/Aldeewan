@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect }  from 'react';
 import { useLocalization } from '../context/LocalizationContext';
 import { Mail, Phone, Github, ArrowLeft, Camera, ChevronRight } from 'lucide-react';
 import BrandIcon from '../components/BrandIcons';
@@ -7,22 +7,18 @@ import developerPhotoSrc from '../assets/PFP.png';
 
 interface AboutScreenProps {
     setActiveScreen: (screen: Screen) => void;
+    setHeaderTitle: (title: string) => void;
 }
 
-const AboutScreen: React.FC<AboutScreenProps> = ({ setActiveScreen }) => {
+const AboutScreen: React.FC<AboutScreenProps> = ({ setActiveScreen, setHeaderTitle }) => {
     const { t } = useLocalization();
+
+    useEffect(() => {
+    setHeaderTitle(t('about_developer'));
+}, [setHeaderTitle, t]);
 
     return (
         <div className="space-y-6 animate-in fade-in-0 duration-300">
-            <div className="flex items-center gap-2">
-                <button 
-    onClick={() => setActiveScreen('settings')} 
-    className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5"
-    aria-label={t('back')}>
-    <ArrowLeft />
-</button>
-                <h1 className="text-2xl font-bold text-light-on-surface dark:text-dark-on-surface">{t('about_developer')}</h1>
-            </div>
 
             <div className="flex flex-col items-center space-y-4 pt-4">
                 <div className="w-28 h-28 rounded-full bg-light-surface dark:bg-dark-surface ring-4 ring-light-background dark:ring-dark-background flex items-center justify-center shadow-md">

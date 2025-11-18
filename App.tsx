@@ -21,6 +21,7 @@ import { handleAndroidBackButton } from './utils/native';
 const AppContent: React.FC = () => {
     const [activeScreen, setActiveScreen] = useState<Screen>('home');
     const { dir, t } = useLocalization();
+    const [headerTitle, setHeaderTitle] = useState<string>('');
     const { addTransaction } = useData();
     const { showToast } = useToast();
 
@@ -56,21 +57,22 @@ const AppContent: React.FC = () => {
     const ScreenComponent = useMemo(() => {
         switch (activeScreen) {
             case 'ledger':
-                return <LedgerScreen selectedPersonId={selectedPersonId} setSelectedPersonId={setSelectedPersonId} />;
+                return <LedgerScreen selectedPersonId={selectedPersonId} setSelectedPersonId={setSelectedPersonId} setHeaderTitle={setHeaderTitle} />;
             case 'cashbook':
-                return <CashbookScreen />;
+                return <CashbookScreen setHeaderTitle={setHeaderTitle}/>;
             case 'reports':
-                return <ReportsScreen activeReport={activeReport} setActiveReport={setActiveReport} />;
+                return <ReportsScreen activeReport={activeReport} setActiveReport={setActiveReport} setHeaderTitle={setHeaderTitle}/>;
             case 'settings':
-                return <SettingsScreen setActiveScreen={setActiveScreen} />;
+                return <SettingsScreen setActiveScreen={setActiveScreen} setHeaderTitle={setHeaderTitle} />;
             case 'about':
-                return <AboutScreen setActiveScreen={setActiveScreen} />;
+                return <AboutScreen setActiveScreen={setActiveScreen} setHeaderTitle={setHeaderTitle} />;
             case 'home':
             default:
                 return <HomeScreen 
                     setActiveScreen={setActiveScreen}
                     onAddCashEntry={() => setCashTransactionModalOpen(true)}
                     onAddLedgerEntry={(type) => setPersonTransactionFlow(type)}
+                    setHeaderTitle={setHeaderTitle}
                 />;
         }
     }, [activeScreen, selectedPersonId, activeReport]);
@@ -82,11 +84,32 @@ const AppContent: React.FC = () => {
         showToast(t('toast_saved_successfully'), 'success');
     };
 
+    const handleBackNavigation = () => {
+    // This logic is copied from your useEffect hook for the back button
+    if (isCashTransactionModalOpen) {
+        setCashTransactionModalOpen(false);
+    } else if (personTransactionFlow) {
+        setPersonTransactionFlow(null);
+    } else if (selectedPersonId) {
+        setSelectedPersonId(null);
+    } else if (activeReport) {
+        setActiveReport(null);
+    } else if (activeScreen === 'about') {
+        setActiveScreen('settings');
+    } else if (activeScreen !== 'home') {
+        setActiveScreen('home');
+    }
+};
+
+const showBackButton = !!(selectedPersonId || activeReport || activeScreen === 'about');
+
     return (
         <div dir={dir} className="bg-light-background dark:bg-dark-background text-light-on-surface dark:text-dark-on-surface min-h-screen flex flex-col">
-            <Header />
+            <Header title={headerTitle}
+    showBackButton={showBackButton}
+    onBackClick={handleBackNavigation} />
             <main className="flex-grow container mx-auto p-4 pb-24">
-                {ScreenComponent}
+                 {React.cloneElement(ScreenComponent, { setHeaderTitle })}
             </main>
             <BottomNav 
                 activeScreen={activeScreen === 'about' ? 'settings' : activeScreen} 
