@@ -148,7 +148,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ setActiveScreen, setHea
                     ? 'bg-light-primary dark:bg-dark-primary text-white dark:text-dark-background shadow'
                     : 'hover:bg-black/5 dark:hover:bg-white/5 text-light-on-surface-secondary dark:text-dark-on-surface-secondary'
             }`}
-            aria-pressed={(language === 'ar').toString()}
+            aria-pressed={(language === 'ar')}
         >
             العربية
         </button>
@@ -159,7 +159,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ setActiveScreen, setHea
                     ? 'bg-light-primary dark:bg-dark-primary text-white dark:text-dark-background shadow'
                     : 'hover:bg-black/5 dark:hover:bg-white/5 text-light-on-surface-secondary dark:text-dark-on-surface-secondary'
             }`}
-            aria-pressed={(language === 'en').toString()}
+            aria-pressed={(language === 'en')}
         >
             English
         </button>
@@ -205,7 +205,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ setActiveScreen, setHea
                     <button onClick={handleImportClick} className="w-full text-start p-4 hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                         <p className="font-semibold text-light-on-surface dark:text-dark-on-surface">{t('importData')}</p>
                         <p className="text-sm text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{t('importDataDesc')}</p>
-                        <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".json" className="hidden" />
+                        <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".json" className="hidden" aria-label="Import JSON data" />
                     </button>
                 </div>
             </div>

@@ -355,9 +355,13 @@ const [openMenuId, setOpenMenuId] = useState<string | null>(null);
                 zIndex: isMenuOpen ? 10 : 1
                                     }}
                                 >
-                                    <TransactionListItem transaction={transaction} onEdit={() => handleOpenForm(transaction)} onDelete={() => setDeletingTransactionId(transaction.id)} isMenuOpen={false} onToggleMenu={function (): void {
-                throw new Error('Function not implemented.');
-            } } />
+                                   <TransactionListItem 
+    transaction={transaction} 
+    onEdit={() => handleOpenForm(transaction)} 
+    onDelete={() => setDeletingTransactionId(transaction.id)} 
+    isMenuOpen={isMenuOpen} 
+    onToggleMenu={handleToggleMenu} 
+/>
                                 </div>
                             );
                         })}
