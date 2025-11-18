@@ -16,7 +16,7 @@ const BackArrowIcon = dir === 'rtl' ? ArrowRight : ArrowLeft;
    
 
     return (
-        <header className="bg-light-surface dark:bg-dark-surface sticky top-0 z-10 shadow-md">
+        <header className="bg-light-surface dark:bg-dark-surface sticky top-0 z-10 shadow-md pt-[env(safe-area-inset-top)]">
             <div className="container mx-auto px-4 py-3 flex items-center gap-4 h-14">
                 {showBackButton ? (
                     <button 
