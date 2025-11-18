@@ -2,6 +2,7 @@ import React from 'react';
 import { useLocalization } from '../context/LocalizationContext';
 import { useData } from '../context/DataContext';
 import { TestTube, Sparkles } from 'lucide-react';
+import logoSrc from '../assets/logo.png';
 
 const OnboardingGuide: React.FC = () => {
     const { t } = useLocalization();
@@ -34,7 +35,7 @@ const OnboardingGuide: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-light-background dark:bg-dark-background flex flex-col items-center justify-center p-4 text-center">
-             <img src="assets/logo.PNG" alt={t('ALDEEWAN')} className="h-12 w-auto mb-6" />
+             <img src={logoSrc} alt={t('ALDEEWAN')} className="h-16 w-auto mb-6" />
             <h1 className="text-3xl font-bold mb-2 text-light-on-surface dark:text-dark-on-surface">{t('welcome_title')}</h1>
             <p className="max-w-md mb-10 text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{t('welcome_message')}</p>
 

@@ -39,20 +39,16 @@ const StatCard: React.FC<StatCardProps> = ({ label, value, Icon, colorClass }) =
     
     // Determine text size based on length to prevent wrapping
     let valueTextSize = 'text-xl';
-    if (formattedValue.length > 15) {
-        valueTextSize = 'text-base'; // For very long numbers
-    } else if (formattedValue.length > 10) {
-        valueTextSize = 'text-lg'; // For medium numbers
-    }
+    
 
     return (
         <div className="bg-light-surface dark:bg-dark-surface p-4 rounded-lg flex items-center space-x-3 rtl:space-x-reverse ring-1 ring-black/5 dark:ring-white/10">
             <div className={`p-2 rounded-full bg-opacity-10 ${colorClass.replace('text-', 'bg-')}`}>
                 <Icon className={`w-6 h-6 ${colorClass}`} />
             </div>
-            <div>
+            <div className="min-w-0">
                 <p className="text-sm text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{label}</p>
-                <p className={`${valueTextSize} font-bold text-light-on-surface dark:text-dark-on-surface`}>{formattedValue}</p>
+                <p className={`${valueTextSize} font-bold text-light-on-surface dark:text-dark-on-surface whitespace-nowrap`}>{formattedValue}</p>
             </div>
         </div>
     );
@@ -115,7 +111,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ setActiveScreen, onAddCashEntry
         <div className="space-y-6">
              <h2 className="text-lg font-semibold text-center text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{t('tagline')}</h2>
             
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4">
                 <StatCard label={t('totalReceivable')} value={totalReceivable} Icon={ArrowDownCircle} colorClass="text-brand-green" />
                 <StatCard label={t('totalPayable')} value={totalPayable} Icon={ArrowUpCircle} colorClass="text-brand-red" />
                 <StatCard label={t('monthlyIncome')} value={monthlyIncome} Icon={ArrowDownCircle} colorClass="text-brand-green" />

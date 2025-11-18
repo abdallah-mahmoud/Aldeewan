@@ -3,6 +3,7 @@ import { useLocalization } from '../context/LocalizationContext';
 import { Mail, Phone, Github, ArrowLeft, Camera, ChevronRight } from 'lucide-react';
 import BrandIcon from '../components/BrandIcons';
 import type { Screen } from '../types';
+import developerPhotoSrc from '../assets/PFP.png';
 
 interface AboutScreenProps {
     setActiveScreen: (screen: Screen) => void;
@@ -25,7 +26,7 @@ const AboutScreen: React.FC<AboutScreenProps> = ({ setActiveScreen }) => {
 
             <div className="flex flex-col items-center space-y-4 pt-4">
                 <div className="w-28 h-28 rounded-full bg-light-surface dark:bg-dark-surface ring-4 ring-light-background dark:ring-dark-background flex items-center justify-center shadow-md">
-                    <img src="assets/PFP.png" alt={t('developer_name')} className="w-full h-full object-cover" />
+                    <img src={developerPhotoSrc} alt={t('developer_name')} className="w-full h-full object-cover" />
                 </div>
                 <div className="text-center">
                     <p className="font-bold text-2xl tracking-wider text-light-on-surface dark:text-dark-on-surface">{t('developer_name')}</p>

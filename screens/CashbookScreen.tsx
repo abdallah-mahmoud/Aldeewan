@@ -285,19 +285,19 @@ const CashbookScreen: React.FC = () => {
             <div className="grid grid-cols-3 gap-2 text-center">
                 <div className="bg-light-surface dark:bg-dark-surface ring-1 ring-black/5 dark:ring-white/10 p-3 rounded-lg">
                     <p className="text-xs text-light-on-surface-secondary dark:text-dark-on-surface-secondary truncate">{t('totalIncome')}</p>
-                    <p className={`font-bold text-brand-green ${formatCurrency(totalIncome).length > 10 ? 'text-lg' : 'text-xl'}`}>
+                    <p className={`font-bold text-brand-green ${formatCurrency(totalIncome).length > 10 ? 'text-sm' : 'text-base'}`}>
     {formatCurrency(totalIncome)}
 </p>
                 </div>
                 <div className="bg-light-surface dark:bg-dark-surface ring-1 ring-black/5 dark:ring-white/10 p-3 rounded-lg">
                     <p className="text-xs text-light-on-surface-secondary dark:text-dark-on-surface-secondary truncate">{t('totalExpense')}</p>
-                    <p className={`font-bold text-brand-red ${formatCurrency(totalExpense).length > 10 ? 'text-lg' : 'text-xl'}`}>
+                    <p className={`font-bold text-brand-red ${formatCurrency(totalExpense).length > 10 ? 'text-sm' : 'text-base'}`}>
     {formatCurrency(totalExpense)}
 </p>
                 </div>
                 <div className="bg-light-surface dark:bg-dark-surface ring-1 ring-black/5 dark:ring-white/10 p-3 rounded-lg">
                     <p className="text-xs text-light-on-surface-secondary dark:text-dark-on-surface-secondary truncate">{t('netFlow')}</p>
-                    <p className={`font-bold ${netFlow >= 0 ? 'text-light-primary dark:text-dark-primary' : 'text-orange-500'} ${formatCurrency(netFlow).length > 10 ? 'text-lg' : 'text-xl'}`}>
+                    <p className={`font-bold ${netFlow >= 0 ? 'text-light-primary dark:text-dark-primary' : 'text-orange-500'} ${formatCurrency(netFlow).length > 10 ? 'text-sm' : 'text-base'}`}>
     {formatCurrency(netFlow)}
 </p>
                 </div>
