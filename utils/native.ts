@@ -8,6 +8,8 @@ declare global {
     CapacitorPlugins?: {
       StatusBar?: any;
       Filesystem?: any;
+      Share?: any;    
+  Dialog?: any;
     };
   }
 }
@@ -36,21 +38,61 @@ export const updateStatusBar = (isDark: boolean) => {
 };
 
 /**
+ * Initiates a native sharing dialog.
+ * @param options - The content to share.
+ * @returns A promise that resolves to true if sharing was initiated, false otherwise.
+ */
+export const nativeShare = async (options: { title: string; text: string; dialogTitle?: string }): Promise<boolean> => {
+    const Share = window.Capacitor?.Plugins?.Share;
+    if (!Share) return false;
+
+    try {
+        await Share.share({
+            title: options.title,
+            text: options.text,
+            dialogTitle: options.dialogTitle || 'Share',
+        });
+        return true;
+    } catch (e) {
+        console.error('Native share failed:', e);
+        return false;
+    }
+};
+
+/**
+ * Shows a native alert dialog.
+ * @param message - The message to display in the alert.
+ */
+export const showNativeAlert = async (message: string): Promise<void> => {
+    const Dialog = window.Capacitor?.Plugins?.Dialog;
+    if (!Dialog) {
+        // Fallback for web browser testing
+        alert(message);
+        return;
+    }
+
+    await Dialog.alert({
+        title: 'AlDeewan',
+        message: message,
+        buttonTitle: 'OK',
+    });
+};
+
+/**
  * Saves a data blob to the device's filesystem (e.g., Downloads folder).
  * @param filename - The name of the file to save.
  * @param data - The Blob data to be saved.
  * @returns A promise that resolves to true on success, false on failure.
  */
 export const saveFileToDevice = async (filename: string, data: Blob): Promise<boolean> => {
-    // Check if the Capacitor Filesystem plugin is available
     const Filesystem = window.Capacitor?.Plugins?.Filesystem;
     if (!Filesystem) return false;
 
     try {
-        // Convert Blob to Base64
+        // Convert Blob to Base64, REMOVING the data URL prefix
         const reader = new FileReader();
         const base64Data = await new Promise<string>((resolve, reject) => {
-            reader.onloadend = () => resolve(reader.result as string);
+            reader.onloadend = () => resolve((reader.result as string).split(',')[1]); // Corrected line
             reader.onerror = reject;
             reader.readAsDataURL(data);
         });
@@ -58,11 +100,16 @@ export const saveFileToDevice = async (filename: string, data: Blob): Promise<bo
         await Filesystem.writeFile({
             path: filename,
             data: base64Data,
-            directory: 'DOWNLOADS', // Standard directory for user files
+            directory: 'DOWNLOADS',
         });
+        
+        // Add success feedback
+        await showNativeAlert(`File saved to Downloads: ${filename}`);
         return true;
-    } catch (e) {
+    } catch (e: any) {
         console.error('Native file save failed:', e);
+        // Add error feedback
+        await showNativeAlert(`Error saving file: ${e.message}`);
         return false;
     }
 };

@@ -10,6 +10,7 @@ import DatePicker from '../components/DatePicker';
 import { ArrowLeft, BookUser, BarChart3, Database, ChevronRight, Share2, Sheet } from 'lucide-react';
 import { calculatePersonBalance } from '../utils/calculations';
 import { calculateCashFlowReport, generatePersonStatementText } from '../utils/reporting';
+import { nativeShare } from '../utils/native';
 
 export type ReportType = 'person' | 'cashflow' | 'export';
 
@@ -120,11 +121,24 @@ const PersonStatementReport: React.FC<{ onBack: () => void }> = ({ onBack }) => 
 
     const handleShare = async () => {
         if (!statement) return;
-        if (navigator.share) {
-            await navigator.share({ title: t('appName'), text: statement });
-        } else {
-            await navigator.clipboard.writeText(statement);
-            showToast(t('toast_copied_clipboard'), 'info');
+
+        const shareTitle = t('appName');
+
+        // 1. TRY NATIVE SHARE FIRST
+        const sharedNatively = await nativeShare({
+            title: shareTitle,
+            text: statement,
+            dialogTitle: t('share'),
+        });
+
+        // 2. FALLBACK TO WEB SHARE / CLIPBOARD if native share fails
+        if (!sharedNatively) {
+            if (navigator.share) {
+                await navigator.share({ title: shareTitle, text: statement });
+            } else {
+                await navigator.clipboard.writeText(statement);
+                showToast(t('toast_copied_clipboard'), 'info');
+            }
         }
     };
     

@@ -14,6 +14,8 @@ import EmptyState from '../components/EmptyState';
 import useDebounce from '../hooks/useDebounce';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { calculatePersonBalance } from '../utils/calculations';
+import { generatePersonStatementText } from '../utils/reporting';
+import { nativeShare } from '../utils/native';
 
 const PersonListItem: React.FC<{ person: Person, balance: number, onClick: () => void }> = ({ person, balance, onClick }) => {
     const { t, formatCurrency } = useLocalization();
@@ -329,69 +331,34 @@ const PersonDetailView: React.FC<PersonDetailViewProps> = ({ person, balance, on
         }
     };
     
-    const handleShareStatement = async () => {
-        const transactions = await db.transactions.where('personId').equals(person.id).toArray();
-        
-        const sortedTransactions = transactions.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-        
-        let runningBalance = 0;
-        const transactionsWithBalance = sortedTransactions.map(transaction => {
-            const debitTypes = [TransactionType.SALE_ON_CREDIT, TransactionType.PURCHASE_ON_CREDIT];
-            runningBalance += debitTypes.includes(transaction.type) ? transaction.amount : -transaction.amount;
-            return { ...transaction, runningBalance };
+   const handleShareStatement = async () => {
+        // This helper function creates the text, just like your old code did.
+        const statementText = generatePersonStatementText({
+            person,
+            transactionsInDateRange: personTransactions, // Uses data we already have on the screen
+            balanceBroughtForward: 0, // This is simplified for sharing the current view
+            t,
+            formatDate,
+            formatCurrency
         });
-    
-        const header = [ t('statement_header'), `${t('statement_from')}: ${t('appName')}`, `${t('statement_to')}: ${person.name}`, `${t('statement_date')}: ${formatDate(new Date().toISOString())}` ].join('\n');
-    
-        let finalBalanceLabel = '';
-        if (balance > 0) {
-            finalBalanceLabel = person.role === PersonRole.CUSTOMER ? t('statement_final_balance_due') : t('statement_final_balance_payable');
-        } else if (balance < 0) {
-            finalBalanceLabel = t('statement_final_balance_credit');
-        }
         
-        const summary = [ `\n${t('statement_summary_header')}`, `${finalBalanceLabel}: ${formatCurrency(Math.abs(balance))}` ].join('\n');
-    
-        const history = transactionsWithBalance.map(tx => {
-            let txTypeLabel = '';
-            let amountSign = '';
-    
-            if (person.role === PersonRole.CUSTOMER) {
-                if (tx.type === TransactionType.SALE_ON_CREDIT) {
-                    txTypeLabel = t('customer_tx_debt');
-                    amountSign = '+';
-                } else if (tx.type === TransactionType.PAYMENT_RECEIVED) {
-                    txTypeLabel = t('customer_tx_payment');
-                    amountSign = '-';
-                }
+        const shareTitle = `${t('ledgerOf')} ${person.name}`;
+
+        // 1. TRY NATIVE SHARE FIRST
+        const sharedNatively = await nativeShare({
+            title: shareTitle,
+            text: statementText,
+            dialogTitle: t('share'),
+        });
+
+        // 2. FALLBACK TO WEB SHARE / CLIPBOARD if native share fails
+        if (!sharedNatively) {
+            if (navigator.share) {
+                await navigator.share({ title: shareTitle, text: statementText });
             } else {
-                if (tx.type === TransactionType.PURCHASE_ON_CREDIT) {
-                    txTypeLabel = t('supplier_tx_debt');
-                    amountSign = '+';
-                } else if (tx.type === TransactionType.PAYMENT_MADE) {
-                    txTypeLabel = t('supplier_tx_payment');
-                    amountSign = '-';
-                }
+                await navigator.clipboard.writeText(statementText);
+                showToast(t('toast_copied_clipboard'), 'info');
             }
-    
-            let entry = `\n🗓️ ${formatDate(tx.date)}\n${txTypeLabel}: ${amountSign} ${formatCurrency(tx.amount)}`;
-            if (tx.note) {
-                entry += `\n  - ${t('statement_tx_note_prefix')}: ${tx.note}`;
-            }
-            entry += `\n  - ${t('statement_tx_running_balance_prefix')}: ${formatCurrency(tx.runningBalance)}`;
-            
-            return entry;
-        }).join('\n');
-    
-        const historySection = `\n\n${t('statement_tx_history_header')}\n--------------------${history}\n--------------------`;
-        const footer = `\n\n${t('statement_footer_thanks')}\n${t('statement_footer_generated_by')}`;
-        const fullStatement = [header, summary, historySection, footer].join('\n');
-    
-        if (navigator.share) {
-            await navigator.share({ title: `${t('appName')} - ${person.name}`, text: fullStatement });
-        } else {
-            await navigator.clipboard.writeText(fullStatement);
-            showToast(t('toast_copied_clipboard'), 'info');
         }
     };
 
