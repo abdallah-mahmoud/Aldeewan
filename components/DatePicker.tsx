@@ -5,13 +5,22 @@ interface DatePickerProps {
     onChange: (value: string) => void;
     required?: boolean;
     id?: string;
+    'aria-label'?: string;
 }
 
-const DatePicker: React.FC<DatePickerProps> = ({ value, onChange, required = false, id }) => {
+const DatePicker: React.FC<DatePickerProps> = ({ 
+    value, 
+    onChange, 
+    required = false, 
+    id, 
+    'aria-label': ariaLabel 
+}) => {
     return (
         <input
-        id={id}
+            id={id}
             type="date"
+            // 3. Add the attribute here with a default value
+            aria-label={ariaLabel || "Date Picker"} 
             value={value}
             onChange={(e) => onChange(e.target.value)}
             required={required}
@@ -21,3 +30,4 @@ const DatePicker: React.FC<DatePickerProps> = ({ value, onChange, required = fal
 };
 
 export default DatePicker;
+
