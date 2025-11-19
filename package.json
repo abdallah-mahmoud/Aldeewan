@@ -11,6 +11,8 @@
   "dependencies": {
     "@capacitor/android": "^7.4.4",
     "@capacitor/cli": "^7.4.4",
+    "@capacitor/filesystem": "^7.1.4",
+    "@capacitor/share": "^7.0.2",
     "@jest/globals": "^30.2.0",
     "@tanstack/react-virtual": "^3.7.0",
     "@testing-library/jest-dom": "^6.9.1",

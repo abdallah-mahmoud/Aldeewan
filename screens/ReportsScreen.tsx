@@ -126,46 +126,29 @@ const handleWhatsApp = () => {
     window.open(url, '_blank');
 };
     
-    const handleExportCsv = async () => {
-        // 1. Check data
-        const person = persons.find(p => p.id === personId);
-        if (!person || statementTransactions.length === 0) return;
+    const handleExportClientStatementCsv = () => {
+  const person = persons.find(p => p.id === personId);
+  if (!person || statementTransactions.length === 0) return;
 
-        // 2. Build CSV Content
-        const rows = statementTransactions.map(tx => ({
-            date: formatDate(tx.date),
-            type: t(tx.type),
-            note: tx.note || '',
-            amount: tx.amount
-        }));
-        
-        const header = Object.keys(rows[0]).join(',') + '\n';
-        const csvContent = header + rows.map(row => Object.values(row).map(v => `"${v}"`).join(',')).join('\n');
+  const rows = statementTransactions.map(tx => ({
+    date: formatDate(tx.date),
+    type: t(tx.type),
+    note: tx.note || '',
+    amount: tx.amount,
+  }));
 
-        // 3. Create a File Object
-        const fileName = `${person.name}_statement.csv`;
-        const file = new File([csvContent], fileName, { type: 'text/csv' });
+  const fileName = `${person.name}_statement.csv`;
 
-        // 4. SHARE the file (The Fix)
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            try {
-                await navigator.share({
-                    files: [file],
-                    title: 'AlDeewan Statement',
-                    text: `Statement for ${person.name}`
-                });
-            } catch (error) {
-                console.log('Share cancelled', error);
-            }
-        } else {
-            // Fallback for PC / Browsers that don't support file sharing
-            const url = URL.createObjectURL(file);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            a.click();
-        }
-    };
+  exportToCsv(
+    fileName,
+    rows,
+    true, // ✅ enable sharing
+    'Client Statement',
+    `Statement for ${person.name}`
+  );
+};
+
+
 
     return (
         <div className="space-y-4">
@@ -185,7 +168,7 @@ const handleWhatsApp = () => {
                     <pre className="whitespace-pre-wrap text-sm font-mono bg-light-background dark:bg-dark-background p-3 rounded-md overflow-x-auto">{statement}</pre>
                     <div className="flex gap-2">
                         <button onClick={handleWhatsApp} className="w-full flex items-center justify-center gap-2 bg-black/5 dark:bg-white/5 font-bold py-2 px-4 rounded-lg"><Share2 className="w-4 h-4" /> {t('share')}</button>
-                        <button onClick={handleExportCsv} className="w-full flex items-center justify-center gap-2 bg-black/5 dark:bg-white/5 font-bold py-2 px-4 rounded-lg"><Sheet className="w-4 h-4" /> {t('exportAsCSV')}</button>
+                       { /* <button onClick={handleExportClientStatementCsv} className="w-full flex items-center justify-center gap-2 bg-black/5 dark:bg-white/5 font-bold py-2 px-4 rounded-lg"><Sheet className="w-4 h-4" /> {t('exportAsCSV')}</button> */}
                     </div>
                 </div>
             )}
@@ -205,16 +188,29 @@ const CashFlowReport: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         const data = calculateCashFlowReport(transactions, t);
         setReportData(data);
     };
-    
-    const handleExportCsv = () => {
-        if(!reportData || reportData.categories.length === 0) return;
-        const rows = reportData.categories.map((cat: any) => ({
-            category: cat.name,
-            income: cat.income,
-            expense: cat.expense
-        }));
-        exportToCsv(`cash_flow_${startDate}_to_${endDate}.csv`, rows);
-    };
+
+
+    const handleExportCashFlowCsv = () => {
+  if (!reportData || reportData.categories.length === 0) return;
+
+  const rows = reportData.categories.map((cat: any) => ({
+    category: cat.name,
+    income: cat.income,
+    expense: cat.expense,
+  }));
+
+  const fileName = `cash_flow_${startDate}_to_${endDate}.csv`;
+
+  exportToCsv(
+    fileName,
+    rows,
+    false, // ❌ no share
+    'Cash Flow Report',
+    `Cash flow report from ${startDate} to ${endDate}`
+  );
+};
+
+
 
     // ADD this function inside CashFlowReport component
 const handleWhatsApp = () => {
@@ -273,7 +269,7 @@ const handleWhatsApp = () => {
                               <button onClick={handleWhatsApp} className="flex items-center gap-1 text-xs text-brand-green font-bold bg-brand-green/10 px-2 py-1 rounded hover:bg-brand-green/20">
             <Share2 className="w-3 h-3"/> {t('share')}
         </button>
-                            <button onClick={handleExportCsv} className="flex items-center gap-1 text-xs text-light-primary dark:text-dark-primary font-semibold"><Sheet className="w-4 h-4"/>{t('exportAsCSV')}</button>
+                           {/* <button onClick={handleExportCashFlowCsv} className="flex items-center gap-1 text-xs text-light-primary dark:text-dark-primary font-semibold"><Sheet className="w-4 h-4"/>{t('exportAsCSV')}</button> */}
                        </div>
                         </div>
                         <div className="divide-y divide-black/5 dark:divide-white/5">
@@ -297,20 +293,40 @@ const handleWhatsApp = () => {
     );
 };
 
-const DataExportReport: React.FC<{ onBack: () => void }> = ({ onBack }) => {
+/*const DataExportReport: React.FC<{ onBack: () => void }> = ({ onBack }) => {
     const { t } = useLocalization();
     const persons = useLiveQuery(() => db.persons.toArray(), []) || [];
     const transactions = useLiveQuery(() => db.transactions.toArray(), []) || [];
 
     const exportAllTransactions = () => {
-        const rows = transactions.map(tx => ({ ...tx }));
-        exportToCsv(`aldeewan_all_transactions_${new Date().toISOString().split('T')[0]}.csv`, rows);
-    };
+  if (!transactions.length) return;
+
+  const rows = transactions.map(tx => ({ ...tx }));
+  const fileName = `aldeewan_all_transactions_${new Date().toISOString().split('T')[0]}.csv`;
+
+  exportToCsv(
+    fileName,
+    rows,
+    true, // ❌ no share by default
+    'All Transactions',
+    'Full transaction export from AlDeewan'
+  );
+};
 
     const exportAllPersons = () => {
-        const rows = persons.map(p => ({ ...p }));
-        exportToCsv(`aldeewan_all_persons_${new Date().toISOString().split('T')[0]}.csv`, rows);
-    };
+  if (!persons.length) return;
+
+  const rows = persons.map(p => ({ ...p }));
+  const fileName = `aldeewan_all_persons_${new Date().toISOString().split('T')[0]}.csv`;
+
+  exportToCsv(
+    fileName,
+    rows,
+    true, // ❌ no share by default
+    'All Persons',
+    'Full person export from AlDeewan'
+  );
+};
 
     return (
         <div className="space-y-4">
@@ -325,9 +341,9 @@ const DataExportReport: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     {t('exportPersons')} ({persons.length})
                 </button>
             </div>
-        </div>
+        </div> 
     );
-};
+}; */
 
 
 // --- Main Screen Component ---
@@ -356,9 +372,9 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ activeReport, setActiveRe
     if (activeReport === 'cashflow') {
         return <CashFlowReport onBack={() => setActiveReport(null)} />;
     }
-    if (activeReport === 'export') {
+      /*  if (activeReport === 'export') {
         return <DataExportReport onBack={() => setActiveReport(null)} />;
-    }
+    } */
 
     return (
         <div className="space-y-4">
@@ -369,7 +385,7 @@ const ReportsScreen: React.FC<ReportsScreenProps> = ({ activeReport, setActiveRe
             <div className="space-y-3">
                  <ReportCard title={t('personStatement')} description={t('generateStatementFor')} Icon={BookUser} onClick={() => setActiveReport('person')} />
                  <ReportCard title={t('cashFlowReport')} description={t('viewIncomeVsExpense')} Icon={BarChart3} onClick={() => setActiveReport('cashflow')} />
-                 <ReportCard title={t('fullDataExport')} description={t('exportAllYourData')} Icon={Database} onClick={() => setActiveReport('export')} />
+              {/* <ReportCard title={t('fullDataExport')} description={t('exportAllYourData')} Icon={Database} onClick={() => setActiveReport('export')} /> */}
             </div>
         </div>
     );

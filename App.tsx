@@ -17,6 +17,7 @@ import { PersonTransactionForm } from './components/AddLedgerEntryForm';
 import type { Screen, LedgerFlowType, Transaction } from './types';
 import OnboardingGuide from './components/OnboardingGuide';
 import { handleAndroidBackButton } from './utils/native';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 
 const AppContent: React.FC = () => {
     const [activeScreen, setActiveScreen] = useState<Screen>('home');
@@ -30,6 +31,57 @@ const AppContent: React.FC = () => {
     const [activeReport, setActiveReport] = useState<ReportType | null>(null);
     const [isCashTransactionModalOpen, setCashTransactionModalOpen] = useState(false);
     const [personTransactionFlow, setPersonTransactionFlow] = useState<LedgerFlowType | null>(null);
+
+    
+    useEffect(() => {
+  const ensurePermission = async () => {
+    try {
+      const status = await Filesystem.checkPermissions();
+      console.log('Filesystem.checkPermissions', status);
+
+      if (status.publicStorage !== 'granted') {
+        const req = await Filesystem.requestPermissions();
+        console.log('Filesystem.requestPermissions', req);
+      }
+    } catch (e) {
+      console.error('Filesystem permission check error', e);
+    }
+  };
+
+  ensurePermission();
+}, []);
+
+/* Example read effect that verifies permission before attempting to read */
+useEffect(() => {
+  const readFile = async () => {
+    try {
+      // Double-check permissions immediately before operation
+      const perm = await Filesystem.checkPermissions();
+      console.log('Pre-read permission', perm);
+      if (perm.publicStorage !== 'granted') {
+        const req = await Filesystem.requestPermissions();
+        console.log('Pre-read request result', req);
+        if (req.publicStorage !== 'granted') {
+          console.warn('Storage permission not granted — aborting read.');
+          return;
+        }
+      }
+
+      const contents = await Filesystem.readFile({
+        path: 'myfile.txt',
+        directory: Directory.Data,
+        encoding: Encoding.UTF8,
+      });
+      console.log('File contents:', contents);
+    } catch (e) {
+      console.error('Error reading file', e);
+    }
+  };
+
+  readFile();
+}, []);
+
+
 
     // Effect for handling the Android back button
     useEffect(() => {
@@ -102,6 +154,10 @@ const AppContent: React.FC = () => {
 };
 
 const showBackButton = !!(selectedPersonId || activeReport || activeScreen === 'about');
+
+
+
+
 
     return (
         <div dir={dir} className="bg-light-background dark:bg-dark-background text-light-on-surface dark:text-dark-on-surface min-h-screen flex flex-col">

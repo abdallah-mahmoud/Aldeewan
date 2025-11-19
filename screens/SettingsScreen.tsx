@@ -7,6 +7,9 @@ import Modal from '../components/Modal';
 import { ChevronRight } from 'lucide-react';
 import type { Screen } from '../types';
 import { saveFileToDevice } from '../utils/native';
+import { Share } from '@capacitor/share';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+
 
 const currencyOptions = [
   { code: 'SDG', nameKey: 'sdg' },
@@ -48,31 +51,51 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ setActiveScreen, setHea
     ];
 
     const handleExport = async () => {
-        try {
-            const blob = await db.exportDB();
-            const filename = `aldeewan_backup_${new Date().toISOString().split('T')[0]}.json`;
+  try {
+    const backupBlob = await db.exportDB();
+    const filename = `aldeewan_backup_${new Date().toISOString().split('T')[0]}.json`;
 
-            // Try saving natively first
-            const nativeSaveSuccess = await saveFileToDevice(filename, blob);
-            if (nativeSaveSuccess) {
-                showToast("Backup saved to Downloads folder.", 'success');
-                return;
-            }
+    // ✅ Try saving natively first
+    const nativeSaveSuccess = await saveFileToDevice(filename, backupBlob);
+    if (nativeSaveSuccess) {
+      showToast("Backup saved to Downloads folder.", 'success');
+      return;
+    }
 
-            // Fallback to web download
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        } catch (error) {
-            console.error("Export failed:", error);
-            showToast(t('exportError'), 'error');
-        }
-    };
+    // ✅ Fallback: save to app storage
+    await Filesystem.writeFile({
+      path: filename,
+      data: await backupBlob.text(),
+      directory: Directory.Data,
+      encoding: Encoding.UTF8,
+    });
+
+    // ✅ Share the file
+    const file = await Filesystem.readFile({
+  path: filename,
+  directory: Directory.Data,
+});
+
+const blob = new Blob([file.data], { type: 'application/json' });
+const fileToShare = new File([blob], filename, { type: 'application/json' });
+
+if (navigator.canShare && navigator.canShare({ files: [fileToShare] })) {
+  await navigator.share({
+    title: 'AlDeewan Backup',
+    text: 'Here is your full backup file.',
+    files: [fileToShare],
+  });
+} else {
+  alert('Sharing not supported on this device.');
+}
+
+  } catch (error) {
+    console.error("Export failed:", error);
+    showToast(t('exportError'), 'error');
+  }
+};
+
+
 
     const handleImportClick = () => {
         fileInputRef.current?.click();

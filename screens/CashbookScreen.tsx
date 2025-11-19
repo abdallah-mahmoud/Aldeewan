@@ -320,7 +320,7 @@ const [openMenuId, setOpenMenuId] = useState<string | null>(null);
                 </div>
             </div>
 
-            <div ref={parentRef} className="overflow-auto h-[calc(100vh-340px)]">
+            <div ref={parentRef} className="flex-1 overflow-auto">
                 {allCashTransactions.length === 0 ? (
                      <EmptyState
                         Icon={Archive}

@@ -84,27 +84,47 @@ export const showNativeAlert = async (message: string): Promise<void> => {
  * @param data - The Blob data to be saved.
  * @returns A promise that resolves to true on success, false on failure.
  */
+// utils/native.ts
+
 export const saveFileToDevice = async (filename: string, data: Blob): Promise<boolean> => {
-    // 1. Check if Capacitor is available
-    const Filesystem = window.Capacitor?.Plugins?.Filesystem;
-    if (!Filesystem) return false;
+    // DEBUG LOG 1: Start
+    alert(`DEBUG: 1. Starting save for ${filename}`);
+
+    // Check if Capacitor is available
+    const Capacitor = window.Capacitor;
+    
+    if (!Capacitor) {
+        alert("DEBUG: 2. Capacitor object is missing. You are in Web Mode.");
+        return false;
+    }
+
+    const Filesystem = Capacitor.Plugins?.Filesystem;
+    if (!Filesystem) {
+        alert("DEBUG: 3. Filesystem plugin is missing.");
+        return false;
+    }
 
     try {
-        // 2. Convert Blob to Base64
+        // DEBUG LOG 4: Conversion
+        alert("DEBUG: 4. Converting file to Base64...");
+        
         const reader = new FileReader();
         const base64Data = await new Promise<string>((resolve, reject) => {
             reader.onloadend = () => {
                 const res = reader.result as string;
-                // Remove the data URL prefix (e.g., "data:text/csv;base64,")
                 const base64 = res.includes(',') ? res.split(',')[1] : res;
                 resolve(base64);
             };
-            reader.onerror = reject;
+            reader.onerror = (err) => {
+                alert("DEBUG: Conversion Error " + JSON.stringify(err));
+                reject(err);
+            };
             reader.readAsDataURL(data);
         });
 
-        // 3. Write to the Documents Directory
-        // 'DOCUMENTS' is the safest target on Android 10+ for file creation
+        // DEBUG LOG 5: Writing
+        alert("DEBUG: 5. Writing to DOCUMENTS...");
+
         await Filesystem.writeFile({
             path: filename,
             data: base64Data,
@@ -112,12 +132,17 @@ export const saveFileToDevice = async (filename: string, data: Blob): Promise<bo
             recursive: true
         });
         
-        // 4. Show success message
+        // DEBUG LOG 6: Success
+        alert(`DEBUG: 6. SUCCESS! File saved to Documents/${filename}`);
+        
+        // Also show the native alert just in case
         await showNativeAlert(`File saved successfully to Documents.\n\nFilename: ${filename}`);
         return true;
     } catch (e: any) {
+        // DEBUG LOG 7: Error
         console.error('Native file save failed:', e);
-        await showNativeAlert(`Error saving file: ${e.message}`);
+        alert(`DEBUG: 7. ERROR SAVING: ${JSON.stringify(e.message || e)}`);
+        await showNativeAlert(`Error saving file: ${e.message || 'Permission denied'}`);
         return false;
     }
 };

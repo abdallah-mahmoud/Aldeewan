@@ -27,7 +27,7 @@ const translations: Record<Language, Record<string, string>> = {
     addCashEntry: 'إضافة دخل / مصروف',
     viewBalances: 'عرض الأرصدة',
     quickActions: 'إجراءات سريعة',
-    totalReceivable: 'إجمالي المستحق',
+    totalReceivable: 'إجمالي المستحق لك',
     totalPayable: 'إجمالي الدفع',
     monthlyIncome: 'دخل الشهر',
     monthlyExpense: 'مصروفات الشهر',

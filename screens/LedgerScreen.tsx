@@ -230,7 +230,7 @@ useEffect(() => {
                 </div>
             </div>
             
-             <div ref={parentRef} className="overflow-auto h-[calc(100vh-320px)]">
+             <div ref={parentRef} className="flex-1 overflow-auto">
                 {persons.length === 0 ? (
                      <EmptyState
                         Icon={Users}
