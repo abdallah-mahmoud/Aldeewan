@@ -142,10 +142,12 @@ const PersonStatementReport: React.FC<{ onBack: () => void }> = ({ onBack }) => 
         }
     };
     
-    const handleExportCsv = () => {
+    const handleExportCsv = async () => {
+        // 1. Check data
         const person = persons.find(p => p.id === personId);
-        if(!person || statementTransactions.length === 0) return;
-        
+        if (!person || statementTransactions.length === 0) return;
+
+        // 2. Build CSV Content
         const rows = statementTransactions.map(tx => ({
             date: formatDate(tx.date),
             type: t(tx.type),
@@ -153,8 +155,33 @@ const PersonStatementReport: React.FC<{ onBack: () => void }> = ({ onBack }) => 
             amount: tx.amount
         }));
         
-        exportToCsv(`${person.name}_statement_${startDate}_to_${endDate}.csv`, rows);
-    }
+        const header = Object.keys(rows[0]).join(',') + '\n';
+        const csvContent = header + rows.map(row => Object.values(row).map(v => `"${v}"`).join(',')).join('\n');
+
+        // 3. Create a File Object
+        const fileName = `${person.name}_statement.csv`;
+        const file = new File([csvContent], fileName, { type: 'text/csv' });
+
+        // 4. SHARE the file (The Fix)
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: 'AlDeewan Statement',
+                    text: `Statement for ${person.name}`
+                });
+            } catch (error) {
+                console.log('Share cancelled', error);
+            }
+        } else {
+            // Fallback for PC / Browsers that don't support file sharing
+            const url = URL.createObjectURL(file);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            a.click();
+        }
+    };
 
     return (
         <div className="space-y-4">

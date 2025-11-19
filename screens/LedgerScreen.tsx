@@ -346,36 +346,22 @@ const PersonDetailView: React.FC<PersonDetailViewProps> = ({ person, balance, on
             showToast(t('toast_deleted_successfully'), 'success');
         }
     };
-    
-   const handleShareStatement = async () => {
-        // This helper function creates the text, just like your old code did.
+       
+
+    // 2. Direct WhatsApp Link (Works on all Androids without special permissions)
+    const handleWhatsApp = () => {
         const statementText = generatePersonStatementText({
             person,
-            transactionsInDateRange: personTransactions, // Uses data we already have on the screen
-            balanceBroughtForward: 0, // This is simplified for sharing the current view
-            t,
-            formatDate,
-            formatCurrency
+            transactionsInDateRange: personTransactions, 
+            balanceBroughtForward: 0,
+            t, formatDate, formatCurrency
         });
         
-        const shareTitle = `${t('ledgerOf')} ${person.name}`;
-
-        // 1. TRY NATIVE SHARE FIRST
-        const sharedNatively = await nativeShare({
-            title: shareTitle,
-            text: statementText,
-            dialogTitle: t('share'),
-        });
-
-        // 2. FALLBACK TO WEB SHARE / CLIPBOARD if native share fails
-        if (!sharedNatively) {
-            if (navigator.share) {
-                await navigator.share({ title: shareTitle, text: statementText });
-            } else {
-                await navigator.clipboard.writeText(statementText);
-                showToast(t('toast_copied_clipboard'), 'info');
-            }
-        }
+        // Encode the text properly for a URL
+        const url = `https://wa.me/?text=${encodeURIComponent(statementText)}`;
+        
+        // Open in new window (triggers WhatsApp app)
+        window.open(url, '_blank');
     };
 
     const isAsset = (person.role === PersonRole.CUSTOMER && balance > 0) || (person.role === PersonRole.SUPPLIER && balance < 0);
@@ -390,9 +376,15 @@ const PersonDetailView: React.FC<PersonDetailViewProps> = ({ person, balance, on
     <p className="text-sm text-light-on-surface-secondary dark:text-dark-on-surface-secondary">{t('ledgerOf')} {t(person.role)}</p>
 </div>
                  <div className="flex items-center gap-2">
-                    <button onClick={handleShareStatement} className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/5" aria-label={t('share')}>
-                        <Share2 className="w-5 h-5 text-light-on-surface-secondary dark:text-dark-on-surface-secondary"/>
-                    </button>
+                    {/* WhatsApp Button */}
+{/* Green Share Icon Button (Triggers WhatsApp) */}
+    <button 
+        onClick={handleWhatsApp} 
+        className="p-2 rounded-full text-brand-green bg-brand-green/10 hover:bg-brand-green/20 transition-colors" 
+        aria-label={t('share')}
+    >
+        <Share2 className="w-5 h-5" />
+    </button>
                     <div className="text-end flex-shrink-0">
                         <p className={`font-bold text-2xl ${balanceColor}`}>{formatCurrency(balanceAmount)}</p>
                         <p className={`text-sm font-semibold ${balanceColor}`}>{balanceLabel}</p>

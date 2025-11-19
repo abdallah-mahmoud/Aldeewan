@@ -85,14 +85,30 @@ export const showNativeAlert = async (message: string): Promise<void> => {
  * @returns A promise that resolves to true on success, false on failure.
  */
 export const saveFileToDevice = async (filename: string, data: Blob): Promise<boolean> => {
+    // Check if the Capacitor Filesystem plugin is available
     const Filesystem = window.Capacitor?.Plugins?.Filesystem;
     if (!Filesystem) return false;
 
     try {
-        // Convert Blob to Base64, REMOVING the data URL prefix
+        // --- NEW: PERMISSION CHECK START ---
+        // 1. Check current status
+        const permissionStatus = await Filesystem.checkPermissions();
+        
+        // 2. If not granted, ask the user
+        if (permissionStatus.publicStorage !== 'granted') {
+            const request = await Filesystem.requestPermissions();
+            // 3. If user denied, stop here
+            if (request.publicStorage !== 'granted') {
+                await showNativeAlert('Storage permission is required to save files.');
+                return false;
+            }
+        }
+        // --- NEW: PERMISSION CHECK END ---
+
+        // Convert Blob to Base64
         const reader = new FileReader();
         const base64Data = await new Promise<string>((resolve, reject) => {
-            reader.onloadend = () => resolve((reader.result as string).split(',')[1]); // Corrected line
+            reader.onloadend = () => resolve(reader.result as string);
             reader.onerror = reject;
             reader.readAsDataURL(data);
         });
@@ -100,15 +116,13 @@ export const saveFileToDevice = async (filename: string, data: Blob): Promise<bo
         await Filesystem.writeFile({
             path: filename,
             data: base64Data,
-            directory: 'DOWNLOADS',
+            directory: 'DOWNLOADS', // Standard directory for user files
         });
         
-        // Add success feedback
         await showNativeAlert(`File saved to Downloads: ${filename}`);
         return true;
     } catch (e: any) {
         console.error('Native file save failed:', e);
-        // Add error feedback
         await showNativeAlert(`Error saving file: ${e.message}`);
         return false;
     }
