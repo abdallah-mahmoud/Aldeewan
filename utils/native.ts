@@ -85,41 +85,35 @@ export const showNativeAlert = async (message: string): Promise<void> => {
  * @returns A promise that resolves to true on success, false on failure.
  */
 export const saveFileToDevice = async (filename: string, data: Blob): Promise<boolean> => {
-    // Check if the Capacitor Filesystem plugin is available
+    // 1. Check if Capacitor is available
     const Filesystem = window.Capacitor?.Plugins?.Filesystem;
     if (!Filesystem) return false;
 
     try {
-        // --- NEW: PERMISSION CHECK START ---
-        // 1. Check current status
-        const permissionStatus = await Filesystem.checkPermissions();
-        
-        // 2. If not granted, ask the user
-        if (permissionStatus.publicStorage !== 'granted') {
-            const request = await Filesystem.requestPermissions();
-            // 3. If user denied, stop here
-            if (request.publicStorage !== 'granted') {
-                await showNativeAlert('Storage permission is required to save files.');
-                return false;
-            }
-        }
-        // --- NEW: PERMISSION CHECK END ---
-
-        // Convert Blob to Base64
+        // 2. Convert Blob to Base64
         const reader = new FileReader();
         const base64Data = await new Promise<string>((resolve, reject) => {
-            reader.onloadend = () => resolve(reader.result as string);
+            reader.onloadend = () => {
+                const res = reader.result as string;
+                // Remove the data URL prefix (e.g., "data:text/csv;base64,")
+                const base64 = res.includes(',') ? res.split(',')[1] : res;
+                resolve(base64);
+            };
             reader.onerror = reject;
             reader.readAsDataURL(data);
         });
 
+        // 3. Write to the Documents Directory
+        // 'DOCUMENTS' is the safest target on Android 10+ for file creation
         await Filesystem.writeFile({
             path: filename,
             data: base64Data,
-            directory: 'DOWNLOADS', // Standard directory for user files
+            directory: 'DOCUMENTS', 
+            recursive: true
         });
         
-        await showNativeAlert(`File saved to Downloads: ${filename}`);
+        // 4. Show success message
+        await showNativeAlert(`File saved successfully to Documents.\n\nFilename: ${filename}`);
         return true;
     } catch (e: any) {
         console.error('Native file save failed:', e);

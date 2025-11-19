@@ -119,28 +119,12 @@ const PersonStatementReport: React.FC<{ onBack: () => void }> = ({ onBack }) => 
         setStatement(statementText);
     };
 
-    const handleShare = async () => {
-        if (!statement) return;
-
-        const shareTitle = t('appName');
-
-        // 1. TRY NATIVE SHARE FIRST
-        const sharedNatively = await nativeShare({
-            title: shareTitle,
-            text: statement,
-            dialogTitle: t('share'),
-        });
-
-        // 2. FALLBACK TO WEB SHARE / CLIPBOARD if native share fails
-        if (!sharedNatively) {
-            if (navigator.share) {
-                await navigator.share({ title: shareTitle, text: statement });
-            } else {
-                await navigator.clipboard.writeText(statement);
-                showToast(t('toast_copied_clipboard'), 'info');
-            }
-        }
-    };
+    // REPLACE the existing handleShare function with this:
+const handleWhatsApp = () => {
+    if (!statement) return;
+    const url = `https://wa.me/?text=${encodeURIComponent(statement)}`;
+    window.open(url, '_blank');
+};
     
     const handleExportCsv = async () => {
         // 1. Check data
@@ -200,7 +184,7 @@ const PersonStatementReport: React.FC<{ onBack: () => void }> = ({ onBack }) => 
                 <div className="p-4 bg-light-surface dark:bg-dark-surface rounded-lg ring-1 ring-black/5 dark:ring-white/10 space-y-4">
                     <pre className="whitespace-pre-wrap text-sm font-mono bg-light-background dark:bg-dark-background p-3 rounded-md overflow-x-auto">{statement}</pre>
                     <div className="flex gap-2">
-                        <button onClick={handleShare} className="w-full flex items-center justify-center gap-2 bg-black/5 dark:bg-white/5 font-bold py-2 px-4 rounded-lg"><Share2 className="w-4 h-4" /> {t('share')}</button>
+                        <button onClick={handleWhatsApp} className="w-full flex items-center justify-center gap-2 bg-black/5 dark:bg-white/5 font-bold py-2 px-4 rounded-lg"><Share2 className="w-4 h-4" /> {t('share')}</button>
                         <button onClick={handleExportCsv} className="w-full flex items-center justify-center gap-2 bg-black/5 dark:bg-white/5 font-bold py-2 px-4 rounded-lg"><Sheet className="w-4 h-4" /> {t('exportAsCSV')}</button>
                     </div>
                 </div>
@@ -210,7 +194,7 @@ const PersonStatementReport: React.FC<{ onBack: () => void }> = ({ onBack }) => 
 };
 
 const CashFlowReport: React.FC<{ onBack: () => void }> = ({ onBack }) => {
-    const { t, getTodayDateString, formatCurrency } = useLocalization();
+    const { t, getTodayDateString, formatCurrency, formatDate } = useLocalization();
     const { getTransactionsByDateRange } = useData();
     const [startDate, setStartDate] = useState(() => { const d = new Date(); d.setDate(1); return d.toISOString().split('T')[0]; });
     const [endDate, setEndDate] = useState(getTodayDateString());
@@ -231,6 +215,26 @@ const CashFlowReport: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         }));
         exportToCsv(`cash_flow_${startDate}_to_${endDate}.csv`, rows);
     };
+
+    // ADD this function inside CashFlowReport component
+const handleWhatsApp = () => {
+    if (!reportData || !reportData.profitLoss) return;
+
+    const summary = [
+        `*${t('cashFlowReport')}*`,
+        `${t('startDate')}: ${formatDate(startDate)}`,
+        `${t('endDate')}: ${formatDate(endDate)}`,
+        `----------------`,
+        `${t('totalCashIn')}: ${formatCurrency(reportData.profitLoss.cashIn)}`,
+        `${t('totalCashOut')}: ${formatCurrency(reportData.profitLoss.cashOut)}`,
+        `----------------`,
+        `${reportData.profitLoss.profit >= 0 ? t('profit') : t('loss')}: ${formatCurrency(Math.abs(reportData.profitLoss.profit))}`,
+        `\n${t('statement_footer_generated_by')}`
+    ].join('\n');
+
+    const url = `https://wa.me/?text=${encodeURIComponent(summary)}`;
+    window.open(url, '_blank');
+};
 
     return (
         <div className="space-y-4">
@@ -265,7 +269,12 @@ const CashFlowReport: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                     <div className="p-4 bg-light-surface dark:bg-dark-surface rounded-lg ring-1 ring-black/5 dark:ring-white/10 space-y-3">
                         <div className="flex justify-between items-center">
                             <h3 className="font-bold text-lg">{t('incomeAndExpenses')}</h3>
+                            <div className="flex gap-3">
+                              <button onClick={handleWhatsApp} className="flex items-center gap-1 text-xs text-brand-green font-bold bg-brand-green/10 px-2 py-1 rounded hover:bg-brand-green/20">
+            <Share2 className="w-3 h-3"/> {t('share')}
+        </button>
                             <button onClick={handleExportCsv} className="flex items-center gap-1 text-xs text-light-primary dark:text-dark-primary font-semibold"><Sheet className="w-4 h-4"/>{t('exportAsCSV')}</button>
+                       </div>
                         </div>
                         <div className="divide-y divide-black/5 dark:divide-white/5">
                             <div className="flex justify-between font-bold text-sm py-2">

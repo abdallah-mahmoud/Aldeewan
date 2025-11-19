@@ -48,6 +48,8 @@ export async function exportToCsv(filename: string, rows: object[]) {
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+
+             setTimeout(() => alert("Export complete. Check your downloads folder."), 100);
         }
     }
     
