@@ -1,12 +1,12 @@
 import 'package:realm/realm.dart';
 import 'package:aldeewan_mobile/domain/entities/person.dart';
 
-part 'person_model.g.dart';
+part 'person_model.realm.dart';
 
 @RealmModel()
 class _PersonModel {
   @PrimaryKey()
-  late String uuid;
+  late String id;
 
   late String role; // Storing Enum as String
   late String name;
@@ -17,8 +17,8 @@ class _PersonModel {
 extension PersonModelMapper on PersonModel {
   Person toEntity() {
     return Person(
-      id: uuid,
-      role: PersonRole.values.firstWhere((e) => e.name == role, orElse: () => PersonRole.debtor),
+      id: id,
+      role: PersonRole.values.firstWhere((e) => e.name == role, orElse: () => PersonRole.customer),
       name: name,
       phone: phone,
       createdAt: createdAt,

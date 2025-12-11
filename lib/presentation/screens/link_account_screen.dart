@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/presentation/providers/account_provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class LinkAccountScreen extends ConsumerStatefulWidget {
   const LinkAccountScreen({super.key});
@@ -30,13 +31,13 @@ class _LinkAccountScreenState extends ConsumerState<LinkAccountScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final success = await ref.read(accountProvider.notifier).linkAccount(
-            providerId: _selectedProvider,
-            username: _usernameController.text,
-            password: _passwordController.text,
+      await ref.read(accountProvider.notifier).linkAccount(
+            _selectedProvider,
+            _usernameController.text,
+            _passwordController.text,
           );
 
-      if (success && mounted) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Account linked successfully!')),
         );
@@ -129,10 +130,10 @@ class _LinkAccountScreenState extends ConsumerState<LinkAccountScreen> {
               ),
               if (_selectedProvider == 'MOCK_BANK') ...[
                 const SizedBox(height: 16),
-                const Text(
-                  'Demo Credentials:\nUser: user\nPass: password',
+                Text(
+                  'Demo Credentials:\nUser: ${dotenv.env['MOCK_USER'] ?? 'user'}\nPass: ${dotenv.env['MOCK_PASSWORD'] ?? 'password'}',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.grey),
+                  style: const TextStyle(color: Colors.grey),
                 ),
               ],
             ],

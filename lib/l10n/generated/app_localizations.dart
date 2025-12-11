@@ -164,6 +164,12 @@ abstract class AppLocalizations {
   /// **'Add Person'**
   String get addPerson;
 
+  /// No description provided for @addPersonPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'You need to add a person before adding a transaction'**
+  String get addPersonPrompt;
+
   /// No description provided for @appearance.
   ///
   /// In en, this message translates to:
@@ -421,6 +427,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Person'**
   String get selectPerson;
+
+  /// No description provided for @noPersonsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No persons found'**
+  String get noPersonsFound;
 
   /// No description provided for @customer.
   ///
@@ -806,6 +818,12 @@ abstract class AppLocalizations {
   /// **'My Accounts'**
   String get myAccounts;
 
+  /// No description provided for @comingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Coming Soon'**
+  String get comingSoon;
+
   /// No description provided for @syncAccounts.
   ///
   /// In en, this message translates to:
@@ -835,6 +853,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create Goal'**
   String get createGoal;
+
+  /// No description provided for @goalName.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal Name'**
+  String get goalName;
 
   /// No description provided for @monthlyLimit.
   ///

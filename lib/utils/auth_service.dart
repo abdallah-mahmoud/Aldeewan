@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:local_auth/error_codes.dart' as auth_error;
@@ -12,7 +13,7 @@ class AuthService {
           canAuthenticateWithBiometrics || await auth.isDeviceSupported();
       return canAuthenticate;
     } on PlatformException catch (e) {
-      print("Error checking biometrics: $e");
+      debugPrint("Error checking biometrics: $e");
       return false;
     }
   }
@@ -27,7 +28,7 @@ class AuthService {
         ),
       );
     } on PlatformException catch (e) {
-      print("Authentication error: $e");
+      debugPrint("Authentication error: $e");
       if (e.code == auth_error.notAvailable) {
         // Handle not available
       }

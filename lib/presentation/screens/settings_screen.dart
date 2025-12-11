@@ -16,6 +16,7 @@ import 'package:aldeewan_mobile/presentation/providers/locale_provider.dart';
 import 'package:aldeewan_mobile/utils/csv_exporter.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/security_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -25,6 +26,7 @@ class SettingsScreen extends ConsumerWidget {
     final themeMode = ref.watch(themeProvider);
     final locale = ref.watch(localeProvider);
     final currency = ref.watch(currencyProvider);
+    final isAppLockEnabled = ref.watch(securityProvider);
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -106,6 +108,17 @@ class SettingsScreen extends ConsumerWidget {
                 DropdownMenuItem(value: 'SDG', child: Text('SDG (ج.س)')),
               ],
             ),
+          ),
+          const Divider(),
+          _buildSectionHeader(context, 'Security'),
+          SwitchListTile(
+            secondary: const Icon(LucideIcons.lock),
+            title: const Text('App Lock'),
+            subtitle: const Text('Require authentication to open app'),
+            value: isAppLockEnabled,
+            onChanged: (bool value) {
+              ref.read(securityProvider.notifier).setAppLock(value);
+            },
           ),
           const Divider(),
           _buildSectionHeader(context, l10n.dataManagement),
@@ -254,7 +267,7 @@ class SettingsScreen extends ConsumerWidget {
         // But we can't clear easily without a clear method.
         
         // Let's assume for now we just add them (which might duplicate if IDs match, or update).
-        // Isar put updates if ID matches.
+        // Realm put updates if ID matches.
         
         final notifier = ref.read(ledgerProvider.notifier);
         

@@ -121,7 +121,7 @@ class _PersonFormState extends State<PersonForm> {
               },
             ),
             const SizedBox(height: 24),
-            ElevatedButton(
+            FilledButton(
               onPressed: () => _save(l10n),
               child: Text(l10n.save),
             ),

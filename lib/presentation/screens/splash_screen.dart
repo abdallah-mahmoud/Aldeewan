@@ -1,16 +1,18 @@
 ﻿import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/utils/auth_service.dart';
+import 'package:aldeewan_mobile/presentation/providers/security_provider.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacity;
   late Animation<double> _scale;
@@ -39,6 +41,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   Future<void> _checkAuth() async {
     if (!mounted) return;
     
+    // Check if app lock is enabled
+    final isAppLockEnabled = ref.read(securityProvider);
+    if (!isAppLockEnabled) {
+      if (mounted) context.go('/home');
+      return;
+    }
+
     final isAvailable = await _authService.isBiometricAvailable();
     if (isAvailable) {
       final authenticated = await _authService.authenticate();
@@ -50,6 +59,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         });
       }
     } else {
+      // If biometrics not available but lock is enabled, we should probably show PIN or something.
+      // For now, if no biometrics, we just let them in (or maybe we should block?)
+      // Assuming "App Lock" implies biometrics for now as per AuthService.
       if (mounted) context.go('/home');
     }
   }
@@ -80,10 +92,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         color: Theme.of(context).colorScheme.primaryContainer,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(
-                        LucideIcons.wallet,
-                        size: 64,
-                        color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      child: Image.asset(
+                        'assets/images/logo.png',
+                        width: 64,
+                        height: 64,
                       ),
                     ),
                     const SizedBox(height: 24),

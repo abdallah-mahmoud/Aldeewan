@@ -1,6 +1,6 @@
 import 'package:realm/realm.dart';
 
-part 'financial_account_model.g.dart';
+part 'financial_account_model.realm.dart';
 
 @RealmModel()
 class _FinancialAccountModel {

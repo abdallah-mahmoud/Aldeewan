@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:aldeewan_mobile/presentation/screens/home_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/ledger_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/cashbook_screen.dart';
-import 'package:aldeewan_mobile/presentation/screens/budget_screen.dart';
+import 'package:aldeewan_mobile/presentation/screens/analytics_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/settings_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/person_details_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/about_screen.dart';
@@ -59,7 +59,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/analytics',
-            builder: (context, state) => const BudgetScreen(),
+            builder: (context, state) => const AnalyticsScreen(),
           ),
           GoRoute(
             path: '/settings',

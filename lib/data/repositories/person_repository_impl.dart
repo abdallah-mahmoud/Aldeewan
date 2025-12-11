@@ -22,20 +22,13 @@ class PersonRepositoryImpl implements PersonRepository {
 
   @override
   Future<void> addPerson(Person person) async {
-    final model = PersonModel.fromEntity(person);
+    final model = PersonModelMapper.fromEntity(person);
     await _dataSource.putPerson(model);
   }
 
   @override
   Future<void> updatePerson(Person person) async {
-    final model = PersonModel.fromEntity(person);
-    // We need to ensure the Isar Id is preserved if we want to be efficient, 
-    // but since we use UUID index with replace=true, putPerson handles it.
-    // However, to be safe and correct with Isar's internal ID:
-    final existing = await _dataSource.getPerson(person.id);
-    if (existing != null) {
-      model.id = existing.id;
-    }
+    final model = PersonModelMapper.fromEntity(person);
     await _dataSource.putPerson(model);
   }
 

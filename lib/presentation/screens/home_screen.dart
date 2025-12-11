@@ -6,6 +6,7 @@ import 'package:aldeewan_mobile/config/gradients.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/account_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/database_provider.dart';
 import 'package:aldeewan_mobile/data/services/sync_service.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/widgets/hero_balance_card.dart';
@@ -32,7 +33,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     try {
       await ref.read(syncServiceProvider).syncAllAccounts();
       // Refresh accounts list
-      await ref.read(accountProvider.notifier).loadAccounts();
+      ref.read(accountProvider.notifier).loadAccounts();
       // Refresh ledger if needed (though ledger provider might need to be updated to fetch from DB again)
       await ref.read(ledgerProvider.notifier).loadData(); 
     } finally {
@@ -51,7 +52,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isDark = theme.brightness == Brightness.dark;
 
     String formatCurrency(double amount) {
-      return NumberFormat.currency(symbol: currency, decimalDigits: 2).format(amount);
+      final isSDG = currency == 'SDG';
+      return NumberFormat.currency(symbol: currency, decimalDigits: isSDG ? 0 : 2).format(amount);
     }
 
     // Derive filtered transactions for the selected range.
@@ -129,8 +131,23 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Row(
                           children: [
                             Text(
-                              'My Accounts',
+                              l10n.myAccounts,
                               style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primaryContainer,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                l10n.comingSoon,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.onPrimaryContainer,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                             if (_isSyncing) ...[
                               const SizedBox(width: 8),
@@ -158,8 +175,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     const SizedBox(height: 8),
                     SizedBox(
                       height: 140,
-                      child: accountState.when(
-                        data: (accounts) {
+                      child: ref.watch(realmProvider).when(
+                        data: (_) {
+                          final accounts = accountState;
                           if (accounts.isEmpty) {
                             return GestureDetector(
                               onTap: () => context.push('/link-account'),
@@ -243,7 +261,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           );
                         },
                         loading: () => const Center(child: CircularProgressIndicator()),
-                        error: (e, _) => Center(child: Text('Error loading accounts')),
+                        error: (e, _) => const Center(child: Text('Error loading accounts')),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -283,6 +301,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     crossAxisCount: 2,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
+                    childAspectRatio: 1.5,
                     children: [
                       SummaryStatCard(
                         label: l10n.totalReceivable,

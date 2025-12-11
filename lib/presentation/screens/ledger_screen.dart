@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/domain/entities/person.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 import 'package:aldeewan_mobile/presentation/widgets/empty_state.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/widgets/person_form.dart';
@@ -43,6 +45,46 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
 
   void _handleQuickAction(String action) {
     final l10n = AppLocalizations.of(context)!;
+    final persons = ref.read(ledgerProvider).persons;
+
+    if (persons.isEmpty) {
+      showModalBottomSheet(
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.all(24.0),
+          width: double.infinity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(LucideIcons.users, size: 48, color: Colors.grey),
+              const SizedBox(height: 16),
+              Text(
+                l10n.noPersonsFound,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                l10n.addPersonPrompt,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              const SizedBox(height: 24),
+              FilledButton.icon(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _showAddPersonModal(context);
+                },
+                icon: const Icon(LucideIcons.userPlus),
+                label: Text(l10n.addPerson),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      );
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
       builder: (context) => Column(
@@ -58,11 +100,12 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
           Expanded(
             child: Consumer(
               builder: (context, ref, child) {
-                final persons = ref.watch(ledgerProvider).persons;
+                // Re-watch in case it changes while open (unlikely but good practice)
+                final currentPersons = ref.watch(ledgerProvider).persons;
                 return ListView.builder(
-                  itemCount: persons.length,
+                  itemCount: currentPersons.length,
                   itemBuilder: (context, index) {
-                    final person = persons[index];
+                    final person = currentPersons[index];
                     return ListTile(
                       title: Text(person.name),
                       subtitle: Text(person.role == PersonRole.customer ? l10n.customer : l10n.supplier),
@@ -129,6 +172,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
     final ledgerState = ref.watch(ledgerProvider);
     final notifier = ref.read(ledgerProvider.notifier);
     final l10n = AppLocalizations.of(context)!;
+    final currency = ref.watch(currencyProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -146,18 +190,20 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
           : TabBarView(
               controller: _tabController,
               children: [
-                _buildPersonList(context, ledgerState.persons, PersonRole.customer, notifier, l10n),
-                _buildPersonList(context, ledgerState.persons, PersonRole.supplier, notifier, l10n),
+                _buildPersonList(context, ledgerState.persons, PersonRole.customer, notifier, l10n, currency),
+                _buildPersonList(context, ledgerState.persons, PersonRole.supplier, notifier, l10n, currency),
               ],
             ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddPersonModal(context),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
         child: const Icon(Icons.add),
       ),
     );
   }
 
-  Widget _buildPersonList(BuildContext context, List<Person> persons, PersonRole role, LedgerNotifier notifier, AppLocalizations l10n) {
+  Widget _buildPersonList(BuildContext context, List<Person> persons, PersonRole role, LedgerNotifier notifier, AppLocalizations l10n, String currency) {
     final filteredPersons = persons.where((p) => p.role == role).toList();
 
     if (filteredPersons.isEmpty) {
@@ -222,7 +268,10 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  balance.abs().toStringAsFixed(2),
+                  NumberFormat.currency(
+                    symbol: currency,
+                    decimalDigits: currency == 'SDG' ? 0 : 2,
+                  ).format(balance.abs()),
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,

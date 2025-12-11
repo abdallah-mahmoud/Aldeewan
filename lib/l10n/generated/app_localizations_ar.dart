@@ -42,6 +42,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addPerson => 'إضافة شخص';
 
   @override
+  String get addPersonPrompt => 'تحتاج إلى إضافة شخص قبل إضافة معاملة';
+
+  @override
   String get appearance => 'المظهر';
 
   @override
@@ -176,6 +179,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get selectPerson => 'اختر الشخص';
+
+  @override
+  String get noPersonsFound => 'لا يوجد أشخاص';
 
   @override
   String get customer => 'عميل';
@@ -375,6 +381,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get myAccounts => 'حساباتي';
 
   @override
+  String get comingSoon => 'قريباً';
+
+  @override
   String get syncAccounts => 'مزامنة الحسابات';
 
   @override
@@ -388,6 +397,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get createGoal => 'إنشاء هدف';
+
+  @override
+  String get goalName => 'اسم الهدف';
 
   @override
   String get monthlyLimit => 'الحد الشهري';

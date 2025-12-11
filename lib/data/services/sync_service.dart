@@ -1,10 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:aldeewan_mobile/data/datasources/bank_provider_interface.dart';
 import 'package:aldeewan_mobile/data/datasources/mock_bank_provider.dart';
 import 'package:aldeewan_mobile/data/models/financial_account_model.dart';
 import 'package:aldeewan_mobile/data/models/transaction_model.dart';
 import 'package:aldeewan_mobile/presentation/providers/database_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:isar/isar.dart';
+import 'package:realm/realm.dart';
 
 final syncServiceProvider = Provider<SyncService>((ref) {
   return SyncService(ref);
@@ -16,17 +17,17 @@ class SyncService {
   SyncService(this.ref);
 
   Future<void> syncAllAccounts() async {
-    final isar = await ref.read(isarProvider.future);
-    final accounts = await isar.financialAccountModels.where().findAll();
+    final realm = await ref.read(realmProvider.future);
+    final accounts = realm.all<FinancialAccountModel>().toList();
 
     for (final account in accounts) {
       if (account.providerId.isNotEmpty) {
-        await _syncAccount(isar, account);
+        await _syncAccount(realm, account);
       }
     }
   }
 
-  Future<void> _syncAccount(Isar isar, FinancialAccountModel account) async {
+  Future<void> _syncAccount(Realm realm, FinancialAccountModel account) async {
     try {
       BankProviderInterface provider;
       switch (account.providerId) {
@@ -44,34 +45,33 @@ class SyncService {
 
       if (transactions.isEmpty) return;
 
-      await isar.writeTxn(() async {
+      realm.write(() {
         // Save transactions
         for (final txn in transactions) {
           // Check if transaction already exists to avoid duplicates
-          final exists = await isar.transactionModels
-              .filter()
-              .externalIdEqualTo(txn.externalId)
-              .findFirst();
+          final exists = realm.query<TransactionModel>('externalId == \$0', [txn.externalId]).firstOrNull;
 
           if (exists == null) {
             txn.accountId = account.id;
-            await isar.transactionModels.put(txn);
+            realm.add(txn);
           }
         }
 
         // Update account balance and sync time
-        // In a real app, we might want to fetch the balance from the API again
-        // or calculate it based on transactions. Here we trust the provider's balance if available,
-        // but fetchTransactions doesn't return balance.
-        // Let's fetch balance separately.
-        final newBalance = await provider.getBalance(account.externalAccountId ?? '');
-        
+        // In a real app, we would fetch balance separately.
+        // For now we assume provider.getBalance works.
+      });
+      
+      // Fetch balance outside write transaction because it's async
+      final newBalance = await provider.getBalance(account.externalAccountId ?? '');
+      
+      realm.write(() {
         account.balance = newBalance;
         account.lastSyncTime = DateTime.now();
-        await isar.financialAccountModels.put(account);
       });
+
     } catch (e) {
-      print('Error syncing account ${account.name}: $e');
+      debugPrint('Error syncing account : $e');
     }
   }
 }

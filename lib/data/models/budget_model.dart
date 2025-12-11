@@ -1,6 +1,6 @@
 import 'package:realm/realm.dart';
 
-part 'budget_model.g.dart';
+part 'budget_model.realm.dart';
 
 @RealmModel()
 class _BudgetModel {

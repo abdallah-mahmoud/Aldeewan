@@ -1,6 +1,6 @@
 import 'package:realm/realm.dart';
 
-part 'savings_goal_model.g.dart';
+part 'savings_goal_model.realm.dart';
 
 @RealmModel()
 class _SavingsGoalModel {

@@ -42,6 +42,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addPerson => 'Add Person';
 
   @override
+  String get addPersonPrompt =>
+      'You need to add a person before adding a transaction';
+
+  @override
   String get appearance => 'Appearance';
 
   @override
@@ -176,6 +180,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectPerson => 'Select Person';
+
+  @override
+  String get noPersonsFound => 'No persons found';
 
   @override
   String get customer => 'Customer';
@@ -376,6 +383,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get myAccounts => 'My Accounts';
 
   @override
+  String get comingSoon => 'Coming Soon';
+
+  @override
   String get syncAccounts => 'Sync Accounts';
 
   @override
@@ -389,6 +399,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get createGoal => 'Create Goal';
+
+  @override
+  String get goalName => 'Goal Name';
 
   @override
   String get monthlyLimit => 'Monthly Limit';

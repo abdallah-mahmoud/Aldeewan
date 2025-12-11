@@ -9,7 +9,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability within this project, please send an e-mail to the developer at [contact@example.com](mailto:contact@example.com). All security vulnerabilities will be promptly addressed.
+If you discover a security vulnerability within this project, please send an e-mail to the developer at [abdo13-m.azme@hotmail.com](mailto:abdo13-m.azme@hotmail.com). All security vulnerabilities will be promptly addressed.
 
 ## Security Measures
 

@@ -30,7 +30,7 @@ class BottomNavBar extends StatelessWidget {
         ),
         NavigationDestination(
           icon: const Icon(LucideIcons.pieChart),
-          label: 'Analytics', // TODO: Add to l10n
+          label: l10n.analytics,
         ),
         NavigationDestination(
           icon: const Icon(LucideIcons.settings),

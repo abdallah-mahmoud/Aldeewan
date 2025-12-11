@@ -1,7 +1,7 @@
-import 'package:realm/realm.dart';
+import 'package:realm/realm.dart' hide Transaction;
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 
-part 'transaction_model.g.dart';
+part 'transaction_model.realm.dart';
 
 @RealmModel()
 class _TransactionModel {
@@ -29,7 +29,7 @@ extension TransactionModelMapper on TransactionModel {
   Transaction toEntity() {
     return Transaction(
       id: uuid,
-      type: TransactionType.values.firstWhere((e) => e.name == type, orElse: () => TransactionType.credit),
+      type: TransactionType.values.firstWhere((e) => e.name == type, orElse: () => TransactionType.cashExpense),
       personId: personId,
       amount: amount,
       date: date,
