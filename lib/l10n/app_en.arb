@@ -117,5 +117,21 @@
   "payable": "Payable",
   "advance": "Advance",
   "income": "Income",
-  "expense": "Expense"
+  "expense": "Expense",
+  "analytics": "Analytics",
+  "budgets": "Budgets",
+  "goals": "Goals",
+  "linkAccount": "Link Account",
+  "myAccounts": "My Accounts",
+  "syncAccounts": "Sync Accounts",
+  "expensesByCategory": "Expenses by Category",
+  "budgetSummary": "Budget Summary",
+  "createBudget": "Create Budget",
+  "createGoal": "Create Goal",
+  "monthlyLimit": "Monthly Limit",
+  "targetAmount": "Target Amount",
+  "currentSaved": "Current Saved",
+  "addToGoal": "Add to Goal",
+  "connectBank": "Connect Bank",
+  "selectProvider": "Select Provider"
 }

@@ -1,20 +1,17 @@
-import 'package:isar/isar.dart';
+import 'package:realm/realm.dart';
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 
 part 'transaction_model.g.dart';
 
-@collection
-class TransactionModel {
-  Id id = Isar.autoIncrement;
-
-  @Index(unique: true, replace: true)
+@RealmModel()
+class _TransactionModel {
+  @PrimaryKey()
   late String uuid;
 
-  @Enumerated(EnumType.name)
-  late TransactionType type;
+  late String type; // Enum as String
 
-  @Index()
-  String? personId; // Foreign key to Person UUID
+  @Indexed()
+  String? personId;
 
   late double amount;
   late DateTime date;
@@ -22,30 +19,42 @@ class TransactionModel {
   String? note;
   DateTime? dueDate;
 
-  // Mapper: Model -> Entity
+  @Indexed()
+  String? externalId;
+  String? status;
+  int? accountId;
+}
+
+extension TransactionModelMapper on TransactionModel {
   Transaction toEntity() {
     return Transaction(
       id: uuid,
-      type: type,
+      type: TransactionType.values.firstWhere((e) => e.name == type, orElse: () => TransactionType.credit),
       personId: personId,
       amount: amount,
       date: date,
       category: category,
       note: note,
       dueDate: dueDate,
+      externalId: externalId,
+      status: status,
+      accountId: accountId,
     );
   }
 
-  // Mapper: Entity -> Model
   static TransactionModel fromEntity(Transaction transaction) {
-    return TransactionModel()
-      ..uuid = transaction.id
-      ..type = transaction.type
-      ..personId = transaction.personId
-      ..amount = transaction.amount
-      ..date = transaction.date
-      ..category = transaction.category
-      ..note = transaction.note
-      ..dueDate = transaction.dueDate;
+    return TransactionModel(
+      transaction.id,
+      transaction.type.name,
+      transaction.amount,
+      transaction.date,
+      personId: transaction.personId,
+      category: transaction.category,
+      note: transaction.note,
+      dueDate: transaction.dueDate,
+      externalId: transaction.externalId,
+      status: transaction.status,
+      accountId: transaction.accountId,
+    );
   }
 }

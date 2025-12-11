@@ -359,4 +359,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get advance => 'Advance';
+
+  @override
+  String get analytics => 'Analytics';
+
+  @override
+  String get budgets => 'Budgets';
+
+  @override
+  String get goals => 'Goals';
+
+  @override
+  String get linkAccount => 'Link Account';
+
+  @override
+  String get myAccounts => 'My Accounts';
+
+  @override
+  String get syncAccounts => 'Sync Accounts';
+
+  @override
+  String get expensesByCategory => 'Expenses by Category';
+
+  @override
+  String get budgetSummary => 'Budget Summary';
+
+  @override
+  String get createBudget => 'Create Budget';
+
+  @override
+  String get createGoal => 'Create Goal';
+
+  @override
+  String get monthlyLimit => 'Monthly Limit';
+
+  @override
+  String get targetAmount => 'Target Amount';
+
+  @override
+  String get currentSaved => 'Current Saved';
+
+  @override
+  String get addToGoal => 'Add to Goal';
+
+  @override
+  String get connectBank => 'Connect Bank';
+
+  @override
+  String get selectProvider => 'Select Provider';
 }

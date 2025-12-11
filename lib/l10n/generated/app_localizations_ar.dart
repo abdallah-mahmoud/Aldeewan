@@ -358,4 +358,52 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get advance => 'مقدم';
+
+  @override
+  String get analytics => 'التحليلات';
+
+  @override
+  String get budgets => 'الميزانيات';
+
+  @override
+  String get goals => 'الأهداف';
+
+  @override
+  String get linkAccount => 'ربط حساب';
+
+  @override
+  String get myAccounts => 'حساباتي';
+
+  @override
+  String get syncAccounts => 'مزامنة الحسابات';
+
+  @override
+  String get expensesByCategory => 'المصروفات حسب الفئة';
+
+  @override
+  String get budgetSummary => 'ملخص الميزانية';
+
+  @override
+  String get createBudget => 'إنشاء ميزانية';
+
+  @override
+  String get createGoal => 'إنشاء هدف';
+
+  @override
+  String get monthlyLimit => 'الحد الشهري';
+
+  @override
+  String get targetAmount => 'المبلغ المستهدف';
+
+  @override
+  String get currentSaved => 'المدخرات الحالية';
+
+  @override
+  String get addToGoal => 'إضافة للهدف';
+
+  @override
+  String get connectBank => 'ربط البنك';
+
+  @override
+  String get selectProvider => 'اختر المزود';
 }

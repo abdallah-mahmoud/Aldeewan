@@ -1,40 +1,37 @@
-import 'package:isar/isar.dart';
+import 'package:realm/realm.dart';
 import 'package:aldeewan_mobile/domain/entities/person.dart';
 
 part 'person_model.g.dart';
 
-@collection
-class PersonModel {
-  Id id = Isar.autoIncrement; // Isar requires an integer ID for auto-increment
+@RealmModel()
+class _PersonModel {
+  @PrimaryKey()
+  late String uuid;
 
-  @Index(unique: true, replace: true)
-  late String uuid; // We'll use a UUID to match the Domain Entity ID
-
-  @Enumerated(EnumType.name)
-  late PersonRole role;
-
+  late String role; // Storing Enum as String
   late String name;
   String? phone;
   late DateTime createdAt;
+}
 
-  // Mapper: Model -> Entity
+extension PersonModelMapper on PersonModel {
   Person toEntity() {
     return Person(
       id: uuid,
-      role: role,
+      role: PersonRole.values.firstWhere((e) => e.name == role, orElse: () => PersonRole.debtor),
       name: name,
       phone: phone,
       createdAt: createdAt,
     );
   }
 
-  // Mapper: Entity -> Model
   static PersonModel fromEntity(Person person) {
-    return PersonModel()
-      ..uuid = person.id
-      ..role = person.role
-      ..name = person.name
-      ..phone = person.phone
-      ..createdAt = person.createdAt;
+    return PersonModel(
+      person.id,
+      person.role.name,
+      person.name,
+      person.createdAt,
+      phone: person.phone,
+    );
   }
 }

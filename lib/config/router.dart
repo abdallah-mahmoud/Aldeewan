@@ -4,11 +4,12 @@ import 'package:go_router/go_router.dart';
 import 'package:aldeewan_mobile/presentation/screens/home_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/ledger_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/cashbook_screen.dart';
-import 'package:aldeewan_mobile/presentation/screens/reports_screen.dart';
+import 'package:aldeewan_mobile/presentation/screens/budget_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/settings_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/person_details_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/about_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/splash_screen.dart';
+import 'package:aldeewan_mobile/presentation/screens/link_account_screen.dart';
 import 'package:aldeewan_mobile/presentation/widgets/scaffold_with_nav_bar.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -22,6 +23,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/',
         builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
+        path: '/link-account',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const LinkAccountScreen(),
       ),
       ShellRoute(
         navigatorKey: shellNavigatorKey,
@@ -52,8 +58,8 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const CashbookScreen(),
           ),
           GoRoute(
-            path: '/reports',
-            builder: (context, state) => const ReportsScreen(),
+            path: '/analytics',
+            builder: (context, state) => const BudgetScreen(),
           ),
           GoRoute(
             path: '/settings',

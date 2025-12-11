@@ -3,7 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  isar_flutter_libs
+  flutter_secure_storage_linux
+  realm
   url_launcher_linux
 )
 

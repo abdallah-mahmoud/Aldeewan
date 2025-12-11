@@ -20,6 +20,11 @@ class Transaction {
   final String? category;
   final String? note;
   final DateTime? dueDate;
+  
+  // New Fields for V1.2
+  final String? externalId;
+  final String? status;
+  final int? accountId;
 
   Transaction({
     required this.id,
@@ -30,5 +35,8 @@ class Transaction {
     this.category,
     this.note,
     this.dueDate,
+    this.externalId,
+    this.status,
+    this.accountId,
   });
 }

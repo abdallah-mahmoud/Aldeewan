@@ -30,7 +30,7 @@ class BottomNavBar extends StatelessWidget {
         ),
         NavigationDestination(
           icon: const Icon(LucideIcons.pieChart),
-          label: l10n.reports,
+          label: 'Analytics', // TODO: Add to l10n
         ),
         NavigationDestination(
           icon: const Icon(LucideIcons.settings),
@@ -44,7 +44,7 @@ class BottomNavBar extends StatelessWidget {
     if (path == '/home' || path == '/') return 0;
     if (path.startsWith('/ledger')) return 1;
     if (path.startsWith('/cashbook')) return 2;
-    if (path.startsWith('/reports')) return 3;
+    if (path.startsWith('/analytics')) return 3;
     if (path.startsWith('/settings')) return 4;
     return 0; // Default to Overview
   }
@@ -61,7 +61,7 @@ class BottomNavBar extends StatelessWidget {
         context.go('/cashbook');
         break;
       case 3:
-        context.go('/reports');
+        context.go('/analytics');
         break;
       case 4:
         context.go('/settings');

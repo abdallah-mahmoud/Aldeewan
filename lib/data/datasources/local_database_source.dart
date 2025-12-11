@@ -1,10 +1,17 @@
+import 'dart:convert';
+import 'dart:math';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:aldeewan_mobile/data/models/person_model.dart';
 import 'package:aldeewan_mobile/data/models/transaction_model.dart';
+import 'package:aldeewan_mobile/data/models/financial_account_model.dart';
+import 'package:aldeewan_mobile/data/models/budget_model.dart';
+import 'package:aldeewan_mobile/data/models/savings_goal_model.dart';
 
 class LocalDatabaseSource {
   late Future<Isar> db;
+  final _storage = const FlutterSecureStorage();
 
   LocalDatabaseSource() {
     db = _initDb();
@@ -12,15 +19,38 @@ class LocalDatabaseSource {
 
   Future<Isar> _initDb() async {
     final dir = await getApplicationDocumentsDirectory();
+
     if (Isar.instanceNames.isEmpty) {
       return await Isar.open(
-        [PersonModelSchema, TransactionModelSchema],
+        [
+          PersonModelSchema, 
+          TransactionModelSchema,
+          FinancialAccountModelSchema,
+          BudgetModelSchema,
+          SavingsGoalModelSchema,
+        ],
         directory: dir.path,
         inspector: true,
+        // encryptionKey: encryptionKey, // TODO: Re-enable when Isar supports it or upgrade
       );
     }
     return Future.value(Isar.getInstance());
   }
+
+  /*
+  Future<List<int>> _getEncryptionKey() async {
+    String? keyString = await _storage.read(key: 'isar_db_key');
+    
+    if (keyString == null) {
+      final key = List<int>.generate(32, (i) => Random.secure().nextInt(256));
+      keyString = base64Url.encode(key);
+      await _storage.write(key: 'isar_db_key', value: keyString);
+      return key;
+    } else {
+      return base64Url.decode(keyString);
+    }
+  }
+  */
 
   // --- Person Operations ---
   Future<List<PersonModel>> getPeople() async {

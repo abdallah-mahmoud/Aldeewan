@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:aldeewan_mobile/config/gradients.dart';
 
 class HeroBalanceCard extends StatelessWidget {
   final String title;
@@ -31,13 +32,7 @@ class HeroBalanceCard extends StatelessWidget {
             offset: const Offset(0, 10),
           ),
         ],
-        gradient: LinearGradient(
-          colors: isPositive
-              ? [const Color(0xFF4338CA), const Color(0xFF6366F1)] // Indigo 700 -> Indigo 500
-              : [const Color(0xFFBE123C), const Color(0xFFF43F5E)], // Rose 700 -> Rose 500
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: isPositive ? AppGradients.primaryCard : AppGradients.budgetDanger,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

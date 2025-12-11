@@ -22,16 +22,19 @@ dependencies:
   lucide_icons: ^0.257.0
   uuid: ^4.3.3
   url_launcher: ^6.2.5
-  isar: ^3.1.0+1
-  isar_flutter_libs: ^3.1.0+1
+  realm: ^3.0.0
   google_fonts: ^6.3.2
+  fl_chart: ^0.69.0
+  dio: ^5.9.0
+  flutter_secure_storage: ^9.0.0
+  local_auth: ^2.3.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
   flutter_launcher_icons: ^0.13.1
-  isar_generator: ^3.1.0+1
+  realm_generator: ^3.0.0
   build_runner: ^2.4.13
 
 flutter_icons:

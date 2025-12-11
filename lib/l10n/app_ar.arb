@@ -114,5 +114,21 @@
   "payable": "علينا",
   "advance": "مقدم",
   "income": "دخل",
-  "expense": "صرف"
+  "expense": "صرف",
+  "analytics": "التحليلات",
+  "budgets": "الميزانيات",
+  "goals": "الأهداف",
+  "linkAccount": "ربط حساب",
+  "myAccounts": "حساباتي",
+  "syncAccounts": "مزامنة الحسابات",
+  "expensesByCategory": "المصروفات حسب الفئة",
+  "budgetSummary": "ملخص الميزانية",
+  "createBudget": "إنشاء ميزانية",
+  "createGoal": "إنشاء هدف",
+  "monthlyLimit": "الحد الشهري",
+  "targetAmount": "المبلغ المستهدف",
+  "currentSaved": "المدخرات الحالية",
+  "addToGoal": "إضافة للهدف",
+  "connectBank": "ربط البنك",
+  "selectProvider": "اختر المزود"
 }
