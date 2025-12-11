@@ -137,5 +137,20 @@
   "currentSaved": "Current Saved",
   "addToGoal": "Add to Goal",
   "connectBank": "Connect Bank",
-  "selectProvider": "Select Provider"
+  "selectProvider": "Select Provider",
+  "noExpensesToShow": "No expenses to show",
+  "unlock": "Unlock",
+  "appLocked": "App Locked",
+  "link": "Link",
+  "linkBankAccount": "Link your bank account",
+  "errorLoadingAccounts": "Error loading accounts",
+  "personNotFound": "Person Not Found",
+  "appLock": "App Lock",
+  "appLockSubtitle": "Require authentication to open app",
+  "unlockApp": "Unlock App",
+  "accountLinkedSuccess": "Account linked successfully!",
+  "authFailed": "Authentication failed. Please check credentials.",
+  "linkBankAccountTitle": "Link Bank Account",
+  "connectAccount": "Connect Account",
+  "errorOccurred": "Error: {error}"
 }

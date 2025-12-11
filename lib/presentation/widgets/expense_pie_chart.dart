@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
+import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 
 class ExpensePieChart extends StatefulWidget {
   final List<Transaction> transactions;
@@ -17,11 +18,12 @@ class _ExpensePieChartState extends State<ExpensePieChart> {
   @override
   Widget build(BuildContext context) {
     final groupedExpenses = _groupExpensesByCategory();
+    final l10n = AppLocalizations.of(context)!;
     
     if (groupedExpenses.isEmpty) {
-      return const SizedBox(
+      return SizedBox(
         height: 200,
-        child: Center(child: Text('No expenses to show')),
+        child: Center(child: Text(l10n.noExpensesToShow)),
       );
     }
 

@@ -895,6 +895,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Provider'**
   String get selectProvider;
+
+  /// No description provided for @noExpensesToShow.
+  ///
+  /// In en, this message translates to:
+  /// **'No expenses to show'**
+  String get noExpensesToShow;
+
+  /// No description provided for @unlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get unlock;
+
+  /// No description provided for @appLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'App Locked'**
+  String get appLocked;
+
+  /// No description provided for @link.
+  ///
+  /// In en, this message translates to:
+  /// **'Link'**
+  String get link;
+
+  /// No description provided for @linkBankAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Link your bank account'**
+  String get linkBankAccount;
+
+  /// No description provided for @errorLoadingAccounts.
+  ///
+  /// In en, this message translates to:
+  /// **'Error loading accounts'**
+  String get errorLoadingAccounts;
+
+  /// No description provided for @personNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Person Not Found'**
+  String get personNotFound;
+
+  /// No description provided for @appLock.
+  ///
+  /// In en, this message translates to:
+  /// **'App Lock'**
+  String get appLock;
+
+  /// No description provided for @appLockSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Require authentication to open app'**
+  String get appLockSubtitle;
+
+  /// No description provided for @unlockApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock App'**
+  String get unlockApp;
+
+  /// No description provided for @accountLinkedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Account linked successfully!'**
+  String get accountLinkedSuccess;
+
+  /// No description provided for @authFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication failed. Please check credentials.'**
+  String get authFailed;
+
+  /// No description provided for @linkBankAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Bank Account'**
+  String get linkBankAccountTitle;
+
+  /// No description provided for @connectAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect Account'**
+  String get connectAccount;
+
+  /// No description provided for @errorOccurred.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {error}'**
+  String errorOccurred(Object error);
 }
 
 class _AppLocalizationsDelegate

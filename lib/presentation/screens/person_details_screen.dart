@@ -48,8 +48,8 @@ class PersonDetailsScreen extends ConsumerWidget {
 
     if (person.id == 'not-found') {
       return Scaffold(
-        appBar: AppBar(title: const Text('Person Not Found')),
-        body: const Center(child: Text('Person not found')),
+        appBar: AppBar(title: Text(l10n.personNotFound)),
+        body: Center(child: Text(l10n.personNotFound)),
       );
     }
 

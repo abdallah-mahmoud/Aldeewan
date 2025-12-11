@@ -134,5 +134,20 @@
   "currentSaved": "المدخرات الحالية",
   "addToGoal": "إضافة للهدف",
   "connectBank": "ربط البنك",
-  "selectProvider": "اختر المزود"
+  "selectProvider": "اختر المزود",
+  "noExpensesToShow": "لا توجد مصروفات لعرضها",
+  "unlock": "فتح القفل",
+  "appLocked": "التطبيق مقفل",
+  "link": "ربط",
+  "linkBankAccount": "ربط حسابك البنكي",
+  "errorLoadingAccounts": "خطأ في تحميل الحسابات",
+  "personNotFound": "الشخص غير موجود",
+  "appLock": "قفل التطبيق",
+  "appLockSubtitle": "طلب المصادقة لفتح التطبيق",
+  "unlockApp": "فتح التطبيق",
+  "accountLinkedSuccess": "تم ربط الحساب بنجاح!",
+  "authFailed": "فشلت المصادقة. يرجى التحقق من البيانات.",
+  "linkBankAccountTitle": "ربط حساب بنكي",
+  "connectAccount": "اتصال بالحساب",
+  "errorOccurred": "خطأ: {error}"
 }

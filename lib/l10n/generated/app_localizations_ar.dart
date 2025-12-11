@@ -418,4 +418,51 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get selectProvider => 'اختر المزود';
+
+  @override
+  String get noExpensesToShow => 'لا توجد مصروفات لعرضها';
+
+  @override
+  String get unlock => 'فتح القفل';
+
+  @override
+  String get appLocked => 'التطبيق مقفل';
+
+  @override
+  String get link => 'ربط';
+
+  @override
+  String get linkBankAccount => 'ربط حسابك البنكي';
+
+  @override
+  String get errorLoadingAccounts => 'خطأ في تحميل الحسابات';
+
+  @override
+  String get personNotFound => 'الشخص غير موجود';
+
+  @override
+  String get appLock => 'قفل التطبيق';
+
+  @override
+  String get appLockSubtitle => 'طلب المصادقة لفتح التطبيق';
+
+  @override
+  String get unlockApp => 'فتح التطبيق';
+
+  @override
+  String get accountLinkedSuccess => 'تم ربط الحساب بنجاح!';
+
+  @override
+  String get authFailed => 'فشلت المصادقة. يرجى التحقق من البيانات.';
+
+  @override
+  String get linkBankAccountTitle => 'ربط حساب بنكي';
+
+  @override
+  String get connectAccount => 'اتصال بالحساب';
+
+  @override
+  String errorOccurred(Object error) {
+    return 'خطأ: $error';
+  }
 }

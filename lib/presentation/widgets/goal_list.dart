@@ -5,6 +5,7 @@ import 'package:aldeewan_mobile/data/models/savings_goal_model.dart';
 import 'package:aldeewan_mobile/presentation/widgets/empty_state.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
+import 'package:aldeewan_mobile/utils/input_formatters.dart';
 
 class GoalList extends ConsumerWidget {
   const GoalList({super.key});
@@ -70,13 +71,14 @@ class GoalList extends ConsumerWidget {
         content: TextField(
           controller: amountController,
           decoration: InputDecoration(labelText: l10n.amount),
-          keyboardType: TextInputType.number,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
+          inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
           FilledButton(
             onPressed: () {
-              final amount = double.tryParse(amountController.text) ?? 0;
+              final amount = double.tryParse(amountController.text.replaceAll(',', '')) ?? 0;
               if (amount > 0) {
                 ref.read(budgetProvider.notifier).updateGoal(goal, amount);
               }

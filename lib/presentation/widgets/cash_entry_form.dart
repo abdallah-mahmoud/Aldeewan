@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/utils/toast_service.dart';
+import 'package:aldeewan_mobile/utils/input_formatters.dart';
 
 class CashEntryForm extends StatefulWidget {
   final Function(Transaction) onSave;
@@ -53,7 +54,7 @@ class _CashEntryFormState extends State<CashEntryForm> {
 
   void _save(AppLocalizations l10n) {
     if (_formKey.currentState!.validate()) {
-      final amount = double.tryParse(_amountController.text);
+      final amount = double.tryParse(_amountController.text.replaceAll(',', ''));
       if (amount == null) return;
 
       final transaction = Transaction(
@@ -130,11 +131,12 @@ class _CashEntryFormState extends State<CashEntryForm> {
                 prefixText: '\$ ', // Should be localized currency symbol ideally
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return l10n.pleaseEnterAmount;
                 }
-                if (double.tryParse(value) == null) {
+                if (double.tryParse(value.replaceAll(',', '')) == null) {
                   return l10n.invalidNumber;
                 }
                 return null;

@@ -12,6 +12,7 @@ import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
 import 'package:aldeewan_mobile/data/models/budget_model.dart';
 import 'package:aldeewan_mobile/data/models/savings_goal_model.dart';
 import 'package:realm/realm.dart';
+import 'package:aldeewan_mobile/utils/input_formatters.dart';
 
 class AnalyticsScreen extends ConsumerStatefulWidget {
   const AnalyticsScreen({super.key});
@@ -121,7 +122,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
             TextField(
               controller: amountController,
               decoration: InputDecoration(labelText: l10n.monthlyLimit),
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
             ),
           ],
         ),
@@ -132,7 +134,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
               final budget = BudgetModel(
                 ObjectId(),
                 categoryController.text,
-                double.tryParse(amountController.text) ?? 0,
+                double.tryParse(amountController.text.replaceAll(',', '')) ?? 0,
                 0,
                 DateTime(DateTime.now().year, DateTime.now().month, 1),
                 DateTime(DateTime.now().year, DateTime.now().month + 1, 0),
@@ -168,7 +170,8 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
             TextField(
               controller: targetController,
               decoration: InputDecoration(labelText: l10n.targetAmount),
-              keyboardType: TextInputType.number,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
             ),
           ],
         ),
@@ -179,7 +182,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
               final goal = SavingsGoalModel(
                 ObjectId(),
                 nameController.text,
-                double.tryParse(targetController.text) ?? 0,
+                double.tryParse(targetController.text.replaceAll(',', '')) ?? 0,
                 0,
               );
               

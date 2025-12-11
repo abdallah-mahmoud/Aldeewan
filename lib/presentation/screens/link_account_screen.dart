@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/presentation/providers/account_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 
 class LinkAccountScreen extends ConsumerStatefulWidget {
   const LinkAccountScreen({super.key});
@@ -27,6 +28,7 @@ class _LinkAccountScreenState extends ConsumerState<LinkAccountScreen> {
 
   Future<void> _linkAccount() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
 
     setState(() => _isLoading = true);
 
@@ -39,18 +41,18 @@ class _LinkAccountScreenState extends ConsumerState<LinkAccountScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Account linked successfully!')),
+          SnackBar(content: Text(l10n.accountLinkedSuccess)),
         );
         context.pop();
       } else if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Authentication failed. Please check credentials.')),
+          SnackBar(content: Text(l10n.authFailed)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(content: Text(l10n.errorOccurred(e.toString()))),
         );
       }
     } finally {
@@ -60,9 +62,10 @@ class _LinkAccountScreenState extends ConsumerState<LinkAccountScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Link Bank Account'),
+        title: Text(l10n.linkBankAccountTitle),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -126,7 +129,7 @@ class _LinkAccountScreenState extends ConsumerState<LinkAccountScreen> {
                         width: 20,
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
-                    : const Text('Connect Account'),
+                    : Text(l10n.connectAccount),
               ),
               if (_selectedProvider == 'MOCK_BANK') ...[
                 const SizedBox(height: 16),

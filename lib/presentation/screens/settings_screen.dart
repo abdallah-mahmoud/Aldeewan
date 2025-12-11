@@ -110,11 +110,11 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const Divider(),
-          _buildSectionHeader(context, 'Security'),
+          _buildSectionHeader(context, l10n.appLock), // Using appLock as header too? Or maybe 'Security' needs a key
           SwitchListTile(
             secondary: const Icon(LucideIcons.lock),
-            title: const Text('App Lock'),
-            subtitle: const Text('Require authentication to open app'),
+            title: Text(l10n.appLock),
+            subtitle: Text(l10n.appLockSubtitle),
             value: isAppLockEnabled,
             onChanged: (bool value) {
               ref.read(securityProvider.notifier).setAppLock(value);

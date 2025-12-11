@@ -168,7 +168,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         TextButton.icon(
                           onPressed: () => context.push('/link-account'),
                           icon: const Icon(LucideIcons.plus, size: 16),
-                          label: const Text('Link'),
+                          label: Text(l10n.link),
                         ),
                       ],
                     ),
@@ -193,7 +193,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                                   children: [
                                     Icon(LucideIcons.landmark, size: 32, color: theme.colorScheme.primary),
                                     const SizedBox(height: 8),
-                                    Text('Link your bank account', style: theme.textTheme.bodyMedium),
+                                    Text(l10n.linkBankAccount, style: theme.textTheme.bodyMedium),
                                   ],
                                 ),
                               ),
@@ -261,7 +261,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           );
                         },
                         loading: () => const Center(child: CircularProgressIndicator()),
-                        error: (e, _) => const Center(child: Text('Error loading accounts')),
+                        error: (e, _) => Center(child: Text(l10n.errorLoadingAccounts)),
                       ),
                     ),
                     const SizedBox(height: 24),

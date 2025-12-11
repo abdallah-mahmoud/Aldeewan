@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/utils/auth_service.dart';
 import 'package:aldeewan_mobile/presentation/providers/security_provider.dart';
+import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -122,7 +123,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> with SingleTickerPr
               ElevatedButton.icon(
                 onPressed: _checkAuth,
                 icon: const Icon(LucideIcons.lock),
-                label: const Text('Unlock App'),
+                label: Text(AppLocalizations.of(context)!.unlockApp),
               ),
             ],
           ],

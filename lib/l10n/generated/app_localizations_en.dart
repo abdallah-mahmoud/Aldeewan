@@ -420,4 +420,51 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get selectProvider => 'Select Provider';
+
+  @override
+  String get noExpensesToShow => 'No expenses to show';
+
+  @override
+  String get unlock => 'Unlock';
+
+  @override
+  String get appLocked => 'App Locked';
+
+  @override
+  String get link => 'Link';
+
+  @override
+  String get linkBankAccount => 'Link your bank account';
+
+  @override
+  String get errorLoadingAccounts => 'Error loading accounts';
+
+  @override
+  String get personNotFound => 'Person Not Found';
+
+  @override
+  String get appLock => 'App Lock';
+
+  @override
+  String get appLockSubtitle => 'Require authentication to open app';
+
+  @override
+  String get unlockApp => 'Unlock App';
+
+  @override
+  String get accountLinkedSuccess => 'Account linked successfully!';
+
+  @override
+  String get authFailed => 'Authentication failed. Please check credentials.';
+
+  @override
+  String get linkBankAccountTitle => 'Link Bank Account';
+
+  @override
+  String get connectAccount => 'Connect Account';
+
+  @override
+  String errorOccurred(Object error) {
+    return 'Error: $error';
+  }
 }
