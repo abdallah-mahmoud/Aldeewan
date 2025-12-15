@@ -69,21 +69,20 @@ final cashbookProvider = FutureProvider<CashbookState>((ref) async {
   final ledgerAsync = ref.watch(ledgerProvider);
   final filter = ref.watch(cashFilterProvider);
   final dateRange = ref.watch(activeDateRangeProvider);
-  final searchQuery = ref.watch(cashbookSearchProvider);
+  // Removed searchQuery dependency to allow local filtering in UI
 
   final ledgerState = ledgerAsync.value;
   if (ledgerState == null) {
     return const CashbookState(transactions: [], totalIncome: 0, totalExpense: 0, netBalance: 0);
   }
 
-  return compute(_calculateCashbookState, (ledgerState, filter, dateRange, searchQuery));
+  return compute(_calculateCashbookState, (ledgerState, filter, dateRange));
 });
 
-CashbookState _calculateCashbookState((LedgerState, CashFilter, DateTimeRange?, String) data) {
+CashbookState _calculateCashbookState((LedgerState, CashFilter, DateTimeRange?) data) {
   final ledgerState = data.$1;
   final filter = data.$2;
   final dateRange = data.$3;
-  final searchQuery = data.$4;
 
   // 1. Filter for cash-related transactions
   var allCashTransactions = ledgerState.transactions.where((t) {
@@ -103,30 +102,12 @@ CashbookState _calculateCashbookState((LedgerState, CashFilter, DateTimeRange?, 
     }).toList();
   }
 
-  // 3. Apply search query
-  if (searchQuery.isNotEmpty) {
-    final lowerQuery = searchQuery.toLowerCase();
-    allCashTransactions = allCashTransactions.where((tx) {
-      // Search by note
-      if ((tx.note ?? '').toLowerCase().contains(lowerQuery)) return true;
-      // Search by category
-      if ((tx.category ?? '').toLowerCase().contains(lowerQuery)) return true;
-      // Search by person name
-      if (tx.personId != null) {
-        // We need person name. ledgerState has persons list.
-        try {
-          final person = ledgerState.persons.firstWhere((p) => p.id == tx.personId);
-          if (person.name.toLowerCase().contains(lowerQuery)) return true;
-        } catch (_) {}
-      }
-      return false;
-    }).toList();
-  }
+  // Note: Search filtering is now done in the UI (CashbookScreen) to avoid reload flicker
 
   // Sort by date descending
   allCashTransactions.sort((a, b) => b.date.compareTo(a.date));
 
-  // 4. Apply income/expense filter
+  // 3. Apply income/expense filter
   final filtered = allCashTransactions.where((t) {
     final isIncome = t.type == TransactionType.paymentReceived ||
         t.type == TransactionType.cashSale ||
@@ -137,7 +118,7 @@ CashbookState _calculateCashbookState((LedgerState, CashFilter, DateTimeRange?, 
     return true;
   }).toList();
 
-  // 5. Compute summary
+  // 4. Compute summary
   double totalIn = 0;
   double totalOut = 0;
   for (final t in filtered) {

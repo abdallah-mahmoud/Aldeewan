@@ -64,7 +64,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
   Future<void> _checkAuth() async {
     final context = rootNavigatorKey.currentContext;
     String reason = 'Please authenticate to access Aldeewan';
-    if (context != null) {
+    if (context != null && context.mounted) {
       final l10n = AppLocalizations.of(context);
       if (l10n != null) {
         reason = l10n.authenticateReason;
@@ -131,7 +131,7 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
         String title = 'Daily Reminder';
         String body = "Don't forget to record your transactions for today!";
         
-        if (context != null) {
+        if (context != null && context.mounted) {
           final l10n = AppLocalizations.of(context);
           if (l10n != null) {
             title = l10n.dailyReminderTitle;

@@ -11,13 +11,13 @@ class NotificationState {
 }
 
 class NotificationNotifier extends StateNotifier<NotificationState> {
-  NotificationNotifier() : super(NotificationState(isEnabled: false, time: const TimeOfDay(hour: 20, minute: 0))) {
+  NotificationNotifier() : super(NotificationState(isEnabled: true, time: const TimeOfDay(hour: 20, minute: 0))) {
     _loadSettings();
   }
 
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    final isEnabled = prefs.getBool('daily_reminder_enabled') ?? false;
+    final isEnabled = prefs.getBool('daily_reminder_enabled') ?? true;
     final hour = prefs.getInt('daily_reminder_hour') ?? 20;
     final minute = prefs.getInt('daily_reminder_minute') ?? 0;
     state = NotificationState(isEnabled: isEnabled, time: TimeOfDay(hour: hour, minute: minute));

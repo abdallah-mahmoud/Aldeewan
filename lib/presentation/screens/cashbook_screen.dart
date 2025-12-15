@@ -39,6 +39,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
       if (filterParam != null) {
         _initialActionHandled = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
           if (filterParam == 'income') {
             ref.read(cashFilterProvider.notifier).state = CashFilter.income;
           } else if (filterParam == 'expense') {
@@ -64,6 +65,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
         initialNote = uri.queryParameters['note'];
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
           _showAddCashEntryModal(context, ref, initialAmount, initialDate, initialNote);
         });
       }
@@ -85,7 +87,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
         initialDate: initialDate,
         initialNote: initialNote,
         onSave: (transaction) {
-          ref.read(soundServiceProvider).playSuccess();
+          ref.read(soundServiceProvider).playMoneyIn();
           ref.read(ledgerProvider.notifier).addTransaction(transaction);
         },
       ),
@@ -109,11 +111,51 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, s) => Scaffold(body: Center(child: Text(AppLocalizations.of(context)!.errorOccurred(e.toString())))),
       data: (cashbookState) {
-        // Transactions are already filtered by the provider (including search)
-        final filtered = cashbookState.transactions;
-        final totalIn = cashbookState.totalIncome;
-        final totalOut = cashbookState.totalExpense;
-        final net = cashbookState.netBalance;
+      data: (cashbookState) {
+        // 1. Get filtered list from state (already filtered by date/type/filters)
+        var filteredList = cashbookState.transactions;
+        
+        // 2. Apply Search Locally
+        if (searchQuery.isNotEmpty) {
+          final lowerQuery = searchQuery.toLowerCase();
+          filteredList = filteredList.where((tx) {
+            // Search by note
+            if ((tx.note ?? '').toLowerCase().contains(lowerQuery)) return true;
+            // Search by category
+            if ((tx.category ?? '').toLowerCase().contains(lowerQuery)) return true;
+            // Search by person name
+            if (tx.personId != null) {
+              try {
+                final persons = ledgerAsync.value?.persons ?? [];
+                final person = persons.firstWhere((p) => p.id == tx.personId);
+                if (person.name.toLowerCase().contains(lowerQuery)) return true;
+              } catch (_) {}
+            }
+            return false;
+          }).toList();
+        }
+
+        // 3. Recalculate Totals Locally based on filtered list
+        double totalIn = 0;
+        double totalOut = 0;
+        
+        for (final t in filteredList) {
+          final isIncome = t.type == TransactionType.paymentReceived ||
+              t.type == TransactionType.cashSale ||
+              t.type == TransactionType.cashIncome ||
+              t.type == TransactionType.debtTaken;
+              
+          if (isIncome) {
+            totalIn += t.amount;
+          } else {
+            totalOut += t.amount;
+          }
+        }
+        final net = totalIn - totalOut;
+
+        // Use filtered values for UI
+        final filteredTransactions = filteredList;
+
 
 
         return Scaffold(
@@ -328,7 +370,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
                 const Divider(height: 1),
                 // List of transactions
                 Expanded(
-                  child: filtered.isEmpty
+                  child: filteredTransactions.isEmpty
                       ? EmptyState(
                           message: searchQuery.isNotEmpty ? l10n.noResults : l10n.noEntriesYet,
                           icon: LucideIcons.history,
@@ -336,10 +378,10 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
                         )
                       : ListView.separated(
                           padding: const EdgeInsets.all(16),
-                          itemCount: filtered.length,
+                          itemCount: filteredTransactions.length,
                           separatorBuilder: (context, index) => const SizedBox(height: 8),
                           itemBuilder: (context, index) {
-                            final tx = filtered[index];
+                            final tx = filteredTransactions[index];
                             // Income = cash came in (including borrowed money)
                             final isIncome = tx.type == TransactionType.paymentReceived ||
                                 tx.type == TransactionType.cashSale ||

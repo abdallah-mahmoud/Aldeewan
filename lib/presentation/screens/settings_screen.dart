@@ -171,31 +171,7 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  SettingsTile(
-                    icon: LucideIcons.send,
-                    iconColor: Colors.purple,
-                    title: 'Test Notification', // Debug only
-                    onTap: () async {
-                      final hasPerms = await ref.read(notificationProvider.notifier).requestPermissions();
-                      if (hasPerms) {
-                        await ref.read(notificationProvider.notifier).showTestNotification(
-                          l10n.dailyReminderTitle,
-                          l10n.dailyReminderBody,
-                        );
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Test notification sent')),
-                          );
-                        }
-                      } else {
-                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Permissions denied')),
-                          );
-                        }
-                      }
-                    },
-                  ),
+
                 ],
               ],
             ),
