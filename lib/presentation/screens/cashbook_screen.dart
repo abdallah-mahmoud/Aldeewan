@@ -111,7 +111,6 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, s) => Scaffold(body: Center(child: Text(AppLocalizations.of(context)!.errorOccurred(e.toString())))),
       data: (cashbookState) {
-      data: (cashbookState) {
         // 1. Get filtered list from state (already filtered by date/type/filters)
         var filteredList = cashbookState.transactions;
         
