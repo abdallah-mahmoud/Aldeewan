@@ -77,9 +77,9 @@ class SavingsGoalModel extends _SavingsGoalModel
       RealmObjectBase.getChanges<SavingsGoalModel>(this);
 
   @override
-  Stream<RealmObjectChanges<SavingsGoalModel>> changesFor(
-          [List<String>? keyPaths]) =>
-      RealmObjectBase.getChangesFor<SavingsGoalModel>(this, keyPaths);
+  Stream<RealmObjectChanges<SavingsGoalModel>> changesFor([
+    List<String>? keyPaths,
+  ]) => RealmObjectBase.getChangesFor<SavingsGoalModel>(this, keyPaths);
 
   @override
   SavingsGoalModel freeze() =>
@@ -124,15 +124,19 @@ class SavingsGoalModel extends _SavingsGoalModel
     RealmObjectBase.registerFactory(SavingsGoalModel._);
     register(_toEJson, _fromEJson);
     return const SchemaObject(
-        ObjectType.realmObject, SavingsGoalModel, 'SavingsGoalModel', [
-      SchemaProperty('id', RealmPropertyType.objectid, primaryKey: true),
-      SchemaProperty('name', RealmPropertyType.string),
-      SchemaProperty('targetAmount', RealmPropertyType.double),
-      SchemaProperty('currentSaved', RealmPropertyType.double),
-      SchemaProperty('deadline', RealmPropertyType.timestamp, optional: true),
-      SchemaProperty('icon', RealmPropertyType.string, optional: true),
-      SchemaProperty('colorHex', RealmPropertyType.string, optional: true),
-    ]);
+      ObjectType.realmObject,
+      SavingsGoalModel,
+      'SavingsGoalModel',
+      [
+        SchemaProperty('id', RealmPropertyType.objectid, primaryKey: true),
+        SchemaProperty('name', RealmPropertyType.string),
+        SchemaProperty('targetAmount', RealmPropertyType.double),
+        SchemaProperty('currentSaved', RealmPropertyType.double),
+        SchemaProperty('deadline', RealmPropertyType.timestamp, optional: true),
+        SchemaProperty('icon', RealmPropertyType.string, optional: true),
+        SchemaProperty('colorHex', RealmPropertyType.string, optional: true),
+      ],
+    );
   }();
 
   @override

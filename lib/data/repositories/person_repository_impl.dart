@@ -9,6 +9,11 @@ class PersonRepositoryImpl implements PersonRepository {
   PersonRepositoryImpl(this._dataSource);
 
   @override
+  Stream<List<Person>> watchPeople() {
+    return _dataSource.watchPeople().map((models) => models.map((m) => m.toEntity()).toList());
+  }
+
+  @override
   Future<List<Person>> getPeople() async {
     final models = await _dataSource.getPeople();
     return models.map((m) => m.toEntity()).toList();

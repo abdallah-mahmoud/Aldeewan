@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:aldeewan_mobile/presentation/widgets/person_statement_report.dart';
 import 'package:aldeewan_mobile/presentation/widgets/cash_flow_report.dart';
-import 'package:aldeewan_mobile/presentation/widgets/budget_list.dart';
-import 'package:aldeewan_mobile/presentation/widgets/goal_list.dart';
 import 'package:aldeewan_mobile/utils/csv_exporter.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
-import 'package:aldeewan_mobile/presentation/providers/budget_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
-import 'package:aldeewan_mobile/data/models/budget_model.dart';
-import 'package:aldeewan_mobile/data/models/savings_goal_model.dart';
-import 'package:realm/realm.dart';
-import 'package:aldeewan_mobile/utils/input_formatters.dart';
-
+import 'package:aldeewan_mobile/utils/error_handler.dart';import 'package:intl/intl.dart';
 class AnalyticsScreen extends ConsumerStatefulWidget {
   const AnalyticsScreen({super.key});
 
@@ -27,7 +19,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       if (mounted) setState(() {});
     });
@@ -64,15 +56,38 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
               },
             ),
         ],
-        bottom: TabBar(
-          controller: _tabController,
-          isScrollable: true,
-          tabs: [
-            Tab(text: l10n.personStatement),
-            Tab(text: l10n.cashFlow),
-            Tab(text: l10n.budgets),
-            Tab(text: l10n.goals),
-          ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Theme.of(context).colorScheme.surface,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              labelColor: Theme.of(context).colorScheme.onSurface,
+              unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
+              dividerColor: Colors.transparent,
+              padding: const EdgeInsets.all(4),
+              tabs: [
+                Tab(text: l10n.personStatement),
+                Tab(text: l10n.cashFlow),
+              ],
+            ),
+          ),
         ),
       ),
       body: TabBarView(
@@ -80,125 +95,15 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
         children: const [
           PersonStatementReport(),
           CashFlowReport(),
-          BudgetList(),
-          GoalList(),
         ],
       ),
-      floatingActionButton: _buildFab(context, l10n),
-    );
-  }
-
-  Widget? _buildFab(BuildContext context, AppLocalizations l10n) {
-    if (_tabController.index == 2) {
-      return FloatingActionButton(
-        onPressed: () => _showAddBudgetDialog(context),
-        child: const Icon(Icons.add),
-      );
-    } else if (_tabController.index == 3) {
-      return FloatingActionButton(
-        onPressed: () => _showAddGoalDialog(context),
-        child: const Icon(Icons.add),
-      );
-    }
-    return null;
-  }
-
-  Future<void> _showAddBudgetDialog(BuildContext context) async {
-    final categoryController = TextEditingController();
-    final amountController = TextEditingController();
-    final l10n = AppLocalizations.of(context)!;
-    
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.createBudget),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: categoryController,
-              decoration: InputDecoration(labelText: l10n.category),
-            ),
-            TextField(
-              controller: amountController,
-              decoration: InputDecoration(labelText: l10n.monthlyLimit),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-          FilledButton(
-            onPressed: () {
-              final budget = BudgetModel(
-                ObjectId(),
-                categoryController.text,
-                double.tryParse(amountController.text.replaceAll(',', '')) ?? 0,
-                0,
-                DateTime(DateTime.now().year, DateTime.now().month, 1),
-                DateTime(DateTime.now().year, DateTime.now().month + 1, 0),
-                isRecurring: true,
-              );
-              
-              ref.read(budgetProvider.notifier).addBudget(budget);
-              Navigator.pop(context);
-            },
-            child: Text(l10n.save),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _showAddGoalDialog(BuildContext context) async {
-    final nameController = TextEditingController();
-    final targetController = TextEditingController();
-    final l10n = AppLocalizations.of(context)!;
-    
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.createGoal),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(labelText: l10n.goalName),
-            ),
-            TextField(
-              controller: targetController,
-              decoration: InputDecoration(labelText: l10n.targetAmount),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),
-          FilledButton(
-            onPressed: () {
-              final goal = SavingsGoalModel(
-                ObjectId(),
-                nameController.text,
-                double.tryParse(targetController.text.replaceAll(',', '')) ?? 0,
-                0,
-              );
-              
-              ref.read(budgetProvider.notifier).addGoal(goal);
-              Navigator.pop(context);
-            },
-            child: Text(l10n.save),
-          ),
-        ],
-      ),
+      floatingActionButton: null,
     );
   }
 
   Future<void> _exportPersonsCsv(BuildContext context, WidgetRef ref) async {
     try {
-      final persons = ref.read(ledgerProvider).persons;
+      final persons = ref.read(ledgerProvider).value?.persons ?? [];
       final rows = <List<dynamic>>[
         ['ID', 'Name', 'Role', 'Phone', 'Created At'],
       ];
@@ -229,7 +134,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(AppLocalizations.of(context)!.exportFailed(e.toString()))),
+          SnackBar(content: Text(AppLocalizations.of(context)!.exportFailed(ErrorHandler.getUserFriendlyErrorMessage(e, AppLocalizations.of(context)!)))),
         );
       }
     }

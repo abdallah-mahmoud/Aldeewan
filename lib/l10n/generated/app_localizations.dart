@@ -63,7 +63,7 @@ import 'app_localizations_en.dart';
 /// property.
 abstract class AppLocalizations {
   AppLocalizations(String locale)
-      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+    : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -86,16 +86,16 @@ abstract class AppLocalizations {
   /// of delegates is preferred or required.
   static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
       <LocalizationsDelegate<dynamic>>[
-    delegate,
-    GlobalMaterialLocalizations.delegate,
-    GlobalCupertinoLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate,
-  ];
+        delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ];
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
-    Locale('en')
+    Locale('en'),
   ];
 
   /// No description provided for @appName.
@@ -109,6 +109,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Aldeewan'**
   String get appTitle;
+
+  /// No description provided for @appSlogan.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure Financial Management'**
+  String get appSlogan;
 
   /// No description provided for @home.
   ///
@@ -140,6 +146,12 @@ abstract class AppLocalizations {
   /// **'Settings'**
   String get settings;
 
+  /// No description provided for @general.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get general;
+
   /// No description provided for @dashboard.
   ///
   /// In en, this message translates to:
@@ -163,6 +175,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add Person'**
   String get addPerson;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search...'**
+  String get search;
+
+  /// No description provided for @noResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found'**
+  String get noResults;
 
   /// No description provided for @addPersonPrompt.
   ///
@@ -548,6 +572,18 @@ abstract class AppLocalizations {
   /// **'Cash Flow Report'**
   String get cashFlowReport;
 
+  /// No description provided for @madeWithLove.
+  ///
+  /// In en, this message translates to:
+  /// **'Made with ❤️ by Motaasl'**
+  String get madeWithLove;
+
+  /// No description provided for @appVersionInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Aldeewan Mobile v{version}'**
+  String appVersionInfo(String version);
+
   /// No description provided for @developerTagline.
   ///
   /// In en, this message translates to:
@@ -611,7 +647,7 @@ abstract class AppLocalizations {
   /// No description provided for @addCashEntry.
   ///
   /// In en, this message translates to:
-  /// **'Add Cash Entry'**
+  /// **'Add Transaction'**
   String get addCashEntry;
 
   /// No description provided for @viewBalances.
@@ -662,11 +698,137 @@ abstract class AppLocalizations {
   /// **'Monthly Expense'**
   String get monthlyExpense;
 
+  /// No description provided for @transactionDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction Details'**
+  String get transactionDetails;
+
+  /// No description provided for @deleteTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Transaction'**
+  String get deleteTransaction;
+
+  /// No description provided for @deleteTransactionConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this transaction?'**
+  String get deleteTransactionConfirm;
+
+  /// No description provided for @deletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted successfully'**
+  String get deletedSuccessfully;
+
+  /// No description provided for @person.
+  ///
+  /// In en, this message translates to:
+  /// **'Person'**
+  String get person;
+
   /// No description provided for @savedSuccessfully.
   ///
   /// In en, this message translates to:
   /// **'Saved successfully'**
   String get savedSuccessfully;
+
+  /// No description provided for @cashLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash'**
+  String get cashLabel;
+
+  /// No description provided for @bankLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank'**
+  String get bankLabel;
+
+  /// No description provided for @camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// No description provided for @gallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// No description provided for @addToLedger.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Ledger (Debt/Credit)'**
+  String get addToLedger;
+
+  /// No description provided for @addToLedgerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Requires selecting a person'**
+  String get addToLedgerSubtitle;
+
+  /// No description provided for @addToCashbook.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to Cashbook (Income/Expense)'**
+  String get addToCashbook;
+
+  /// No description provided for @addToCashbookSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No person required'**
+  String get addToCashbookSubtitle;
+
+  /// No description provided for @scanReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Receipt'**
+  String get scanReceipt;
+
+  /// No description provided for @scanError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error scanning receipt: {error}'**
+  String scanError(Object error);
+
+  /// No description provided for @scanTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning timed out'**
+  String get scanTimeout;
+
+  /// No description provided for @totalSpent.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Spent'**
+  String get totalSpent;
+
+  /// No description provided for @goalReached.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% Reached'**
+  String goalReached(Object percent);
+
+  /// No description provided for @targetLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Target: {amount}'**
+  String targetLabel(Object amount);
+
+  /// No description provided for @goalProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal Progress'**
+  String get goalProgress;
+
+  /// No description provided for @budgetUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget Usage {percentage}'**
+  String budgetUsage(Object percentage);
 
   /// No description provided for @pleaseEnterAmount.
   ///
@@ -686,6 +848,12 @@ abstract class AppLocalizations {
   /// **'Please enter a name'**
   String get pleaseEnterName;
 
+  /// No description provided for @me.
+  ///
+  /// In en, this message translates to:
+  /// **'Me'**
+  String get me;
+
   /// No description provided for @netPosition.
   ///
   /// In en, this message translates to:
@@ -704,6 +872,18 @@ abstract class AppLocalizations {
   /// **'You owe suppliers more'**
   String get youOweSuppliersMore;
 
+  /// No description provided for @profitThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Profit this month'**
+  String get profitThisMonth;
+
+  /// No description provided for @lossThisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Loss this month'**
+  String get lossThisMonth;
+
   /// No description provided for @all.
   ///
   /// In en, this message translates to:
@@ -715,6 +895,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This Month'**
   String get thisMonth;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @thisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get thisWeek;
+
+  /// No description provided for @custom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom'**
+  String get custom;
 
   /// No description provided for @saleOnCredit.
   ///
@@ -739,6 +937,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Payment Made'**
   String get paymentMade;
+
+  /// No description provided for @debtGiven.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt (Owed by)'**
+  String get debtGiven;
+
+  /// No description provided for @debtTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Debt (Owed to)'**
+  String get debtTaken;
 
   /// No description provided for @cashSale.
   ///
@@ -985,6 +1195,480 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error: {error}'**
   String errorOccurred(Object error);
+
+  /// No description provided for @simpleMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Simple Mode'**
+  String get simpleMode;
+
+  /// No description provided for @simpleModeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use simplified terminology (Lent/Borrowed)'**
+  String get simpleModeSubtitle;
+
+  /// No description provided for @simpleLent.
+  ///
+  /// In en, this message translates to:
+  /// **'Lent'**
+  String get simpleLent;
+
+  /// No description provided for @simpleBorrowed.
+  ///
+  /// In en, this message translates to:
+  /// **'Borrowed'**
+  String get simpleBorrowed;
+
+  /// No description provided for @simpleGotPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Got Paid'**
+  String get simpleGotPaid;
+
+  /// No description provided for @simplePaidBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid Back'**
+  String get simplePaidBack;
+
+  /// No description provided for @english.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get english;
+
+  /// No description provided for @currencyQAR.
+  ///
+  /// In en, this message translates to:
+  /// **'QAR (ر.ق)'**
+  String get currencyQAR;
+
+  /// No description provided for @currencySAR.
+  ///
+  /// In en, this message translates to:
+  /// **'SAR (ر.س)'**
+  String get currencySAR;
+
+  /// No description provided for @currencyEGP.
+  ///
+  /// In en, this message translates to:
+  /// **'EGP (ج.م)'**
+  String get currencyEGP;
+
+  /// No description provided for @currencySDG.
+  ///
+  /// In en, this message translates to:
+  /// **'Sudanese Pound (SDG)'**
+  String get currencySDG;
+
+  /// No description provided for @currencyKWD.
+  ///
+  /// In en, this message translates to:
+  /// **'Kuwaiti Dinar (KWD)'**
+  String get currencyKWD;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading'**
+  String get loading;
+
+  /// No description provided for @error.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get error;
+
+  /// No description provided for @deleteCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Category?'**
+  String get deleteCategoryTitle;
+
+  /// No description provided for @deleteCategoryContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete \"{categoryName}\"?'**
+  String deleteCategoryContent(Object categoryName);
+
+  /// No description provided for @newCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Category'**
+  String get newCategoryTitle;
+
+  /// No description provided for @categoryType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type: '**
+  String get categoryType;
+
+  /// No description provided for @selectColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Color'**
+  String get selectColor;
+
+  /// No description provided for @selectIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Icon'**
+  String get selectIcon;
+
+  /// No description provided for @create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create;
+
+  /// No description provided for @active.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get active;
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// No description provided for @overBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Over Budget'**
+  String get overBudget;
+
+  /// No description provided for @remaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Remaining'**
+  String get remaining;
+
+  /// No description provided for @spent.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent'**
+  String get spent;
+
+  /// No description provided for @limit.
+  ///
+  /// In en, this message translates to:
+  /// **'Limit'**
+  String get limit;
+
+  /// No description provided for @catHousing.
+  ///
+  /// In en, this message translates to:
+  /// **'Housing'**
+  String get catHousing;
+
+  /// No description provided for @catFood.
+  ///
+  /// In en, this message translates to:
+  /// **'Food & Dining'**
+  String get catFood;
+
+  /// No description provided for @catTransportation.
+  ///
+  /// In en, this message translates to:
+  /// **'Transportation'**
+  String get catTransportation;
+
+  /// No description provided for @catHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Health'**
+  String get catHealth;
+
+  /// No description provided for @catEntertainment.
+  ///
+  /// In en, this message translates to:
+  /// **'Entertainment'**
+  String get catEntertainment;
+
+  /// No description provided for @catShopping.
+  ///
+  /// In en, this message translates to:
+  /// **'Shopping'**
+  String get catShopping;
+
+  /// No description provided for @catUtilities.
+  ///
+  /// In en, this message translates to:
+  /// **'Utilities'**
+  String get catUtilities;
+
+  /// No description provided for @catIncome.
+  ///
+  /// In en, this message translates to:
+  /// **'Income'**
+  String get catIncome;
+
+  /// No description provided for @catOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get catOther;
+
+  /// No description provided for @catSavings.
+  ///
+  /// In en, this message translates to:
+  /// **'Savings'**
+  String get catSavings;
+
+  /// No description provided for @manageCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage Categories'**
+  String get manageCategories;
+
+  /// No description provided for @budgetExceededMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have exceeded your budget by {currency} {amount}'**
+  String budgetExceededMessage(String currency, String amount);
+
+  /// No description provided for @budgetRemainingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have {currency} {amount} remaining'**
+  String budgetRemainingMessage(String currency, String amount);
+
+  /// No description provided for @deleteBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Budget'**
+  String get deleteBudget;
+
+  /// No description provided for @deleteBudgetConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this budget?'**
+  String get deleteBudgetConfirmation;
+
+  /// No description provided for @deleteGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Goal'**
+  String get deleteGoal;
+
+  /// No description provided for @deleteGoalConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this goal?'**
+  String get deleteGoalConfirmation;
+
+  /// No description provided for @goalDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal Details'**
+  String get goalDetails;
+
+  /// No description provided for @budgetDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget Details'**
+  String get budgetDetails;
+
+  /// No description provided for @deadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Deadline'**
+  String get deadline;
+
+  /// No description provided for @saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get saved;
+
+  /// No description provided for @target.
+  ///
+  /// In en, this message translates to:
+  /// **'Target'**
+  String get target;
+
+  /// No description provided for @actions.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get actions;
+
+  /// No description provided for @addFunds.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Funds'**
+  String get addFunds;
+
+  /// No description provided for @withdraw.
+  ///
+  /// In en, this message translates to:
+  /// **'Withdraw'**
+  String get withdraw;
+
+  /// No description provided for @goalNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal not found'**
+  String get goalNotFound;
+
+  /// No description provided for @budgetNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget not found'**
+  String get budgetNotFound;
+
+  /// No description provided for @goalExceededError.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot add funds. Total saved would exceed the target amount.'**
+  String get goalExceededError;
+
+  /// No description provided for @budgetExceededError.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot add expense. Total spent would exceed the budget limit.'**
+  String get budgetExceededError;
+
+  /// No description provided for @goalExceededErrorWithRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot add funds. You can only add up to {amount}.'**
+  String goalExceededErrorWithRemaining(String amount);
+
+  /// No description provided for @budgetExceededErrorWithRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot add expense. You only have {amount} remaining in this budget.'**
+  String budgetExceededErrorWithRemaining(String amount);
+
+  /// No description provided for @expenseBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Expense Breakdown'**
+  String get expenseBreakdown;
+
+  /// No description provided for @editGoal.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Goal'**
+  String get editGoal;
+
+  /// No description provided for @startDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Start Date'**
+  String get startDate;
+
+  /// No description provided for @endDate.
+  ///
+  /// In en, this message translates to:
+  /// **'End Date'**
+  String get endDate;
+
+  /// No description provided for @noDate.
+  ///
+  /// In en, this message translates to:
+  /// **'No Date'**
+  String get noDate;
+
+  /// No description provided for @editBudget.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Budget'**
+  String get editBudget;
+
+  /// No description provided for @appSounds.
+  ///
+  /// In en, this message translates to:
+  /// **'App Sounds'**
+  String get appSounds;
+
+  /// No description provided for @appSoundsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable sound effects'**
+  String get appSoundsSubtitle;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @markAllAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark all as read'**
+  String get markAllAsRead;
+
+  /// No description provided for @noNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'No notifications yet'**
+  String get noNotifications;
+
+  /// No description provided for @dailyReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Reminder'**
+  String get dailyReminder;
+
+  /// No description provided for @dailyReminderSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Get a daily reminder to record your transactions'**
+  String get dailyReminderSubtitle;
+
+  /// No description provided for @authenticateReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Please authenticate to access Aldeewan'**
+  String get authenticateReason;
+
+  /// No description provided for @dailyReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily Reminder'**
+  String get dailyReminderTitle;
+
+  /// No description provided for @dailyReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t forget to record your transactions for today!'**
+  String get dailyReminderBody;
+
+  /// No description provided for @reminderTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder Time'**
+  String get reminderTime;
+
+  /// No description provided for @budgetExceededTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Budget Exceeded'**
+  String get budgetExceededTitle;
+
+  /// No description provided for @budgetExceededBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You have exceeded your budget for {category} by {amount} {currency}.'**
+  String budgetExceededBody(String category, String amount, String currency);
+
+  /// No description provided for @goalReachedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Goal Reached!'**
+  String get goalReachedTitle;
+
+  /// No description provided for @goalReachedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations! You have reached your goal: {goalName}.'**
+  String goalReachedBody(String goalName);
 }
 
 class _AppLocalizationsDelegate
@@ -1014,8 +1698,9 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   }
 
   throw FlutterError(
-      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-      'an issue with the localizations generation tool. Please file an issue '
-      'on GitHub with a reproducible sample app and the gen-l10n configuration '
-      'that was used.');
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.',
+  );
 }

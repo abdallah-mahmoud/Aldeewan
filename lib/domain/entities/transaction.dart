@@ -5,6 +5,9 @@ enum TransactionType {
   purchaseOnCredit, // You owe supplier. (Increases payable)
   paymentMade, // You pay off debt to supplier. (Decreases payable, decreases cash)
   
+  debtGiven, // You lent money. (Increases receivable)
+  debtTaken, // You borrowed money. (Increases payable)
+
   // Cash-only transactions
   cashSale, // Customer pays immediately. (Income)
   cashIncome, // Other income not from sales.
@@ -25,6 +28,9 @@ class Transaction {
   final String? externalId;
   final String? status;
   final int? accountId;
+  
+  // Goal tracking - links transaction to a savings goal
+  final String? goalId;
 
   Transaction({
     required this.id,
@@ -38,5 +44,7 @@ class Transaction {
     this.externalId,
     this.status,
     this.accountId,
+    this.goalId,
   });
 }
+

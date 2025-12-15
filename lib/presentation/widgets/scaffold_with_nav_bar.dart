@@ -9,13 +9,25 @@ class ScaffoldWithNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 200),
-        child: child,
-      ),
-      bottomNavigationBar: BottomNavBar(
-        currentPath: GoRouterState.of(context).uri.toString(),
+    final currentPath = GoRouterState.of(context).uri.toString();
+    final isOnHome = currentPath == '/home' || currentPath.startsWith('/home?');
+    
+    return PopScope(
+      canPop: isOnHome, // Only allow pop (exit) if on home screen
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) {
+          // If pop was blocked (not on home), navigate to home instead
+          context.go('/home');
+        }
+      },
+      child: Scaffold(
+        body: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 200),
+          child: child,
+        ),
+        bottomNavigationBar: BottomNavBar(
+          currentPath: currentPath,
+        ),
       ),
     );
   }

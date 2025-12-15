@@ -102,9 +102,9 @@ class FinancialAccountModel extends _FinancialAccountModel
       RealmObjectBase.getChanges<FinancialAccountModel>(this);
 
   @override
-  Stream<RealmObjectChanges<FinancialAccountModel>> changesFor(
-          [List<String>? keyPaths]) =>
-      RealmObjectBase.getChangesFor<FinancialAccountModel>(this, keyPaths);
+  Stream<RealmObjectChanges<FinancialAccountModel>> changesFor([
+    List<String>? keyPaths,
+  ]) => RealmObjectBase.getChangesFor<FinancialAccountModel>(this, keyPaths);
 
   @override
   FinancialAccountModel freeze() =>
@@ -156,21 +156,31 @@ class FinancialAccountModel extends _FinancialAccountModel
   static final schema = () {
     RealmObjectBase.registerFactory(FinancialAccountModel._);
     register(_toEJson, _fromEJson);
-    return const SchemaObject(ObjectType.realmObject, FinancialAccountModel,
-        'FinancialAccountModel', [
-      SchemaProperty('id', RealmPropertyType.int, primaryKey: true),
-      SchemaProperty('name', RealmPropertyType.string),
-      SchemaProperty('providerId', RealmPropertyType.string),
-      SchemaProperty('accountType', RealmPropertyType.string),
-      SchemaProperty('balance', RealmPropertyType.double),
-      SchemaProperty('currency', RealmPropertyType.string),
-      SchemaProperty('externalAccountId', RealmPropertyType.string,
-          optional: true),
-      SchemaProperty('lastSyncTime', RealmPropertyType.timestamp,
-          optional: true),
-      SchemaProperty('status', RealmPropertyType.string, optional: true),
-      SchemaProperty('colorHex', RealmPropertyType.string, optional: true),
-    ]);
+    return const SchemaObject(
+      ObjectType.realmObject,
+      FinancialAccountModel,
+      'FinancialAccountModel',
+      [
+        SchemaProperty('id', RealmPropertyType.int, primaryKey: true),
+        SchemaProperty('name', RealmPropertyType.string),
+        SchemaProperty('providerId', RealmPropertyType.string),
+        SchemaProperty('accountType', RealmPropertyType.string),
+        SchemaProperty('balance', RealmPropertyType.double),
+        SchemaProperty('currency', RealmPropertyType.string),
+        SchemaProperty(
+          'externalAccountId',
+          RealmPropertyType.string,
+          optional: true,
+        ),
+        SchemaProperty(
+          'lastSyncTime',
+          RealmPropertyType.timestamp,
+          optional: true,
+        ),
+        SchemaProperty('status', RealmPropertyType.string, optional: true),
+        SchemaProperty('colorHex', RealmPropertyType.string, optional: true),
+      ],
+    );
   }();
 
   @override

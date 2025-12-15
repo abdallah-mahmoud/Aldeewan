@@ -23,6 +23,7 @@ class TransactionModel extends _TransactionModel
     String? externalId,
     String? status,
     int? accountId,
+    String? goalId,
   }) {
     RealmObjectBase.set(this, 'uuid', uuid);
     RealmObjectBase.set(this, 'type', type);
@@ -35,6 +36,7 @@ class TransactionModel extends _TransactionModel
     RealmObjectBase.set(this, 'externalId', externalId);
     RealmObjectBase.set(this, 'status', status);
     RealmObjectBase.set(this, 'accountId', accountId);
+    RealmObjectBase.set(this, 'goalId', goalId);
   }
 
   TransactionModel._();
@@ -100,13 +102,18 @@ class TransactionModel extends _TransactionModel
   set accountId(int? value) => RealmObjectBase.set(this, 'accountId', value);
 
   @override
+  String? get goalId => RealmObjectBase.get<String>(this, 'goalId') as String?;
+  @override
+  set goalId(String? value) => RealmObjectBase.set(this, 'goalId', value);
+
+  @override
   Stream<RealmObjectChanges<TransactionModel>> get changes =>
       RealmObjectBase.getChanges<TransactionModel>(this);
 
   @override
-  Stream<RealmObjectChanges<TransactionModel>> changesFor(
-          [List<String>? keyPaths]) =>
-      RealmObjectBase.getChangesFor<TransactionModel>(this, keyPaths);
+  Stream<RealmObjectChanges<TransactionModel>> changesFor([
+    List<String>? keyPaths,
+  ]) => RealmObjectBase.getChangesFor<TransactionModel>(this, keyPaths);
 
   @override
   TransactionModel freeze() =>
@@ -125,6 +132,7 @@ class TransactionModel extends _TransactionModel
       'externalId': externalId.toEJson(),
       'status': status.toEJson(),
       'accountId': accountId.toEJson(),
+      'goalId': goalId.toEJson(),
     };
   }
 
@@ -150,6 +158,7 @@ class TransactionModel extends _TransactionModel
           externalId: fromEJson(ejson['externalId']),
           status: fromEJson(ejson['status']),
           accountId: fromEJson(ejson['accountId']),
+          goalId: fromEJson(ejson['goalId']),
         ),
       _ => raiseInvalidEJson(ejson),
     };
@@ -159,21 +168,39 @@ class TransactionModel extends _TransactionModel
     RealmObjectBase.registerFactory(TransactionModel._);
     register(_toEJson, _fromEJson);
     return const SchemaObject(
-        ObjectType.realmObject, TransactionModel, 'TransactionModel', [
-      SchemaProperty('uuid', RealmPropertyType.string, primaryKey: true),
-      SchemaProperty('type', RealmPropertyType.string),
-      SchemaProperty('personId', RealmPropertyType.string,
-          optional: true, indexType: RealmIndexType.regular),
-      SchemaProperty('amount', RealmPropertyType.double),
-      SchemaProperty('date', RealmPropertyType.timestamp),
-      SchemaProperty('category', RealmPropertyType.string, optional: true),
-      SchemaProperty('note', RealmPropertyType.string, optional: true),
-      SchemaProperty('dueDate', RealmPropertyType.timestamp, optional: true),
-      SchemaProperty('externalId', RealmPropertyType.string,
-          optional: true, indexType: RealmIndexType.regular),
-      SchemaProperty('status', RealmPropertyType.string, optional: true),
-      SchemaProperty('accountId', RealmPropertyType.int, optional: true),
-    ]);
+      ObjectType.realmObject,
+      TransactionModel,
+      'TransactionModel',
+      [
+        SchemaProperty('uuid', RealmPropertyType.string, primaryKey: true),
+        SchemaProperty('type', RealmPropertyType.string),
+        SchemaProperty(
+          'personId',
+          RealmPropertyType.string,
+          optional: true,
+          indexType: RealmIndexType.regular,
+        ),
+        SchemaProperty('amount', RealmPropertyType.double),
+        SchemaProperty('date', RealmPropertyType.timestamp),
+        SchemaProperty('category', RealmPropertyType.string, optional: true),
+        SchemaProperty('note', RealmPropertyType.string, optional: true),
+        SchemaProperty('dueDate', RealmPropertyType.timestamp, optional: true),
+        SchemaProperty(
+          'externalId',
+          RealmPropertyType.string,
+          optional: true,
+          indexType: RealmIndexType.regular,
+        ),
+        SchemaProperty('status', RealmPropertyType.string, optional: true),
+        SchemaProperty('accountId', RealmPropertyType.int, optional: true),
+        SchemaProperty(
+          'goalId',
+          RealmPropertyType.string,
+          optional: true,
+          indexType: RealmIndexType.regular,
+        ),
+      ],
+    );
   }();
 
   @override

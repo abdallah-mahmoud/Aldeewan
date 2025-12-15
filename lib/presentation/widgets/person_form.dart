@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aldeewan_mobile/domain/entities/person.dart';
 import 'package:uuid/uuid.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/utils/toast_service.dart';
+import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 
-class PersonForm extends StatefulWidget {
+class PersonForm extends ConsumerStatefulWidget {
   final Person? person;
   final Function(Person) onSave;
 
   const PersonForm({super.key, this.person, required this.onSave});
 
   @override
-  State<PersonForm> createState() => _PersonFormState();
+  ConsumerState<PersonForm> createState() => _PersonFormState();
 }
 
-class _PersonFormState extends State<PersonForm> {
+class _PersonFormState extends ConsumerState<PersonForm> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
@@ -92,12 +94,24 @@ class _PersonFormState extends State<PersonForm> {
               decoration: InputDecoration(
                 labelText: l10n.phone,
                 border: const OutlineInputBorder(),
+                hintText: ref.watch(currencyProvider) == 'SDG' ? '0912391234' : null,
               ),
               keyboardType: TextInputType.phone,
+              validator: (value) {
+                if (value != null && value.isNotEmpty) {
+                  final currency = ref.read(currencyProvider);
+                  if (currency == 'SDG') {
+                    if (!RegExp(r'^0\d{9}$').hasMatch(value)) {
+                      return 'Invalid phone number (Must be 10 digits starting with 0)';
+                    }
+                  }
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<PersonRole>(
-              value: _role,
+              initialValue: _role,
               decoration: InputDecoration(
                 labelText: l10n.role,
                 border: const OutlineInputBorder(),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 import 'package:uuid/uuid.dart';
 import 'package:intl/intl.dart';
@@ -6,24 +8,37 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/utils/toast_service.dart';
 import 'package:aldeewan_mobile/utils/input_formatters.dart';
+import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
+import 'package:aldeewan_mobile/utils/transaction_label_mapper.dart';
+import 'package:aldeewan_mobile/data/services/sound_service.dart';
 
-class TransactionForm extends StatefulWidget {
+import 'package:aldeewan_mobile/domain/entities/person.dart';
+
+class TransactionForm extends ConsumerStatefulWidget {
   final TransactionType? initialType;
   final String? personId;
+  final PersonRole? personRole;
+  final double? initialAmount;
+  final DateTime? initialDate;
+  final String? initialNote;
   final Function(Transaction) onSave;
 
   const TransactionForm({
     super.key,
     this.initialType,
     this.personId,
+    this.personRole,
+    this.initialAmount,
+    this.initialDate,
+    this.initialNote,
     required this.onSave,
   });
 
   @override
-  State<TransactionForm> createState() => _TransactionFormState();
+  ConsumerState<TransactionForm> createState() => _TransactionFormState();
 }
 
-class _TransactionFormState extends State<TransactionForm> {
+class _TransactionFormState extends ConsumerState<TransactionForm> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _amountController;
   late TextEditingController _noteController;
@@ -33,12 +48,17 @@ class _TransactionFormState extends State<TransactionForm> {
   @override
   void initState() {
     super.initState();
-    _amountController = TextEditingController();
-    _noteController = TextEditingController();
-    _type = widget.initialType ?? TransactionType.saleOnCredit;
-    _date = DateTime.now();
+    _amountController = TextEditingController(
+      text: widget.initialAmount != null ? widget.initialAmount.toString() : ''
+    );
+    _noteController = TextEditingController(text: widget.initialNote ?? '');
+    _type = widget.initialType ?? (widget.personRole == PersonRole.customer 
+        ? TransactionType.saleOnCredit 
+        : (widget.personRole == PersonRole.supplier 
+            ? TransactionType.purchaseOnCredit 
+            : TransactionType.saleOnCredit));
+    _date = widget.initialDate ?? DateTime.now();
   }
-
   @override
   void dispose() {
     _amountController.dispose();
@@ -47,12 +67,14 @@ class _TransactionFormState extends State<TransactionForm> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    ref.read(soundServiceProvider).playClick();
     final picked = await showDatePicker(
       context: context,
       initialDate: _date,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
+    if (!mounted) return;
     if (picked != null && picked != _date) {
       setState(() {
         _date = picked;
@@ -62,7 +84,8 @@ class _TransactionFormState extends State<TransactionForm> {
 
   void _save(AppLocalizations l10n) {
     if (_formKey.currentState!.validate()) {
-      final amount = double.tryParse(_amountController.text.replaceAll(',', ''));
+      final cleanAmount = _amountController.text.replaceAll(',', '').replaceAll(' ', '');
+      final amount = double.tryParse(cleanAmount);
       if (amount == null) return;
 
       final transaction = Transaction(
@@ -79,113 +102,131 @@ class _TransactionFormState extends State<TransactionForm> {
     }
   }
 
-  String _getTypeLabel(TransactionType type, AppLocalizations l10n) {
-    switch (type) {
-      case TransactionType.saleOnCredit: return l10n.debt;
-      case TransactionType.paymentReceived: return l10n.payment;
-      case TransactionType.purchaseOnCredit: return l10n.credit;
-      case TransactionType.paymentMade: return l10n.payment;
-      case TransactionType.cashSale: return l10n.income;
-      case TransactionType.cashIncome: return l10n.income;
-      case TransactionType.cashExpense: return l10n.expense;
+  List<TransactionType> _getFilteredTypes() {
+    if (widget.personRole == null) return TransactionType.values;
+    
+    if (widget.personRole == PersonRole.customer) {
+      return [
+        TransactionType.saleOnCredit,
+        TransactionType.paymentReceived,
+        TransactionType.debtGiven,
+        TransactionType.debtTaken,
+        TransactionType.paymentMade, // Returns/Refunds
+      ];
+    } else {
+      // Supplier
+      return [
+        TransactionType.purchaseOnCredit,
+        TransactionType.paymentMade,
+        TransactionType.debtTaken,
+        TransactionType.debtGiven,
+        TransactionType.paymentReceived, // Returns/Refunds
+      ];
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final currency = ref.watch(currencyProvider);
+    final isSimpleMode = ref.watch(settingsProvider);
 
     return Padding(
+      // ... check padding logic inside original file, looks ok to keep just replace dropdown part if possible? 
+      // Replace entire class start to dropdown is safer.
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
         left: 16,
         right: 16,
         top: 16,
       ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              l10n.addTransaction,
-              style: Theme.of(context).textTheme.titleLarge,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<TransactionType>(
-              value: _type,
-              decoration: InputDecoration(
-                labelText: l10n.type,
-                border: const OutlineInputBorder(),
+      child: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                l10n.addTransaction,
+                style: Theme.of(context).textTheme.titleLarge,
+                textAlign: TextAlign.center,
               ),
-              items: TransactionType.values.map((type) {
-                return DropdownMenuItem(
-                  value: type,
-                  child: Text(_getTypeLabel(type, l10n)),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _type = value;
-                  });
-                }
-              },
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _amountController,
-              decoration: InputDecoration(
-                labelText: l10n.amount,
-                border: const OutlineInputBorder(),
-                prefixText: '\$ ', // TODO: Use currency from settings
-              ),
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return l10n.pleaseEnterAmount;
-                }
-                if (double.tryParse(value.replaceAll(',', '')) == null) {
-                  return l10n.invalidNumber;
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 12),
-            InkWell(
-              onTap: () => _selectDate(context),
-              child: InputDecorator(
+              const SizedBox(height: 16),
+              DropdownButtonFormField<TransactionType>(
+                initialValue: _type,
                 decoration: InputDecoration(
-                  labelText: l10n.date,
+                  labelText: l10n.type,
                   border: const OutlineInputBorder(),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(DateFormat.yMMMd().format(_date)),
-                    const Icon(LucideIcons.calendar),
-                  ],
+                items: _getFilteredTypes().map((type) {
+                  return DropdownMenuItem(
+                    value: type,
+                    child: Text(TransactionLabelMapper.getLabel(type, isSimpleMode, l10n)),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  if (value != null) {
+                    ref.read(soundServiceProvider).playClick();
+                    setState(() {
+                      _type = value;
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _amountController,
+                decoration: InputDecoration(
+                  labelText: l10n.amount,
+                  border: const OutlineInputBorder(),
+                  prefixText: '$currency ', 
+                ),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return l10n.pleaseEnterAmount;
+                  }
+                  if (double.tryParse(value.replaceAll(',', '')) == null) {
+                    return l10n.invalidNumber;
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              InkWell(
+                onTap: () => _selectDate(context),
+                child: InputDecorator(
+                  decoration: InputDecoration(
+                    labelText: l10n.date,
+                    border: const OutlineInputBorder(),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(DateFormat.yMMMd().format(_date)),
+                      const Icon(LucideIcons.calendar),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _noteController,
-              decoration: InputDecoration(
-                labelText: l10n.note,
-                border: const OutlineInputBorder(),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _noteController,
+                decoration: InputDecoration(
+                  labelText: l10n.note,
+                  border: const OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => _save(l10n),
-              child: Text(l10n.save),
-            ),
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => _save(l10n),
+                child: Text(l10n.save),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );

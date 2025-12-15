@@ -11,6 +11,9 @@ import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/widgets/person_form.dart';
 import 'package:aldeewan_mobile/presentation/widgets/transaction_form.dart';
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
+import 'package:aldeewan_mobile/config/app_colors.dart';
+import 'package:aldeewan_mobile/data/services/sound_service.dart';
+import 'package:aldeewan_mobile/presentation/widgets/debounced_search_bar.dart';
 
 class LedgerScreen extends ConsumerStatefulWidget {
   const LedgerScreen({super.key});
@@ -34,7 +37,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
     super.didChangeDependencies();
     if (!_initialActionHandled) {
       final action = GoRouterState.of(context).uri.queryParameters['action'];
-      if (action == 'debt' || action == 'payment') {
+      if (action == 'debt' || action == 'payment' || action == 'scan') {
         _initialActionHandled = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _handleQuickAction(action!);
@@ -45,7 +48,23 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
 
   void _handleQuickAction(String action) {
     final l10n = AppLocalizations.of(context)!;
-    final persons = ref.read(ledgerProvider).persons;
+    final ledgerAsync = ref.read(ledgerProvider);
+    final persons = ledgerAsync.value?.persons ?? [];
+
+    double? initialAmount;
+    DateTime? initialDate;
+    String? initialNote;
+
+    if (action == 'scan') {
+      final uri = GoRouterState.of(context).uri;
+      if (uri.queryParameters.containsKey('amount')) {
+        initialAmount = double.tryParse(uri.queryParameters['amount']!);
+      }
+      if (uri.queryParameters.containsKey('date')) {
+        initialDate = DateTime.tryParse(uri.queryParameters['date']!);
+      }
+      initialNote = uri.queryParameters['note'];
+    }
 
     if (persons.isEmpty) {
       showModalBottomSheet(
@@ -101,7 +120,8 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
             child: Consumer(
               builder: (context, ref, child) {
                 // Re-watch in case it changes while open (unlikely but good practice)
-                final currentPersons = ref.watch(ledgerProvider).persons;
+                final ledgerAsync = ref.watch(ledgerProvider);
+                final currentPersons = ledgerAsync.value?.persons ?? [];
                 return ListView.builder(
                   itemCount: currentPersons.length,
                   itemBuilder: (context, index) {
@@ -111,7 +131,13 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                       subtitle: Text(person.role == PersonRole.customer ? l10n.customer : l10n.supplier),
                       onTap: () {
                         Navigator.pop(context); // Close selector
-                        _showTransactionModal(person, action);
+                        _showTransactionModal(
+                          person,
+                          action,
+                          initialAmount: initialAmount,
+                          initialDate: initialDate,
+                          initialNote: initialNote,
+                        );
                       },
                     );
                   },
@@ -124,16 +150,27 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
     );
   }
 
-  void _showTransactionModal(Person person, String action) {
+  void _showTransactionModal(
+    Person person,
+    String action, {
+    double? initialAmount,
+    DateTime? initialDate,
+    String? initialNote,
+  }) {
     TransactionType type;
     if (action == 'debt') {
-      type = person.role == PersonRole.customer 
-          ? TransactionType.saleOnCredit 
+      type = person.role == PersonRole.customer
+          ? TransactionType.saleOnCredit
           : TransactionType.purchaseOnCredit;
-    } else {
-      type = person.role == PersonRole.customer 
-          ? TransactionType.paymentReceived 
+    } else if (action == 'payment') {
+      type = person.role == PersonRole.customer
+          ? TransactionType.paymentReceived
           : TransactionType.paymentMade;
+    } else {
+      // Default for scan or other actions
+      type = person.role == PersonRole.customer
+          ? TransactionType.saleOnCredit
+          : TransactionType.purchaseOnCredit;
     }
 
     showModalBottomSheet(
@@ -141,8 +178,13 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
       isScrollControlled: true,
       builder: (context) => TransactionForm(
         personId: person.id,
+        personRole: person.role,
         initialType: type,
+        initialAmount: initialAmount,
+        initialDate: initialDate,
+        initialNote: initialNote,
         onSave: (transaction) {
+          ref.read(soundServiceProvider).playSuccess();
           ref.read(ledgerProvider.notifier).addTransaction(transaction);
         },
       ),
@@ -161,6 +203,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
       isScrollControlled: true,
       builder: (context) => PersonForm(
         onSave: (person) {
+          ref.read(soundServiceProvider).playSuccess();
           ref.read(ledgerProvider.notifier).addPerson(person);
         },
       ),
@@ -169,7 +212,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
-    final ledgerState = ref.watch(ledgerProvider);
+    final ledgerAsync = ref.watch(ledgerProvider);
     final notifier = ref.read(ledgerProvider.notifier);
     final l10n = AppLocalizations.of(context)!;
     final currency = ref.watch(currencyProvider);
@@ -177,23 +220,52 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.ledger),
-        bottom: TabBar(
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: Container(
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                color: Theme.of(context).colorScheme.surface,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              labelColor: Theme.of(context).colorScheme.onSurface,
+              unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
+              dividerColor: Colors.transparent,
+              padding: const EdgeInsets.all(4),
+              tabs: [
+                Tab(text: l10n.customer),
+                Tab(text: l10n.supplier),
+              ],
+            ),
+          ),
+        ),
+      ),
+      body: ledgerAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, s) => Center(child: Text(l10n.errorOccurred(e.toString()))),
+        data: (ledgerState) => TabBarView(
           controller: _tabController,
-          tabs: [
-            Tab(text: l10n.customer),
-            Tab(text: l10n.supplier),
+          children: [
+            _buildPersonList(context, ledgerState.persons, PersonRole.customer, notifier, l10n, currency),
+            _buildPersonList(context, ledgerState.persons, PersonRole.supplier, notifier, l10n, currency),
           ],
         ),
       ),
-      body: ledgerState.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                _buildPersonList(context, ledgerState.persons, PersonRole.customer, notifier, l10n, currency),
-                _buildPersonList(context, ledgerState.persons, PersonRole.supplier, notifier, l10n, currency),
-              ],
-            ),
+      resizeToAvoidBottomInset: false,
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddPersonModal(context),
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -204,20 +276,44 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
   }
 
   Widget _buildPersonList(BuildContext context, List<Person> persons, PersonRole role, LedgerNotifier notifier, AppLocalizations l10n, String currency) {
-    final filteredPersons = persons.where((p) => p.role == role).toList();
-
-    if (filteredPersons.isEmpty) {
-      return EmptyState(
-        message: l10n.noEntriesYet,
-        icon: LucideIcons.users,
-        actionLabel: l10n.addPerson,
-        onAction: () => _showAddPersonModal(context),
-      );
+    final searchQuery = ref.watch(ledgerSearchProvider);
+    
+    // Filter by role first, then by search query
+    var filteredPersons = persons.where((p) => p.role == role).toList();
+    
+    if (searchQuery.isNotEmpty) {
+      filteredPersons = filteredPersons.where((p) {
+        final name = p.name.toLowerCase();
+        final phone = (p.phone ?? '').toLowerCase();
+        return name.contains(searchQuery) || phone.contains(searchQuery);
+      }).toList();
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.only(top: 8, bottom: 80), // Add padding for FAB
-      itemCount: filteredPersons.length,
+    return Column(
+      children: [
+        // Search bar
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: DebouncedSearchBar(
+            hintText: l10n.search,
+            onSearch: (query) {
+              ref.read(ledgerSearchProvider.notifier).state = query;
+            },
+          ),
+        ),
+        // List or empty state
+        Expanded(
+          child: filteredPersons.isEmpty
+              ? EmptyState(
+                  message: searchQuery.isEmpty ? l10n.noEntriesYet : l10n.noResults,
+                  icon: LucideIcons.users,
+                  lottieAsset: 'assets/animations/empty_users.json',
+                  actionLabel: searchQuery.isEmpty ? l10n.addPerson : null,
+                  onAction: searchQuery.isEmpty ? () => _showAddPersonModal(context) : null,
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.only(top: 0, bottom: 80),
+                  itemCount: filteredPersons.length,
       itemBuilder: (context, index) {
         final person = filteredPersons[index];
         final balance = notifier.calculatePersonBalance(person);
@@ -232,7 +328,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
         
         Color balanceColor = Theme.of(context).colorScheme.onSurface;
         if (balance != 0) {
-          balanceColor = isAsset ? Colors.green : (isLiability ? Colors.red : Colors.grey);
+          balanceColor = isAsset ? AppColors.success : (isLiability ? AppColors.error : Colors.grey);
         }
 
         return Card(
@@ -245,21 +341,35 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
           ),
           child: ListTile(
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            leading: CircleAvatar(
-              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-              foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
-              child: Text(person.name.isNotEmpty ? person.name[0].toUpperCase() : '?'),
+            leading: Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                person.name.isNotEmpty ? person.name[0].toUpperCase() : '?',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
             title: Text(
               person.name,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             subtitle: person.phone != null && person.phone!.isNotEmpty
                 ? Row(
                     children: [
                       Icon(LucideIcons.phone, size: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
                       const SizedBox(width: 4),
-                      Text(person.phone!),
+                      Text(
+                        person.phone!,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ],
                   )
                 : null,
@@ -272,19 +382,18 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                     symbol: currency,
                     decimalDigits: currency == 'SDG' ? 0 : 2,
                   ).format(balance.abs()),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
                     color: balanceColor,
                   ),
                 ),
                 Text(
                   balance == 0 
-                      ? 'Settled' 
+                      ? l10n.settled 
                       : (role == PersonRole.customer 
-                          ? (balance > 0 ? 'Receivable' : 'Advance') 
-                          : (balance > 0 ? 'Payable' : 'Advance')),
-                  style: TextStyle(
+                          ? (balance > 0 ? l10n.receivable : l10n.advance) 
+                          : (balance > 0 ? l10n.payable : l10n.advance)),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontSize: 10,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -297,6 +406,9 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
           ),
         );
       },
+    ),
+        ),
+      ],
     );
   }
 }

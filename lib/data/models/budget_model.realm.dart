@@ -88,9 +88,9 @@ class BudgetModel extends _BudgetModel
       RealmObjectBase.getChanges<BudgetModel>(this);
 
   @override
-  Stream<RealmObjectChanges<BudgetModel>> changesFor(
-          [List<String>? keyPaths]) =>
-      RealmObjectBase.getChangesFor<BudgetModel>(this, keyPaths);
+  Stream<RealmObjectChanges<BudgetModel>> changesFor([
+    List<String>? keyPaths,
+  ]) => RealmObjectBase.getChangesFor<BudgetModel>(this, keyPaths);
 
   @override
   BudgetModel freeze() => RealmObjectBase.freezeObject<BudgetModel>(this);
@@ -136,15 +136,19 @@ class BudgetModel extends _BudgetModel
     RealmObjectBase.registerFactory(BudgetModel._);
     register(_toEJson, _fromEJson);
     return const SchemaObject(
-        ObjectType.realmObject, BudgetModel, 'BudgetModel', [
-      SchemaProperty('id', RealmPropertyType.objectid, primaryKey: true),
-      SchemaProperty('category', RealmPropertyType.string),
-      SchemaProperty('amountLimit', RealmPropertyType.double),
-      SchemaProperty('currentSpent', RealmPropertyType.double),
-      SchemaProperty('startDate', RealmPropertyType.timestamp),
-      SchemaProperty('endDate', RealmPropertyType.timestamp),
-      SchemaProperty('isRecurring', RealmPropertyType.bool),
-    ]);
+      ObjectType.realmObject,
+      BudgetModel,
+      'BudgetModel',
+      [
+        SchemaProperty('id', RealmPropertyType.objectid, primaryKey: true),
+        SchemaProperty('category', RealmPropertyType.string),
+        SchemaProperty('amountLimit', RealmPropertyType.double),
+        SchemaProperty('currentSpent', RealmPropertyType.double),
+        SchemaProperty('startDate', RealmPropertyType.timestamp),
+        SchemaProperty('endDate', RealmPropertyType.timestamp),
+        SchemaProperty('isRecurring', RealmPropertyType.bool),
+      ],
+    );
   }();
 
   @override

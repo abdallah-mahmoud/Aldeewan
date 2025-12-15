@@ -59,9 +59,9 @@ class PersonModel extends _PersonModel
       RealmObjectBase.getChanges<PersonModel>(this);
 
   @override
-  Stream<RealmObjectChanges<PersonModel>> changesFor(
-          [List<String>? keyPaths]) =>
-      RealmObjectBase.getChangesFor<PersonModel>(this, keyPaths);
+  Stream<RealmObjectChanges<PersonModel>> changesFor([
+    List<String>? keyPaths,
+  ]) => RealmObjectBase.getChangesFor<PersonModel>(this, keyPaths);
 
   @override
   PersonModel freeze() => RealmObjectBase.freezeObject<PersonModel>(this);
@@ -101,13 +101,17 @@ class PersonModel extends _PersonModel
     RealmObjectBase.registerFactory(PersonModel._);
     register(_toEJson, _fromEJson);
     return const SchemaObject(
-        ObjectType.realmObject, PersonModel, 'PersonModel', [
-      SchemaProperty('id', RealmPropertyType.string, primaryKey: true),
-      SchemaProperty('role', RealmPropertyType.string),
-      SchemaProperty('name', RealmPropertyType.string),
-      SchemaProperty('phone', RealmPropertyType.string, optional: true),
-      SchemaProperty('createdAt', RealmPropertyType.timestamp),
-    ]);
+      ObjectType.realmObject,
+      PersonModel,
+      'PersonModel',
+      [
+        SchemaProperty('id', RealmPropertyType.string, primaryKey: true),
+        SchemaProperty('role', RealmPropertyType.string),
+        SchemaProperty('name', RealmPropertyType.string),
+        SchemaProperty('phone', RealmPropertyType.string, optional: true),
+        SchemaProperty('createdAt', RealmPropertyType.timestamp),
+      ],
+    );
   }();
 
   @override

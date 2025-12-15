@@ -23,6 +23,9 @@ class _TransactionModel {
   String? externalId;
   String? status;
   int? accountId;
+  
+  @Indexed()
+  String? goalId; // Links transaction to a savings goal
 }
 
 extension TransactionModelMapper on TransactionModel {
@@ -39,6 +42,7 @@ extension TransactionModelMapper on TransactionModel {
       externalId: externalId,
       status: status,
       accountId: accountId,
+      goalId: goalId,
     );
   }
 
@@ -55,6 +59,8 @@ extension TransactionModelMapper on TransactionModel {
       externalId: transaction.externalId,
       status: transaction.status,
       accountId: transaction.accountId,
+      goalId: transaction.goalId,
     );
   }
 }
+

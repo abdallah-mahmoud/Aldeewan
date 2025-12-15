@@ -1,5 +1,10 @@
 ﻿# 📱 تطبيق الديوان (Aldeewan Mobile)
 
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B.svg?logo=flutter)
+![Dart](https://img.shields.io/badge/Dart-3.x-0175C2.svg?logo=dart)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+
 <p align="center">
   <img src="assets/images/logo.png" alt="Aldeewan Logo" width="120" />
 </p>
@@ -7,7 +12,7 @@
 <p align="center">
   <b>نظام محاسبي ذكي وشامل لإدارة الديون والمصروفات والإيرادات</b>
   <br>
-  <i>مصمم بتقنيات حديثة وواجهة عصرية لتجربة مستخدم فائقة</i>
+  <i>الإصدار 2.0.0 - أمان أكثر، دقة أعلى، وتجربة مستخدم أفضل</i>
 </p>
 
 ---
@@ -116,6 +121,12 @@ lib/
 2.  **تثبيت المكتبات:**
     ```bash
     flutter pub get
+    ```
+
+3.  **إعداد المتغيرات البيئية (.env):**
+    أنشئ ملف `.env` في المجلد الرئيسي وأضف مفتاح التشفير (يمكنك توليد مفتاح عشوائي أو استخدام التالي للتطوير):
+    ```env
+    REALM_ENCRYPTION_KEY=<YOUR_64_BYTE_HEX_KEY>
     ```
 
 3.  **توليد ملفات الكود (Code Generation):**

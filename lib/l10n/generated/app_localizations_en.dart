@@ -15,6 +15,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTitle => 'Aldeewan';
 
   @override
+  String get appSlogan => 'Secure Financial Management';
+
+  @override
   String get home => 'Home';
 
   @override
@@ -30,6 +33,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
+  String get general => 'General';
+
+  @override
   String get dashboard => 'Dashboard';
 
   @override
@@ -40,6 +46,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addPerson => 'Add Person';
+
+  @override
+  String get search => 'Search...';
+
+  @override
+  String get noResults => 'No results found';
 
   @override
   String get addPersonPrompt =>
@@ -246,6 +258,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cashFlowReport => 'Cash Flow Report';
 
   @override
+  String get madeWithLove => 'Made with ❤️ by Motaasl';
+
+  @override
+  String appVersionInfo(String version) {
+    return 'Aldeewan Mobile v$version';
+  }
+
+  @override
   String get developerTagline =>
       'Media | Photography | Editing | Design | Web | Software Dev \"Professional, Quality and Art\" #motaasl';
 
@@ -278,7 +298,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recordPayment => 'Record Payment';
 
   @override
-  String get addCashEntry => 'Add Cash Entry';
+  String get addCashEntry => 'Add Transaction';
 
   @override
   String get viewBalances => 'View Balances';
@@ -305,7 +325,79 @@ class AppLocalizationsEn extends AppLocalizations {
   String get monthlyExpense => 'Monthly Expense';
 
   @override
+  String get transactionDetails => 'Transaction Details';
+
+  @override
+  String get deleteTransaction => 'Delete Transaction';
+
+  @override
+  String get deleteTransactionConfirm =>
+      'Are you sure you want to delete this transaction?';
+
+  @override
+  String get deletedSuccessfully => 'Deleted successfully';
+
+  @override
+  String get person => 'Person';
+
+  @override
   String get savedSuccessfully => 'Saved successfully';
+
+  @override
+  String get cashLabel => 'Cash';
+
+  @override
+  String get bankLabel => 'Bank';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get addToLedger => 'Add to Ledger (Debt/Credit)';
+
+  @override
+  String get addToLedgerSubtitle => 'Requires selecting a person';
+
+  @override
+  String get addToCashbook => 'Add to Cashbook (Income/Expense)';
+
+  @override
+  String get addToCashbookSubtitle => 'No person required';
+
+  @override
+  String get scanReceipt => 'Scan Receipt';
+
+  @override
+  String scanError(Object error) {
+    return 'Error scanning receipt: $error';
+  }
+
+  @override
+  String get scanTimeout => 'Scanning timed out';
+
+  @override
+  String get totalSpent => 'Total Spent';
+
+  @override
+  String goalReached(Object percent) {
+    return '$percent% Reached';
+  }
+
+  @override
+  String targetLabel(Object amount) {
+    return 'Target: $amount';
+  }
+
+  @override
+  String get goalProgress => 'Goal Progress';
+
+  @override
+  String budgetUsage(Object percentage) {
+    return 'Budget Usage $percentage';
+  }
 
   @override
   String get pleaseEnterAmount => 'Please enter an amount';
@@ -317,6 +409,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseEnterName => 'Please enter a name';
 
   @override
+  String get me => 'Me';
+
+  @override
   String get netPosition => 'Net Position';
 
   @override
@@ -326,10 +421,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get youOweSuppliersMore => 'You owe suppliers more';
 
   @override
+  String get profitThisMonth => 'Profit this month';
+
+  @override
+  String get lossThisMonth => 'Loss this month';
+
+  @override
   String get all => 'All';
 
   @override
   String get thisMonth => 'This Month';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get thisWeek => 'This Week';
+
+  @override
+  String get custom => 'Custom';
 
   @override
   String get saleOnCredit => 'Sale (Credit)';
@@ -342,6 +452,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get paymentMade => 'Payment Made';
+
+  @override
+  String get debtGiven => 'Debt (Owed by)';
+
+  @override
+  String get debtTaken => 'Debt (Owed to)';
 
   @override
   String get cashSale => 'Cash Sale';
@@ -466,5 +582,262 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String errorOccurred(Object error) {
     return 'Error: $error';
+  }
+
+  @override
+  String get simpleMode => 'Simple Mode';
+
+  @override
+  String get simpleModeSubtitle => 'Use simplified terminology (Lent/Borrowed)';
+
+  @override
+  String get simpleLent => 'Lent';
+
+  @override
+  String get simpleBorrowed => 'Borrowed';
+
+  @override
+  String get simpleGotPaid => 'Got Paid';
+
+  @override
+  String get simplePaidBack => 'Paid Back';
+
+  @override
+  String get english => 'English';
+
+  @override
+  String get currencyQAR => 'QAR (ر.ق)';
+
+  @override
+  String get currencySAR => 'SAR (ر.س)';
+
+  @override
+  String get currencyEGP => 'EGP (ج.م)';
+
+  @override
+  String get currencySDG => 'Sudanese Pound (SDG)';
+
+  @override
+  String get currencyKWD => 'Kuwaiti Dinar (KWD)';
+
+  @override
+  String get loading => 'Loading';
+
+  @override
+  String get error => 'Error';
+
+  @override
+  String get deleteCategoryTitle => 'Delete Category?';
+
+  @override
+  String deleteCategoryContent(Object categoryName) {
+    return 'Are you sure you want to delete \"$categoryName\"?';
+  }
+
+  @override
+  String get newCategoryTitle => 'New Category';
+
+  @override
+  String get categoryType => 'Type: ';
+
+  @override
+  String get selectColor => 'Select Color';
+
+  @override
+  String get selectIcon => 'Select Icon';
+
+  @override
+  String get create => 'Create';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get overBudget => 'Over Budget';
+
+  @override
+  String get remaining => 'Remaining';
+
+  @override
+  String get spent => 'Spent';
+
+  @override
+  String get limit => 'Limit';
+
+  @override
+  String get catHousing => 'Housing';
+
+  @override
+  String get catFood => 'Food & Dining';
+
+  @override
+  String get catTransportation => 'Transportation';
+
+  @override
+  String get catHealth => 'Health';
+
+  @override
+  String get catEntertainment => 'Entertainment';
+
+  @override
+  String get catShopping => 'Shopping';
+
+  @override
+  String get catUtilities => 'Utilities';
+
+  @override
+  String get catIncome => 'Income';
+
+  @override
+  String get catOther => 'Other';
+
+  @override
+  String get catSavings => 'Savings';
+
+  @override
+  String get manageCategories => 'Manage Categories';
+
+  @override
+  String budgetExceededMessage(String currency, String amount) {
+    return 'You have exceeded your budget by $currency $amount';
+  }
+
+  @override
+  String budgetRemainingMessage(String currency, String amount) {
+    return 'You have $currency $amount remaining';
+  }
+
+  @override
+  String get deleteBudget => 'Delete Budget';
+
+  @override
+  String get deleteBudgetConfirmation =>
+      'Are you sure you want to delete this budget?';
+
+  @override
+  String get deleteGoal => 'Delete Goal';
+
+  @override
+  String get deleteGoalConfirmation =>
+      'Are you sure you want to delete this goal?';
+
+  @override
+  String get goalDetails => 'Goal Details';
+
+  @override
+  String get budgetDetails => 'Budget Details';
+
+  @override
+  String get deadline => 'Deadline';
+
+  @override
+  String get saved => 'Saved';
+
+  @override
+  String get target => 'Target';
+
+  @override
+  String get actions => 'Actions';
+
+  @override
+  String get addFunds => 'Add Funds';
+
+  @override
+  String get withdraw => 'Withdraw';
+
+  @override
+  String get goalNotFound => 'Goal not found';
+
+  @override
+  String get budgetNotFound => 'Budget not found';
+
+  @override
+  String get goalExceededError =>
+      'Cannot add funds. Total saved would exceed the target amount.';
+
+  @override
+  String get budgetExceededError =>
+      'Cannot add expense. Total spent would exceed the budget limit.';
+
+  @override
+  String goalExceededErrorWithRemaining(String amount) {
+    return 'Cannot add funds. You can only add up to $amount.';
+  }
+
+  @override
+  String budgetExceededErrorWithRemaining(String amount) {
+    return 'Cannot add expense. You only have $amount remaining in this budget.';
+  }
+
+  @override
+  String get expenseBreakdown => 'Expense Breakdown';
+
+  @override
+  String get editGoal => 'Edit Goal';
+
+  @override
+  String get startDate => 'Start Date';
+
+  @override
+  String get endDate => 'End Date';
+
+  @override
+  String get noDate => 'No Date';
+
+  @override
+  String get editBudget => 'Edit Budget';
+
+  @override
+  String get appSounds => 'App Sounds';
+
+  @override
+  String get appSoundsSubtitle => 'Enable sound effects';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get markAllAsRead => 'Mark all as read';
+
+  @override
+  String get noNotifications => 'No notifications yet';
+
+  @override
+  String get dailyReminder => 'Daily Reminder';
+
+  @override
+  String get dailyReminderSubtitle =>
+      'Get a daily reminder to record your transactions';
+
+  @override
+  String get authenticateReason => 'Please authenticate to access Aldeewan';
+
+  @override
+  String get dailyReminderTitle => 'Daily Reminder';
+
+  @override
+  String get dailyReminderBody =>
+      'Don\'t forget to record your transactions for today!';
+
+  @override
+  String get reminderTime => 'Reminder Time';
+
+  @override
+  String get budgetExceededTitle => 'Budget Exceeded';
+
+  @override
+  String budgetExceededBody(String category, String amount, String currency) {
+    return 'You have exceeded your budget for $category by $amount $currency.';
+  }
+
+  @override
+  String get goalReachedTitle => 'Goal Reached!';
+
+  @override
+  String goalReachedBody(String goalName) {
+    return 'Congratulations! You have reached your goal: $goalName.';
   }
 }

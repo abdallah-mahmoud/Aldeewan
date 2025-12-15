@@ -5,11 +5,17 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 import 'package:aldeewan_mobile/presentation/widgets/empty_state.dart';
 import 'package:aldeewan_mobile/presentation/widgets/cash_entry_form.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
-
-enum CashFilter { all, income, expense }
+import 'package:aldeewan_mobile/presentation/providers/category_provider.dart';
+import 'package:aldeewan_mobile/presentation/screens/transaction_details_screen.dart';
+import 'package:aldeewan_mobile/config/app_colors.dart';
+import 'package:aldeewan_mobile/presentation/providers/cashbook_provider.dart';
+import 'package:aldeewan_mobile/utils/category_helper.dart';
+import 'package:aldeewan_mobile/data/services/sound_service.dart';
+import 'package:aldeewan_mobile/presentation/widgets/debounced_search_bar.dart';
 
 class CashbookScreen extends ConsumerStatefulWidget {
   const CashbookScreen({super.key});
@@ -19,29 +25,67 @@ class CashbookScreen extends ConsumerStatefulWidget {
 }
 
 class _CashbookScreenState extends ConsumerState<CashbookScreen> {
-  CashFilter _filter = CashFilter.all;
   bool _initialActionHandled = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialActionHandled) {
-      final action = GoRouterState.of(context).uri.queryParameters['action'];
-      if (action == 'add') {
+      final uri = GoRouterState.of(context).uri;
+      final action = uri.queryParameters['action'];
+      final filterParam = uri.queryParameters['filter'];
+      
+      // Handle filter query parameter (from dashboard cards)
+      if (filterParam != null) {
         _initialActionHandled = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          _showAddCashEntryModal(context, ref);
+          if (filterParam == 'income') {
+            ref.read(cashFilterProvider.notifier).state = CashFilter.income;
+          } else if (filterParam == 'expense') {
+            ref.read(cashFilterProvider.notifier).state = CashFilter.expense;
+          }
+        });
+      }
+      
+      // Handle add action query parameter (from receipt scanner)
+      if (action == 'add') {
+        _initialActionHandled = true;
+        
+        double? initialAmount;
+        DateTime? initialDate;
+        String? initialNote;
+
+        if (uri.queryParameters.containsKey('amount')) {
+          initialAmount = double.tryParse(uri.queryParameters['amount']!);
+        }
+        if (uri.queryParameters.containsKey('date')) {
+          initialDate = DateTime.tryParse(uri.queryParameters['date']!);
+        }
+        initialNote = uri.queryParameters['note'];
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _showAddCashEntryModal(context, ref, initialAmount, initialDate, initialNote);
         });
       }
     }
   }
 
-  void _showAddCashEntryModal(BuildContext context, WidgetRef ref) {
+  void _showAddCashEntryModal(
+    BuildContext context, 
+    WidgetRef ref, [
+    double? initialAmount,
+    DateTime? initialDate,
+    String? initialNote,
+  ]) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) => CashEntryForm(
+        initialAmount: initialAmount,
+        initialDate: initialDate,
+        initialNote: initialNote,
         onSave: (transaction) {
+          ref.read(soundServiceProvider).playSuccess();
           ref.read(ledgerProvider.notifier).addTransaction(transaction);
         },
       ),
@@ -50,81 +94,191 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ledgerState = ref.watch(ledgerProvider);
+    final cashbookAsync = ref.watch(cashbookProvider);
+    final ledgerAsync = ref.watch(ledgerProvider); // Needed for person name lookup in list items
+    final filter = ref.watch(cashFilterProvider);
+    final datePreset = ref.watch(dateRangePresetProvider);
+    final currency = ref.watch(currencyProvider);
+    final categories = ref.watch(categoryProvider);
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final numberFormat = NumberFormat('#,##0.##');
+    final searchQuery = ref.watch(cashbookSearchProvider);
 
-    // Filter for cash-related transactions
-    final allCashTransactions = ledgerState.transactions.where((t) {
-      return t.type == TransactionType.paymentReceived ||
-          t.type == TransactionType.paymentMade ||
-          t.type == TransactionType.cashSale ||
-          t.type == TransactionType.cashIncome ||
-          t.type == TransactionType.cashExpense;
-    }).toList()
-      ..sort((a, b) => b.date.compareTo(a.date));
+    return cashbookAsync.when(
+      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (e, s) => Scaffold(body: Center(child: Text(AppLocalizations.of(context)!.errorOccurred(e.toString())))),
+      data: (cashbookState) {
+        // Transactions are already filtered by the provider (including search)
+        final filtered = cashbookState.transactions;
+        final totalIn = cashbookState.totalIncome;
+        final totalOut = cashbookState.totalExpense;
+        final net = cashbookState.netBalance;
 
-    // Apply income/expense filter
-    final filtered = allCashTransactions.where((t) {
-      final isIncome = t.type == TransactionType.paymentReceived ||
-          t.type == TransactionType.cashSale ||
-          t.type == TransactionType.cashIncome;
-      if (_filter == CashFilter.income) return isIncome;
-      if (_filter == CashFilter.expense) return !isIncome;
-      return true;
-    }).toList();
 
-    // Compute summary for filtered list
-    double totalIn = 0;
-    double totalOut = 0;
-    for (final t in filtered) {
-      final isIncome = t.type == TransactionType.paymentReceived ||
-          t.type == TransactionType.cashSale ||
-          t.type == TransactionType.cashIncome;
-      if (isIncome) {
-        totalIn += t.amount;
-      } else {
-        totalOut += t.amount;
-      }
-    }
-    final net = totalIn - totalOut;
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.cashbook),
-      ),
-      body: ledgerState.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(l10n.cashbook),
+          ),
+          resizeToAvoidBottomInset: false,
+          body: Column(
               children: [
-                // Filters row
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                // Search bar
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                  child: DebouncedSearchBar(
+                    hintText: l10n.search,
+                    onSearch: (query) {
+                      ref.read(cashbookSearchProvider.notifier).state = query;
+                    },
+                  ),
+                ),
+                // Compact filter row with 2 dropdowns
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
                   child: Row(
                     children: [
-                      ChoiceChip(
-                        label: Text(l10n.allTransactions),
-                        selected: _filter == CashFilter.all,
-                        onSelected: (_) {
-                          setState(() => _filter = CashFilter.all);
-                        },
+                      // Type filter dropdown
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<CashFilter>(
+                              value: filter,
+                              isExpanded: true,
+                              icon: Icon(LucideIcons.chevronDown, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                              items: [
+                                DropdownMenuItem(
+                                  value: CashFilter.all,
+                                  child: Row(
+                                    children: [
+                                      Icon(LucideIcons.list, size: 16, color: theme.colorScheme.primary),
+                                      const SizedBox(width: 8),
+                                      Text(l10n.allTransactions),
+                                    ],
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: CashFilter.income,
+                                  child: Row(
+                                    children: [
+                                      Icon(LucideIcons.arrowDownLeft, size: 16, color: AppColors.success),
+                                      const SizedBox(width: 8),
+                                      Text(l10n.income),
+                                    ],
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: CashFilter.expense,
+                                  child: Row(
+                                    children: [
+                                      Icon(LucideIcons.arrowUpRight, size: 16, color: AppColors.error),
+                                      const SizedBox(width: 8),
+                                      Text(l10n.expense),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                if (value != null) {
+                                  ref.read(cashFilterProvider.notifier).state = value;
+                                }
+                              },
+                            ),
+                          ),
+                        ),
                       ),
-                      const SizedBox(width: 8),
-                      ChoiceChip(
-                        label: Text(l10n.income),
-                        selected: _filter == CashFilter.income,
-                        onSelected: (_) {
-                          setState(() => _filter = CashFilter.income);
-                        },
-                      ),
-                      const SizedBox(width: 8),
-                      ChoiceChip(
-                        label: Text(l10n.expense),
-                        selected: _filter == CashFilter.expense,
-                        onSelected: (_) {
-                          setState(() => _filter = CashFilter.expense);
-                        },
+                      const SizedBox(width: 12),
+                      // Date filter dropdown
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<DateRangePreset>(
+                              value: datePreset,
+                              isExpanded: true,
+                              icon: Icon(LucideIcons.chevronDown, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                              items: [
+                                DropdownMenuItem(
+                                  value: DateRangePreset.all,
+                                  child: Row(
+                                    children: [
+                                      Icon(LucideIcons.infinity, size: 16, color: theme.colorScheme.primary),
+                                      const SizedBox(width: 8),
+                                      Text(l10n.all),
+                                    ],
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: DateRangePreset.today,
+                                  child: Row(
+                                    children: [
+                                      Icon(LucideIcons.calendarCheck, size: 16, color: theme.colorScheme.primary),
+                                      const SizedBox(width: 8),
+                                      Text(l10n.today),
+                                    ],
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: DateRangePreset.thisWeek,
+                                  child: Row(
+                                    children: [
+                                      Icon(LucideIcons.calendarDays, size: 16, color: theme.colorScheme.primary),
+                                      const SizedBox(width: 8),
+                                      Text(l10n.thisWeek),
+                                    ],
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: DateRangePreset.thisMonth,
+                                  child: Row(
+                                    children: [
+                                      Icon(LucideIcons.calendar, size: 16, color: theme.colorScheme.primary),
+                                      const SizedBox(width: 8),
+                                      Text(l10n.thisMonth),
+                                    ],
+                                  ),
+                                ),
+                                DropdownMenuItem(
+                                  value: DateRangePreset.custom,
+                                  child: Row(
+                                    children: [
+                                      Icon(LucideIcons.calendarRange, size: 16, color: theme.colorScheme.primary),
+                                      const SizedBox(width: 8),
+                                      Text(datePreset == DateRangePreset.custom 
+                                          ? _formatDateRange(ref.watch(customDateRangeProvider))
+                                          : l10n.custom),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              onChanged: (value) async {
+                                if (value == DateRangePreset.custom) {
+                                  final picked = await showDateRangePicker(
+                                    context: context,
+                                    firstDate: DateTime(2020),
+                                    lastDate: DateTime.now().add(const Duration(days: 365)),
+                                    initialDateRange: ref.read(customDateRangeProvider),
+                                  );
+                                  if (picked != null) {
+                                    ref.read(customDateRangeProvider.notifier).state = picked;
+                                    ref.read(dateRangePresetProvider.notifier).state = DateRangePreset.custom;
+                                  }
+                                } else if (value != null) {
+                                  ref.read(dateRangePresetProvider.notifier).state = value;
+                                }
+                              },
+                            ),
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -146,19 +300,25 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
                           context,
                           label: l10n.income,
                           value: totalIn,
-                          color: Colors.green,
+                          color: AppColors.success,
+                          currency: currency,
+                          formatter: numberFormat,
                         ),
                         _buildSummaryItem(
                           context,
                           label: l10n.expense,
                           value: totalOut,
-                          color: Colors.red,
+                          color: AppColors.error,
+                          currency: currency,
+                          formatter: numberFormat,
                         ),
                         _buildSummaryItem(
                           context,
                           label: 'Net',
                           value: net,
-                          color: net >= 0 ? Colors.green : Colors.red,
+                          color: net >= 0 ? AppColors.success : AppColors.error,
+                          currency: currency,
+                          formatter: numberFormat,
                         ),
                       ],
                     ),
@@ -170,8 +330,9 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
                 Expanded(
                   child: filtered.isEmpty
                       ? EmptyState(
-                          message: l10n.noEntriesYet,
+                          message: searchQuery.isNotEmpty ? l10n.noResults : l10n.noEntriesYet,
                           icon: LucideIcons.history,
+                          lottieAsset: 'assets/animations/empty_list.json',
                         )
                       : ListView.separated(
                           padding: const EdgeInsets.all(16),
@@ -179,17 +340,23 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
                           separatorBuilder: (context, index) => const SizedBox(height: 8),
                           itemBuilder: (context, index) {
                             final tx = filtered[index];
+                            // Income = cash came in (including borrowed money)
                             final isIncome = tx.type == TransactionType.paymentReceived ||
                                 tx.type == TransactionType.cashSale ||
-                                tx.type == TransactionType.cashIncome;
+                                tx.type == TransactionType.cashIncome ||
+                                tx.type == TransactionType.debtTaken; // Borrowed = cash in
                             
                             String? personName;
                             if (tx.personId != null) {
                               try {
-                                final person = ledgerState.persons.firstWhere((p) => p.id == tx.personId);
+                                final persons = ledgerAsync.value?.persons ?? [];
+                                final person = persons.firstWhere((p) => p.id == tx.personId);
                                 personName = person.name;
                               } catch (_) {}
                             }
+
+                            // Find category
+                            final category = categories.where((c) => c.name == tx.category).firstOrNull;
 
                             return Card(
                               margin: EdgeInsets.zero,
@@ -201,25 +368,31 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
                               ),
                               child: ListTile(
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TransactionDetailsScreen(transaction: tx),
+                                    ),
+                                  );
+                                },
                                 leading: Container(
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color: isIncome
-                                        ? Colors.green.withValues(alpha: 0.1)
-                                        : Colors.red.withValues(alpha: 0.1),
-                                    shape: BoxShape.circle,
+                                    color: category != null 
+                                        ? category.color.withValues(alpha: 0.1)
+                                        : (isIncome ? AppColors.success.withValues(alpha: 0.1) : AppColors.error.withValues(alpha: 0.1)),
+                                    borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Icon(
-                                    isIncome
-                                        ? LucideIcons.arrowDownLeft
-                                        : LucideIcons.arrowUpRight,
-                                    color: isIncome ? Colors.green : Colors.red,
+                                    category != null ? category.icon : (isIncome ? LucideIcons.arrowDownLeft : LucideIcons.arrowUpRight),
+                                    color: category != null ? category.color : (isIncome ? AppColors.success : AppColors.error),
                                     size: 20,
                                   ),
                                 ),
                                 title: Text(
-                                  _getTransactionLabel(tx.type, l10n),
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                  category != null ? CategoryHelper.getLocalizedCategory(category.name, l10n) : _getTransactionLabel(tx.type, l10n),
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                                 ),
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,7 +400,10 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
                                     const SizedBox(height: 4),
                                     Row(
                                       children: [
-                                        Text(DateFormat.yMMMd().format(tx.date)),
+                                        Text(
+                                          DateFormat.yMMMd().format(tx.date),
+                                          style: Theme.of(context).textTheme.bodySmall,
+                                        ),
                                         if (personName != null) ...[
                                           const SizedBox(width: 8),
                                           Icon(LucideIcons.user, size: 12, color: theme.colorScheme.onSurfaceVariant),
@@ -235,7 +411,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
                                           Expanded(
                                             child: Text(
                                               personName,
-                                              style: TextStyle(
+                                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                                 color: theme.colorScheme.onSurfaceVariant,
                                                 fontStyle: FontStyle.italic,
                                               ),
@@ -245,31 +421,25 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
                                         ],
                                       ],
                                     ),
-                                  ],
-                                ),
-                                trailing: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      tx.amount.toStringAsFixed(2),
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: isIncome ? Colors.green : Colors.red,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    if (tx.note != null && tx.note!.isNotEmpty)
+                                    if (tx.note != null && tx.note!.isNotEmpty) ...[
+                                      const SizedBox(height: 2),
                                       Text(
                                         tx.note!,
-                                        style: TextStyle(
-                                          fontSize: 12,
+                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                           color: theme.colorScheme.onSurfaceVariant,
                                         ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
+                                    ],
                                   ],
+                                ),
+                                trailing: Text(
+                                  '$currency ${numberFormat.format(tx.amount)}',
+                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: isIncome ? AppColors.success : AppColors.error,
+                                  ),
                                 ),
                               ),
                             );
@@ -283,10 +453,18 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
         child: const Icon(Icons.add),
       ),
     );
+      },
+    );
   }
 
-  Widget _buildSummaryItem(BuildContext context,
-      {required String label, required double value, required Color color}) {
+  Widget _buildSummaryItem(
+    BuildContext context, {
+    required String label,
+    required double value,
+    required Color color,
+    required String currency,
+    required NumberFormat formatter,
+  }) {
     final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -296,9 +474,12 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
           style: theme.textTheme.bodySmall,
         ),
         const SizedBox(height: 4),
-        Text(
-          value.toStringAsFixed(2),
-          style: theme.textTheme.titleMedium?.copyWith(color: color),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            '$currency ${formatter.format(value)}',
+            style: theme.textTheme.titleMedium?.copyWith(color: color),
+          ),
         ),
       ],
     );
@@ -307,17 +488,27 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
   String _getTransactionLabel(TransactionType type, AppLocalizations l10n) {
     switch (type) {
       case TransactionType.paymentReceived:
-        return l10n.payment; // Or specific key if needed
+        return l10n.paymentReceived;
       case TransactionType.paymentMade:
-        return l10n.payment;
+        return l10n.paymentMade;
       case TransactionType.cashSale:
-        return l10n.income; // Mapping to generic income/expense for now or add specific keys
+        return l10n.cashLabel; // نقد - Cash
       case TransactionType.cashIncome:
-        return l10n.income;
+        return l10n.bankLabel; // بنك - Bank
       case TransactionType.cashExpense:
         return l10n.expense;
+      case TransactionType.debtGiven:
+        return l10n.debtGiven;
+      case TransactionType.debtTaken:
+        return l10n.debtTaken;
       default:
         return l10n.transaction;
     }
+  }
+
+  String _formatDateRange(DateTimeRange? range) {
+    if (range == null) return '';
+    final formatter = DateFormat.MMMd();
+    return '${formatter.format(range.start)} - ${formatter.format(range.end)}';
   }
 }

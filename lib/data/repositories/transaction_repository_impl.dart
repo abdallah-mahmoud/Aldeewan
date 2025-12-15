@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:aldeewan_mobile/data/datasources/local_database_source.dart';
 import 'package:aldeewan_mobile/data/models/transaction_model.dart';
+import 'package:aldeewan_mobile/data/models/transaction_dto.dart';
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 import 'package:aldeewan_mobile/domain/repositories/transaction_repository.dart';
 
@@ -7,6 +9,33 @@ class TransactionRepositoryImpl implements TransactionRepository {
   final LocalDatabaseSource _dataSource;
 
   TransactionRepositoryImpl(this._dataSource);
+
+  @override
+  Stream<List<Transaction>> watchTransactions() {
+    return _dataSource.watchTransactions().asyncMap((models) async {
+      // Extract data to DTOs on the main thread (Realm objects are thread-confined)
+      final dtos = models.map((m) => TransactionDto(
+        id: m.uuid,
+        type: m.type,
+        personId: m.personId,
+        amount: m.amount,
+        date: m.date,
+        category: m.category,
+        note: m.note,
+        dueDate: m.dueDate,
+        externalId: m.externalId,
+        status: m.status,
+        accountId: m.accountId,
+      )).toList();
+
+      // Perform heavy mapping/processing in a background isolate
+      return await compute(_mapDtosToEntities, dtos);
+    });
+  }
+
+  static List<Transaction> _mapDtosToEntities(List<TransactionDto> dtos) {
+    return dtos.map((dto) => dto.toEntity()).toList();
+  }
 
   @override
   Future<List<Transaction>> getTransactions() async {

@@ -46,7 +46,13 @@ app.*.map.json
 
 # Environment variables
 .env
+key.properties
+*.jks
+*.keystore
 
 # Documentation
-docs/
+# Documentation
+# docs/
+
+
 

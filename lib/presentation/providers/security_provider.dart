@@ -6,7 +6,7 @@ final securityProvider = StateNotifierProvider<SecurityNotifier, bool>((ref) {
 });
 
 class SecurityNotifier extends StateNotifier<bool> {
-  SecurityNotifier([bool initialValue = false]) : super(initialValue) {
+  SecurityNotifier([super.state = false]) {
     // If we didn't get an initial value (or it was false), we double check prefs.
     // But if we are using overrides in main, this might be redundant but harmless.
     _loadSettings();

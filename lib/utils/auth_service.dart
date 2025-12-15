@@ -18,10 +18,10 @@ class AuthService {
     }
   }
 
-  Future<bool> authenticate() async {
+  Future<bool> authenticate(String localizedReason) async {
     try {
       return await auth.authenticate(
-        localizedReason: 'Please authenticate to access Aldeewan',
+        localizedReason: localizedReason,
         options: const AuthenticationOptions(
           stickyAuth: true,
           biometricOnly: false, // Allows PIN fallback if biometrics fail

@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/presentation/providers/account_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
+import 'package:aldeewan_mobile/utils/error_handler.dart';
 
 class LinkAccountScreen extends ConsumerStatefulWidget {
   const LinkAccountScreen({super.key});
@@ -52,7 +53,7 @@ class _LinkAccountScreenState extends ConsumerState<LinkAccountScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.errorOccurred(e.toString()))),
+          SnackBar(content: Text(l10n.errorOccurred(ErrorHandler.getUserFriendlyErrorMessage(e, l10n)))),
         );
       }
     } finally {
@@ -83,7 +84,7 @@ class _LinkAccountScreenState extends ConsumerState<LinkAccountScreen> {
               ),
               const SizedBox(height: 32),
               DropdownButtonFormField<String>(
-                value: _selectedProvider,
+                initialValue: _selectedProvider,
                 decoration: const InputDecoration(
                   labelText: 'Select Provider',
                   border: OutlineInputBorder(),

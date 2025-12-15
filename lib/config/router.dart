@@ -10,15 +10,29 @@ import 'package:aldeewan_mobile/presentation/screens/person_details_screen.dart'
 import 'package:aldeewan_mobile/presentation/screens/about_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/splash_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/link_account_screen.dart';
+import 'package:aldeewan_mobile/presentation/screens/budget_screen.dart';
+import 'package:aldeewan_mobile/presentation/screens/budget_details_screen.dart';
+import 'package:aldeewan_mobile/presentation/screens/goals_screen.dart';
+import 'package:aldeewan_mobile/presentation/screens/goal_details_screen.dart';
+import 'package:aldeewan_mobile/presentation/screens/notifications_screen.dart';
+import 'package:aldeewan_mobile/presentation/screens/transaction_details_screen.dart';
 import 'package:aldeewan_mobile/presentation/widgets/scaffold_with_nav_bar.dart';
+import 'package:aldeewan_mobile/domain/entities/transaction.dart';
+import 'package:aldeewan_mobile/data/services/sound_service.dart';
+import 'package:aldeewan_mobile/utils/sound_navigation_observer.dart';
+
+final rootNavigatorKey = GlobalKey<NavigatorState>();
+final shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final routerProvider = Provider<GoRouter>((ref) {
-  final rootNavigatorKey = GlobalKey<NavigatorState>();
-  final shellNavigatorKey = GlobalKey<NavigatorState>();
+  final soundService = ref.watch(soundServiceProvider);
 
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: '/',
+    observers: [
+      SoundNavigationObserver(soundService),
+    ],
     routes: [
       GoRoute(
         path: '/',
@@ -26,8 +40,11 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: '/link-account',
-        parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const LinkAccountScreen(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationsScreen(),
       ),
       ShellRoute(
         navigatorKey: shellNavigatorKey,
@@ -38,6 +55,34 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/home',
             builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/budgets',
+            builder: (context, state) => const BudgetScreen(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                parentNavigatorKey: rootNavigatorKey,
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return BudgetDetailsScreen(budgetId: id);
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/goals',
+            builder: (context, state) => const GoalsScreen(),
+            routes: [
+              GoRoute(
+                path: ':id',
+                parentNavigatorKey: rootNavigatorKey,
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return GoalDetailsScreen(goalId: id);
+                },
+              ),
+            ],
           ),
           GoRoute(
             path: '/ledger',
@@ -73,6 +118,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: '/transaction',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final transaction = state.extra as Transaction;
+          return TransactionDetailsScreen(transaction: transaction);
+        },
       ),
     ],
   );

@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:aldeewan_mobile/config/gradients.dart';
+import 'package:aldeewan_mobile/presentation/widgets/common/rolling_balance.dart';
 
 class HeroBalanceCard extends StatelessWidget {
   final String title;
   final String subtitle;
-  final String amount;
+  final double rawAmount;
+  final String currencyCode;
   final bool isPositive;
 
   const HeroBalanceCard({
     super.key,
     required this.title,
     required this.subtitle,
-    required this.amount,
+    required this.rawAmount,
+    required this.currencyCode,
     this.isPositive = true,
   });
 
@@ -42,9 +45,15 @@ class HeroBalanceCard extends StatelessWidget {
             style: theme.textTheme.titleMedium?.copyWith(color: Colors.white),
           ),
           const SizedBox(height: 8),
-          Text(
-            amount,
-            style: theme.textTheme.headlineLarge?.copyWith(color: Colors.white),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: RollingBalance(
+              balance: rawAmount,
+              currencySymbol: currencyCode,
+              style: theme.textTheme.headlineLarge?.copyWith(color: Colors.white),
+              showSign: false, // Or true if we want +/-
+            ),
           ),
           const SizedBox(height: 8),
           Text(

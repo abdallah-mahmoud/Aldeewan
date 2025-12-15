@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lottie/lottie.dart';
 
 class EmptyState extends StatelessWidget {
   final String message;
   final String? title;
   final IconData? icon;
+  final String? lottieAsset;
   final VoidCallback? onAction;
   final String? actionLabel;
 
@@ -13,6 +15,7 @@ class EmptyState extends StatelessWidget {
     required this.message,
     this.title,
     this.icon,
+    this.lottieAsset,
     this.onAction,
     this.actionLabel,
   });
@@ -27,11 +30,19 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              icon ?? LucideIcons.inbox,
-              size: 64,
-              color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
-            ),
+            if (lottieAsset != null)
+              Lottie.asset(
+                lottieAsset!,
+                width: 200,
+                height: 200,
+                fit: BoxFit.contain,
+              )
+            else
+              Icon(
+                icon ?? LucideIcons.inbox,
+                size: 64,
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
+              ),
             const SizedBox(height: 16),
             if (title != null) ...[
               Text(
@@ -53,7 +64,7 @@ class EmptyState extends StatelessWidget {
             ),
             if (onAction != null && actionLabel != null) ...[
               const SizedBox(height: 24),
-              FilledButton.tonal(
+              FilledButton(
                 onPressed: onAction,
                 child: Text(actionLabel!),
               ),

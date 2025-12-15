@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aldeewan_mobile/presentation/providers/budget_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 import 'package:aldeewan_mobile/presentation/widgets/empty_state.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
+import 'package:intl/intl.dart';
+import 'package:aldeewan_mobile/utils/category_helper.dart';
 
 class BudgetList extends ConsumerWidget {
   const BudgetList({super.key});
@@ -11,7 +14,9 @@ class BudgetList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final budgetState = ref.watch(budgetProvider);
+    final currency = ref.watch(currencyProvider);
     final l10n = AppLocalizations.of(context)!;
+    final formatter = NumberFormat('#,##0.##');
 
     if (budgetState.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -41,8 +46,8 @@ class BudgetList extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(budget.category, style: Theme.of(context).textTheme.titleMedium),
-                    Text('${budget.currentSpent.toStringAsFixed(0)} / ${budget.amountLimit.toStringAsFixed(0)} SDG'),
+                    Text(CategoryHelper.getLocalizedCategory(budget.category, l10n), style: Theme.of(context).textTheme.titleMedium),
+                    Text('$currency ${formatter.format(budget.currentSpent)} / $currency ${formatter.format(budget.amountLimit)}'),
                   ],
                 ),
                 const SizedBox(height: 8),

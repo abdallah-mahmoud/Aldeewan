@@ -17,6 +17,15 @@ import 'package:aldeewan_mobile/utils/csv_exporter.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/security_provider.dart';
+import 'package:aldeewan_mobile/utils/error_handler.dart';
+import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/notification_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/sound_settings_provider.dart';
+
+import 'package:aldeewan_mobile/presentation/screens/categories_management_screen.dart';
+import 'package:aldeewan_mobile/presentation/widgets/settings/settings_section.dart';
+import 'package:aldeewan_mobile/presentation/widgets/settings/settings_tile.dart';
+import 'package:aldeewan_mobile/presentation/widgets/settings/theme_selector.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -27,145 +36,291 @@ class SettingsScreen extends ConsumerWidget {
     final locale = ref.watch(localeProvider);
     final currency = ref.watch(currencyProvider);
     final isAppLockEnabled = ref.watch(securityProvider);
+    final isSimpleMode = ref.watch(settingsProvider);
+    final isSoundEnabled = ref.watch(soundSettingsProvider);
+    final notificationState = ref.watch(notificationProvider);
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return Scaffold(
+      backgroundColor: theme.colorScheme.surfaceContainerLowest,
       appBar: AppBar(
         title: Text(l10n.settings),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
       ),
-      body: ListView(
-        children: [
-          _buildSectionHeader(context, l10n.appearance),
-          ListTile(
-            leading: const Icon(LucideIcons.sun),
-            title: Text(l10n.theme),
-            trailing: DropdownButton<ThemeMode>(
-              value: themeMode,
-              underline: const SizedBox(),
-              onChanged: (ThemeMode? newValue) {
-                if (newValue != null) {
-                  ref.read(themeProvider.notifier).setTheme(newValue);
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: ThemeMode.system,
-                  child: Text(l10n.system),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(bottom: 40),
+        child: Column(
+          children: [
+            // Appearance Section
+            SettingsSection(
+              title: l10n.appearance,
+              children: [
+                ThemeSelector(
+                  currentMode: themeMode,
+                  onThemeChanged: (mode) {
+                    ref.read(themeProvider.notifier).setTheme(mode);
+                  },
                 ),
-                DropdownMenuItem(
-                  value: ThemeMode.light,
-                  child: Text(l10n.light),
+                const Divider(height: 1, indent: 60),
+                SettingsTile(
+                  icon: LucideIcons.languages,
+                  iconColor: Colors.purple,
+                  title: l10n.language,
+                  trailing: DropdownButton<Locale>(
+                    value: locale,
+                    underline: const SizedBox(),
+                    icon: const Icon(Icons.chevron_right, size: 20, color: Colors.grey),
+                    onChanged: (Locale? newValue) {
+                      if (newValue != null) {
+                        ref.read(localeProvider.notifier).setLocale(newValue);
+                      }
+                    },
+                    items: [
+                      DropdownMenuItem(
+                        value: const Locale('en'),
+                        child: Text(l10n.english, style: theme.textTheme.bodyMedium),
+                      ),
+                      const DropdownMenuItem(
+                        value: Locale('ar'),
+                        child: Text('العربية'),
+                      ),
+                    ],
+                  ),
                 ),
-                DropdownMenuItem(
-                  value: ThemeMode.dark,
-                  child: Text(l10n.dark),
+                const Divider(height: 1, indent: 60),
+                SettingsTile(
+                  icon: LucideIcons.layoutTemplate,
+                  iconColor: Colors.orange,
+                  title: l10n.simpleMode,
+                  subtitle: l10n.simpleModeSubtitle,
+                  trailing: Switch.adaptive(
+                    value: isSimpleMode,
+                    activeTrackColor: theme.colorScheme.primary,
+                    onChanged: (bool value) {
+                      ref.read(settingsProvider.notifier).setSimpleMode(value);
+                    },
+                  ),
+                ),
+                const Divider(height: 1, indent: 60),
+                SettingsTile(
+                  icon: LucideIcons.volume2,
+                  iconColor: Colors.teal,
+                  title: l10n.appSounds, // Need to add this to l10n
+                  subtitle: l10n.appSoundsSubtitle, // Need to add this to l10n
+                  trailing: Switch.adaptive(
+                    value: isSoundEnabled,
+                    activeTrackColor: theme.colorScheme.primary,
+                    onChanged: (bool value) {
+                      ref.read(soundSettingsProvider.notifier).setSoundEnabled(value);
+                    },
+                  ),
                 ),
               ],
             ),
-          ),
-          const Divider(),
-          _buildSectionHeader(context, l10n.language),
-          ListTile(
-            leading: const Icon(LucideIcons.languages),
-            title: Text(l10n.language),
-            trailing: DropdownButton<Locale>(
-              value: locale,
-              underline: const SizedBox(),
-              onChanged: (Locale? newValue) {
-                if (newValue != null) {
-                  ref.read(localeProvider.notifier).setLocale(newValue);
-                }
-              },
-              items: const [
-                DropdownMenuItem(
-                  value: Locale('en'),
-                  child: Text('English'),
-                ),
-                DropdownMenuItem(
-                  value: Locale('ar'),
-                  child: Text('العربية'),
-                ),
-              ],
-            ),
-          ),
-          const Divider(),
-          _buildSectionHeader(context, l10n.currencyOptions),
-          ListTile(
-            leading: const Icon(LucideIcons.banknote),
-            title: Text(l10n.currency),
-            trailing: DropdownButton<String>(
-              value: currency,
-              underline: const SizedBox(),
-              onChanged: (String? newValue) {
-                if (newValue != null) {
-                  ref.read(currencyProvider.notifier).setCurrency(newValue);
-                }
-              },
-              items: const [
-                DropdownMenuItem(value: 'QAR', child: Text('QAR (ر.ق)')),
-                DropdownMenuItem(value: 'SAR', child: Text('SAR (ر.س)')),
-                DropdownMenuItem(value: 'EGP', child: Text('EGP (ج.م)')),
-                DropdownMenuItem(value: 'SDG', child: Text('SDG (ج.س)')),
-              ],
-            ),
-          ),
-          const Divider(),
-          _buildSectionHeader(context, l10n.appLock), // Using appLock as header too? Or maybe 'Security' needs a key
-          SwitchListTile(
-            secondary: const Icon(LucideIcons.lock),
-            title: Text(l10n.appLock),
-            subtitle: Text(l10n.appLockSubtitle),
-            value: isAppLockEnabled,
-            onChanged: (bool value) {
-              ref.read(securityProvider.notifier).setAppLock(value);
-            },
-          ),
-          const Divider(),
-          _buildSectionHeader(context, l10n.dataManagement),
-          ListTile(
-            leading: const Icon(LucideIcons.download),
-            title: Text(l10n.backupData),
-            subtitle: Text(l10n.backupDataSubtitle),
-            onTap: () => _backupData(context, ref),
-          ),
-          ListTile(
-            leading: const Icon(LucideIcons.upload),
-            title: Text(l10n.restoreData),
-            subtitle: Text(l10n.restoreDataSubtitle),
-            onTap: () => _restoreData(context, ref),
-          ),
-          ListTile(
-            leading: const Icon(LucideIcons.fileSpreadsheet),
-            title: Text(l10n.exportPersons),
-            onTap: () => _exportPersonsCsv(context, ref),
-          ),
-          ListTile(
-            leading: const Icon(LucideIcons.fileText),
-            title: Text(l10n.exportTransactions),
-            onTap: () => _exportTransactionsCsv(context, ref),
-          ),
-          const Divider(),
-          _buildSectionHeader(context, l10n.aboutDeveloper),
-          ListTile(
-            leading: const Icon(LucideIcons.info),
-            title: Text(l10n.aboutDeveloper),
-            trailing: const Icon(LucideIcons.chevronRight),
-            onTap: () => context.go('/settings/about'),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildSectionHeader(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: Theme.of(context).colorScheme.primary,
-              fontWeight: FontWeight.bold,
+            // Notifications Section
+            SettingsSection(
+              title: l10n.notifications,
+              children: [
+                SettingsTile(
+                  icon: LucideIcons.bell,
+                  iconColor: Colors.amber,
+                  title: l10n.dailyReminder,
+                  subtitle: l10n.dailyReminderSubtitle,
+                  trailing: Switch.adaptive(
+                    value: notificationState.isEnabled,
+                    activeTrackColor: theme.colorScheme.primary,
+                    onChanged: (bool value) {
+                      ref.read(notificationProvider.notifier).toggleReminder(
+                        value,
+                        l10n.dailyReminderTitle,
+                        l10n.dailyReminderBody,
+                      );
+                    },
+                  ),
+                ),
+                if (notificationState.isEnabled) ...[
+                  const Divider(height: 1, indent: 60),
+                  SettingsTile(
+                    icon: LucideIcons.clock,
+                    iconColor: Colors.blue,
+                    title: l10n.reminderTime,
+                    trailing: TextButton(
+                      onPressed: () async {
+                        final TimeOfDay? picked = await showTimePicker(
+                          context: context,
+                          initialTime: notificationState.time,
+                        );
+                        if (picked != null) {
+                          ref.read(notificationProvider.notifier).setTime(
+                            picked,
+                            l10n.dailyReminderTitle,
+                            l10n.dailyReminderBody,
+                          );
+                        }
+                      },
+                      child: Text(
+                        notificationState.time.format(context),
+                        style: theme.textTheme.bodyLarge?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SettingsTile(
+                    icon: LucideIcons.send,
+                    iconColor: Colors.purple,
+                    title: 'Test Notification', // Debug only
+                    onTap: () async {
+                      final hasPerms = await ref.read(notificationProvider.notifier).requestPermissions();
+                      if (hasPerms) {
+                        await ref.read(notificationProvider.notifier).showTestNotification(
+                          l10n.dailyReminderTitle,
+                          l10n.dailyReminderBody,
+                        );
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Test notification sent')),
+                          );
+                        }
+                      } else {
+                         if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Permissions denied')),
+                          );
+                        }
+                      }
+                    },
+                  ),
+                ],
+              ],
             ),
+
+            // General Section
+            SettingsSection(
+              title: l10n.general,
+              children: [
+                SettingsTile(
+                  icon: LucideIcons.banknote,
+                  iconColor: Colors.green,
+                  title: l10n.currency,
+                  trailing: DropdownButton<String>(
+                    value: currency,
+                    underline: const SizedBox(),
+                    icon: const Icon(Icons.chevron_right, size: 20, color: Colors.grey),
+                    onChanged: (String? newValue) {
+                      if (newValue != null) {
+                        ref.read(currencyProvider.notifier).setCurrency(newValue);
+                      }
+                    },
+                    items: [
+                      DropdownMenuItem(value: 'QAR', child: Text(l10n.currencyQAR)),
+                      DropdownMenuItem(value: 'SAR', child: Text(l10n.currencySAR)),
+                      DropdownMenuItem(value: 'EGP', child: Text(l10n.currencyEGP)),
+                      DropdownMenuItem(value: 'SDG', child: Text(l10n.currencySDG)),
+                      DropdownMenuItem(value: 'KWD', child: Text(l10n.currencyKWD)),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1, indent: 60),
+                SettingsTile(
+                  icon: LucideIcons.lock,
+                  iconColor: Colors.blue,
+                  title: l10n.appLock,
+                  subtitle: l10n.appLockSubtitle,
+                  trailing: Switch.adaptive(
+                    value: isAppLockEnabled,
+                    activeTrackColor: theme.colorScheme.primary,
+                    onChanged: (bool value) {
+                      ref.read(securityProvider.notifier).setAppLock(value);
+                    },
+                  ),
+                ),
+                const Divider(height: 1, indent: 60),
+                SettingsTile(
+                  icon: LucideIcons.tags,
+                  iconColor: Colors.indigo,
+                  title: l10n.manageCategories,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const CategoriesManagementScreen()),
+                    );
+                  },
+                ),
+              ],
+            ),
+
+            // Data Management Section
+            SettingsSection(
+              title: l10n.dataManagement,
+              children: [
+                SettingsTile(
+                  icon: LucideIcons.download,
+                  iconColor: Colors.teal,
+                  title: l10n.backupData,
+                  subtitle: l10n.backupDataSubtitle,
+                  onTap: () => _backupData(context, ref),
+                ),
+                const Divider(height: 1, indent: 60),
+                SettingsTile(
+                  icon: LucideIcons.upload,
+                  iconColor: Colors.amber,
+                  title: l10n.restoreData,
+                  subtitle: l10n.restoreDataSubtitle,
+                  onTap: () => _restoreData(context, ref),
+                ),
+                const Divider(height: 1, indent: 60),
+                SettingsTile(
+                  icon: LucideIcons.fileSpreadsheet,
+                  iconColor: Colors.greenAccent.shade700,
+                  title: l10n.exportPersons,
+                  onTap: () => _exportPersonsCsv(context, ref),
+                ),
+                const Divider(height: 1, indent: 60),
+                SettingsTile(
+                  icon: LucideIcons.fileText,
+                  iconColor: Colors.blueAccent,
+                  title: l10n.exportTransactions,
+                  onTap: () => _exportTransactionsCsv(context, ref),
+                ),
+              ],
+            ),
+
+            SettingsSection(
+              title: l10n.aboutDeveloper,
+              children: [
+                SettingsTile(
+                  icon: LucideIcons.info,
+                  iconColor: Colors.grey,
+                  title: l10n.aboutDeveloper,
+                  onTap: () => context.go('/settings/about'),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 32),
+            Center(
+              child: Column(
+                children: [
+                  Text(
+                    l10n.appVersionInfo('2.0.0'),
+                    style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    l10n.madeWithLove,
+                    style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -173,8 +328,9 @@ class SettingsScreen extends ConsumerWidget {
   Future<void> _backupData(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
     try {
-      final persons = ref.read(ledgerProvider).persons;
-      final transactions = ref.read(ledgerProvider).transactions;
+      final ledgerState = ref.read(ledgerProvider).value;
+      final persons = ledgerState?.persons ?? [];
+      final transactions = ledgerState?.transactions ?? [];
 
       final data = {
         'persons': persons.map((p) => {
@@ -214,7 +370,7 @@ class SettingsScreen extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.backupFailed(e.toString()))),
+          SnackBar(content: Text(l10n.backupFailed(ErrorHandler.getUserFriendlyErrorMessage(e, l10n)))),
         );
       }
     }
@@ -289,7 +445,7 @@ class SettingsScreen extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.restoreFailed(e.toString()))),
+          SnackBar(content: Text(l10n.restoreFailed(ErrorHandler.getUserFriendlyErrorMessage(e, l10n)))),
         );
       }
     }
@@ -297,7 +453,7 @@ class SettingsScreen extends ConsumerWidget {
 
   Future<void> _exportPersonsCsv(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
-    final persons = ref.read(ledgerProvider).persons;
+    final persons = ref.read(ledgerProvider).value?.persons ?? [];
     final rows = <List<dynamic>>[
       ['ID', 'Name', 'Role', 'Phone', 'Created At'],
     ];
@@ -323,8 +479,9 @@ class SettingsScreen extends ConsumerWidget {
 
   Future<void> _exportTransactionsCsv(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
-    final transactions = ref.read(ledgerProvider).transactions;
-    final persons = ref.read(ledgerProvider).persons;
+    final ledgerState = ref.read(ledgerProvider).value;
+    final transactions = ledgerState?.transactions ?? [];
+    final persons = ledgerState?.persons ?? [];
     final personMap = {for (var p in persons) p.id: p.name};
 
     final rows = <List<dynamic>>[

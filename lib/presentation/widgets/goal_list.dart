@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aldeewan_mobile/presentation/providers/budget_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 import 'package:aldeewan_mobile/data/models/savings_goal_model.dart';
 import 'package:aldeewan_mobile/presentation/widgets/empty_state.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/utils/input_formatters.dart';
+import 'package:intl/intl.dart';
 
 class GoalList extends ConsumerWidget {
   const GoalList({super.key});
@@ -13,7 +15,9 @@ class GoalList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final budgetState = ref.watch(budgetProvider);
+    final currency = ref.watch(currencyProvider);
     final l10n = AppLocalizations.of(context)!;
+    final formatter = NumberFormat('#,##0.##');
 
     if (budgetState.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -47,7 +51,7 @@ class GoalList extends ConsumerWidget {
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(height: 4),
-                Text('${goal.currentSaved.toStringAsFixed(0)} / ${goal.targetAmount.toStringAsFixed(0)} SDG'),
+                Text('$currency ${formatter.format(goal.currentSaved)} / $currency ${formatter.format(goal.targetAmount)}'),
               ],
             ),
             trailing: IconButton(
