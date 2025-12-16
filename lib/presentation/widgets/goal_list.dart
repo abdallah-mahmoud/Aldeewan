@@ -84,9 +84,22 @@ class GoalList extends ConsumerWidget {
             onPressed: () {
               final amount = double.tryParse(amountController.text.replaceAll(',', '')) ?? 0;
               if (amount > 0) {
-                ref.read(budgetProvider.notifier).updateGoal(goal, amount);
+                try {
+                  ref.read(budgetProvider.notifier).updateGoal(goal, amount);
+                  Navigator.pop(context);
+                } catch (e) {
+                  // Close dialog first so error message is visible
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(e.toString().replaceAll('Exception: ', '')),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              } else {
+                Navigator.pop(context);
               }
-              Navigator.pop(context);
             },
             child: Text(l10n.save),
           ),

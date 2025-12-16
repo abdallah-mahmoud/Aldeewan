@@ -392,19 +392,24 @@ class GoalDetailsScreen extends ConsumerWidget {
                   }
                   Navigator.pop(context);
                 } catch (e) {
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text(l10n.error),
-                      content: Text(e.toString().replaceAll('Exception: ', '')),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: Text(l10n.cancel),
-                        ),
-                      ],
-                    ),
-                  );
+                  // Close the form dialog first
+                  Navigator.pop(context);
+                  // Then show error dialog on top (using outer context via closure)
+                  if (context.mounted) {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text(l10n.insufficientFundsTitle),
+                        content: Text(e.toString().replaceAll('Exception: ', '')),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            child: Text(l10n.cancel),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
                 }
               }
             },
