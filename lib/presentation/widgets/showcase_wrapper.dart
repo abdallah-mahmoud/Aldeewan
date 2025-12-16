@@ -16,7 +16,6 @@ class ShowcaseKeys {
   /// Get all keys for the full tour
   static List<GlobalKey> get allKeys => [
     dashboardCards,
-    fabButton,
   ];
 }
 
