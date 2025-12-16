@@ -23,6 +23,12 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin {
   @override
+  List<GlobalKey> get showcaseKeys => ShowcaseKeys.homeKeys;
+  
+  @override
+  String get screenTourId => 'home';
+  
+  @override
   Widget build(BuildContext context) {
     final ledgerAsync = ref.watch(ledgerProvider);
     final l10n = AppLocalizations.of(context)!;
@@ -104,8 +110,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin 
                   const SummaryGrid(),
                   const SizedBox(height: 24),
 
-                  // Quick Actions
-                  const QuickActions(),
+                  // Quick Actions - Tour Target Step 2
+                  ShowcaseTarget(
+                    showcaseKey: ShowcaseKeys.quickActions,
+                    title: l10n.tourWelcome,
+                    description: l10n.tourAddTransaction,
+                    child: const QuickActions(),
+                  ),
                   const SizedBox(height: 8),
                   
                   // Tip Card for Quick Actions

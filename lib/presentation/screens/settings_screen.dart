@@ -26,6 +26,7 @@ import 'package:aldeewan_mobile/presentation/screens/categories_management_scree
 import 'package:aldeewan_mobile/presentation/widgets/settings/settings_section.dart';
 import 'package:aldeewan_mobile/presentation/widgets/settings/settings_tile.dart';
 import 'package:aldeewan_mobile/presentation/widgets/settings/theme_selector.dart';
+import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -270,12 +271,18 @@ class SettingsScreen extends ConsumerWidget {
             SettingsSection(
               title: l10n.helpCenter,
               children: [
-                SettingsTile(
-                  icon: LucideIcons.helpCircle,
-                  iconColor: Colors.blue,
-                  title: l10n.helpCenter,
-                  subtitle: l10n.helpCenterSubtitle,
-                  onTap: () => context.go('/settings/help'),
+                // Help Center tile - Tour Target Step 6
+                ShowcaseTarget(
+                  showcaseKey: ShowcaseKeys.helpButton,
+                  title: l10n.tourWelcome,
+                  description: l10n.tourHelp,
+                  child: SettingsTile(
+                    icon: LucideIcons.helpCircle,
+                    iconColor: Colors.blue,
+                    title: l10n.helpCenter,
+                    subtitle: l10n.helpCenterSubtitle,
+                    onTap: () => context.go('/settings/help'),
+                  ),
                 ),
                 const Divider(height: 1, indent: 60),
                 SettingsTile(

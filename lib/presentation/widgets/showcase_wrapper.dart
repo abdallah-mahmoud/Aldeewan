@@ -6,16 +6,40 @@ import 'package:aldeewan_mobile/presentation/providers/onboarding_provider.dart'
 
 /// Global keys for showcase targets
 class ShowcaseKeys {
+  // Home Screen (Steps 1-2)
   static final GlobalKey dashboardCards = GlobalKey();
-  static final GlobalKey fabButton = GlobalKey();
+  static final GlobalKey quickActions = GlobalKey();
+  
+  // Ledger Screen (Step 3)
   static final GlobalKey ledgerList = GlobalKey();
+  
+  // Cashbook Screen (Steps 4-5)
   static final GlobalKey cashbookFilter = GlobalKey();
   static final GlobalKey searchBar = GlobalKey();
+  
+  // Settings Screen (Step 6)
   static final GlobalKey helpButton = GlobalKey();
 
-  /// Get all keys for the full tour
-  static List<GlobalKey> get allKeys => [
+  /// Keys for Home Screen tour
+  static List<GlobalKey> get homeKeys => [
     dashboardCards,
+    quickActions,
+  ];
+  
+  /// Keys for Ledger Screen tour
+  static List<GlobalKey> get ledgerKeys => [
+    ledgerList,
+  ];
+  
+  /// Keys for Cashbook Screen tour
+  static List<GlobalKey> get cashbookKeys => [
+    cashbookFilter,
+    searchBar,
+  ];
+  
+  /// Keys for Settings Screen tour
+  static List<GlobalKey> get settingsKeys => [
+    helpButton,
   ];
 }
 
@@ -33,8 +57,8 @@ class GlobalShowcaseWrapper extends ConsumerWidget {
     return ShowCaseWidget(
       builder: (context) => child,
       onFinish: () {
-        // When tour completes
-        ref.read(onboardingProvider.notifier).completeTour();
+        // Mark current screen's tour as complete
+        // The full tour completion is handled by individual screens
       },
     );
   }
@@ -42,6 +66,11 @@ class GlobalShowcaseWrapper extends ConsumerWidget {
 
 /// Mixin to add showcase tour functionality to screens
 mixin ShowcaseTourMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
+  /// Override this in each screen to provide screen-specific keys
+  List<GlobalKey> get showcaseKeys => [];
+  
+  /// Override this to provide a unique ID for this screen's tour
+  String get screenTourId => 'default';
   
   @override
   void initState() {
@@ -51,18 +80,22 @@ mixin ShowcaseTourMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     });
   }
 
-  /// Start the tour if not completed
+  /// Start the tour if not completed for this screen
   void startTourIfNeeded() {
-    // Check if widget is mounted and context is valid
     if (!mounted) return;
+    if (showcaseKeys.isEmpty) return;
 
     final onboarding = ref.read(onboardingProvider);
-    if (!onboarding.tourCompleted) {
-      // Small delay to ensure UI is ready
-      Future.delayed(const Duration(milliseconds: 500), () {
+    final tourKey = 'tour_$screenTourId';
+    
+    // Check if this specific screen's tour was shown
+    if (!onboarding.dismissedTips.contains(tourKey)) {
+      Future.delayed(const Duration(milliseconds: 800), () {
         if (mounted) {
           try {
-            ShowCaseWidget.of(context).startShowCase(ShowcaseKeys.allKeys);
+            ShowCaseWidget.of(context).startShowCase(showcaseKeys);
+            // Mark this screen's tour as shown
+            ref.read(onboardingProvider.notifier).dismissTip(tourKey);
           } catch (e) {
             debugPrint('Showcase error: $e');
           }
@@ -71,15 +104,15 @@ mixin ShowcaseTourMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
     }
   }
 
-  /// Restart the tour
-  void restartTour() {
-    ref.read(onboardingProvider.notifier).restartTour();
+  /// Restart the tour for this screen
+  void restartScreenTour() {
+    if (showcaseKeys.isEmpty) return;
     if (mounted) {
-       try {
-         ShowCaseWidget.of(context).startShowCase(ShowcaseKeys.allKeys);
-       } catch (e) {
-         debugPrint('Showcase restart error: $e');
-       }
+      try {
+        ShowCaseWidget.of(context).startShowCase(showcaseKeys);
+      } catch (e) {
+        debugPrint('Showcase restart error: $e');
+      }
     }
   }
 }

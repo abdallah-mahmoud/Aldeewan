@@ -15,6 +15,7 @@ import 'package:aldeewan_mobile/config/app_colors.dart';
 import 'package:aldeewan_mobile/data/services/sound_service.dart';
 import 'package:aldeewan_mobile/presentation/widgets/debounced_search_bar.dart';
 import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
+import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
 
 class LedgerScreen extends ConsumerStatefulWidget {
   const LedgerScreen({super.key});
@@ -304,20 +305,24 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
         ),
         // Person balance tip
         const PersonBalanceTip(),
-        // List or empty state
+        // List or empty state - Tour Target Step 3
         Expanded(
-          child: filteredPersons.isEmpty
-              ? EmptyState(
-                  message: searchQuery.isEmpty ? l10n.noEntriesYet : l10n.noResults,
-                  icon: LucideIcons.users,
-                  lottieAsset: 'assets/animations/empty_users.json',
-                  actionLabel: searchQuery.isEmpty ? l10n.addPerson : null,
-                  onAction: searchQuery.isEmpty ? () => _showAddPersonModal(context) : null,
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.only(top: 0, bottom: 80),
-                  itemCount: filteredPersons.length,
-      itemBuilder: (context, index) {
+          child: ShowcaseTarget(
+            showcaseKey: ShowcaseKeys.ledgerList,
+            title: l10n.tourWelcome,
+            description: l10n.tourLedger,
+            child: filteredPersons.isEmpty
+                ? EmptyState(
+                    message: searchQuery.isEmpty ? l10n.noEntriesYet : l10n.noResults,
+                    icon: LucideIcons.users,
+                    lottieAsset: 'assets/animations/empty_users.json',
+                    actionLabel: searchQuery.isEmpty ? l10n.addPerson : null,
+                    onAction: searchQuery.isEmpty ? () => _showAddPersonModal(context) : null,
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.only(top: 0, bottom: 80),
+                    itemCount: filteredPersons.length,
+        itemBuilder: (context, index) {
         final person = filteredPersons[index];
         final balance = notifier.calculatePersonBalance(person);
         
@@ -410,6 +415,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
         );
       },
     ),
+          ),
         ),
       ],
     );

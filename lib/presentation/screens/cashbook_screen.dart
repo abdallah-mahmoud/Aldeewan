@@ -19,6 +19,7 @@ import 'package:aldeewan_mobile/presentation/widgets/debounced_search_bar.dart';
 import 'package:aldeewan_mobile/utils/transaction_label_mapper.dart';
 import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
 import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
+import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
 
 class CashbookScreen extends ConsumerStatefulWidget {
   const CashbookScreen({super.key});
@@ -182,21 +183,30 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
           resizeToAvoidBottomInset: false,
           body: Column(
               children: [
-                // Search bar
+                // Search bar - Tour Target Step 5
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                  child: DebouncedSearchBar(
-                    hintText: l10n.search,
-                    onSearch: (query) {
-                      ref.read(cashbookSearchProvider.notifier).state = query;
-                    },
+                  child: ShowcaseTarget(
+                    showcaseKey: ShowcaseKeys.searchBar,
+                    title: l10n.tourWelcome,
+                    description: l10n.tourSearch,
+                    child: DebouncedSearchBar(
+                      hintText: l10n.search,
+                      onSearch: (query) {
+                        ref.read(cashbookSearchProvider.notifier).state = query;
+                      },
+                    ),
                   ),
                 ),
-                // Compact filter row with 2 dropdowns
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-                  child: Row(
-                    children: [
+                // Compact filter row with 2 dropdowns - Tour Target Step 4
+                ShowcaseTarget(
+                  showcaseKey: ShowcaseKeys.cashbookFilter,
+                  title: l10n.tourWelcome,
+                  description: l10n.tourCashbook,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                    child: Row(
+                      children: [
                       // Type filter dropdown
                       Expanded(
                         child: Container(
@@ -339,7 +349,8 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
                           ),
                         ),
                       ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 // Summary bar
