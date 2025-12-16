@@ -150,6 +150,7 @@ class ShowcaseTarget extends StatelessWidget {
       tooltipBackgroundColor: theme.cardColor,
       targetPadding: const EdgeInsets.all(8),
       showArrow: true,
+      enableAutoScroll: true,
       child: child,
     );
   }

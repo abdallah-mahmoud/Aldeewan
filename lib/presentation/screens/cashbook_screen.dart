@@ -28,8 +28,14 @@ class CashbookScreen extends ConsumerStatefulWidget {
   ConsumerState<CashbookScreen> createState() => _CashbookScreenState();
 }
 
-class _CashbookScreenState extends ConsumerState<CashbookScreen> {
+class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTourMixin {
   bool _initialActionHandled = false;
+
+  @override
+  List<GlobalKey> get showcaseKeys => ShowcaseKeys.cashbookKeys;
+  
+  @override
+  String get screenTourId => 'cashbook';
 
   @override
   void didChangeDependencies() {
