@@ -23,7 +23,8 @@ class BudgetDetailsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final currency = ref.watch(currencyProvider);
     final budgetState = ref.watch(budgetProvider);
-    final ledgerState = ref.watch(ledgerProvider).value;
+    // Use select to only watch transactions, not entire ledger state
+    final transactions = ref.watch(ledgerProvider.select((s) => s.value?.transactions ?? <Transaction>[]));
     final theme = Theme.of(context);
     final formatter = NumberFormat('#,##0.##');
 
@@ -234,7 +235,7 @@ class BudgetDetailsScreen extends ConsumerWidget {
               style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
-            _buildTransactionList(context, budget, ledgerState?.transactions ?? [], currency, formatter),
+            _buildTransactionList(context, budget, transactions, currency, formatter),
           ],
         ),
       ),

@@ -11,6 +11,7 @@ import 'package:aldeewan_mobile/utils/input_formatters.dart';
 import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
 import 'package:aldeewan_mobile/utils/transaction_label_mapper.dart';
 import 'package:aldeewan_mobile/data/services/sound_service.dart';
+import 'package:aldeewan_mobile/presentation/providers/home_provider.dart';
 
 import 'package:aldeewan_mobile/domain/entities/person.dart';
 
@@ -87,6 +88,21 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
       final cleanAmount = _amountController.text.replaceAll(',', '').replaceAll(' ', '');
       final amount = double.tryParse(cleanAmount);
       if (amount == null) return;
+
+      // Check Balance Constraint for payment transactions
+      if (_type == TransactionType.paymentMade) {
+        final currentBalance = ref.read(dashboardStatsProvider).net;
+        if (currentBalance < amount) {
+          final currency = ref.read(currencyProvider);
+          final formatter = NumberFormat('#,##0.##');
+          ToastService.showError(context, l10n.insufficientFundsMessage(
+            formatter.format(currentBalance),
+            currency,
+            formatter.format(amount),
+          ));
+          return;
+        }
+      }
 
       final transaction = Transaction(
         id: const Uuid().v4(),
@@ -183,7 +199,7 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
                   prefixText: '$currency ', 
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
+                inputFormatters: amountFormatters(allowFraction: true),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return l10n.pleaseEnterAmount;

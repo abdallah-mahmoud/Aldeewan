@@ -14,6 +14,7 @@ import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 import 'package:aldeewan_mobile/config/app_colors.dart';
 import 'package:aldeewan_mobile/data/services/sound_service.dart';
 import 'package:aldeewan_mobile/presentation/widgets/debounced_search_bar.dart';
+import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
 
 class LedgerScreen extends ConsumerStatefulWidget {
   const LedgerScreen({super.key});
@@ -301,6 +302,8 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
             },
           ),
         ),
+        // Person balance tip
+        const PersonBalanceTip(),
         // List or empty state
         Expanded(
           child: filteredPersons.isEmpty

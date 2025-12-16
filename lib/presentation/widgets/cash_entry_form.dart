@@ -15,6 +15,7 @@ import 'package:aldeewan_mobile/data/models/budget_model.dart';
 import 'package:aldeewan_mobile/utils/category_helper.dart';
 import 'package:aldeewan_mobile/presentation/providers/notification_history_provider.dart';
 import 'package:aldeewan_mobile/data/services/sound_service.dart';
+import 'package:aldeewan_mobile/presentation/providers/home_provider.dart';
 
 class CashEntryForm extends ConsumerStatefulWidget {
   final Function(Transaction) onSave;
@@ -110,6 +111,21 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
     if (_formKey.currentState!.validate()) {
       final amount = double.tryParse(_amountController.text.replaceAll(',', ''));
       if (amount == null) return;
+
+      // Check Balance Constraint - block expense if insufficient funds
+      if (_type == TransactionType.cashExpense) {
+        final currentBalance = ref.read(dashboardStatsProvider).net;
+        if (currentBalance < amount) {
+          final currency = ref.read(currencyProvider);
+          final formatter = NumberFormat('#,##0.##');
+          ToastService.showError(context, l10n.insufficientFundsMessage(
+            formatter.format(currentBalance),
+            currency,
+            formatter.format(amount),
+          ));
+          return;
+        }
+      }
 
       // Check Budget Constraint
       if (_type == TransactionType.cashExpense && _selectedCategory != null) {
@@ -242,7 +258,7 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
                 prefixText: '$currency ',
               ),
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
+              inputFormatters: amountFormatters(allowFraction: true),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return l10n.pleaseEnterAmount;

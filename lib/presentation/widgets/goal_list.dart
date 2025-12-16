@@ -76,7 +76,7 @@ class GoalList extends ConsumerWidget {
           controller: amountController,
           decoration: InputDecoration(labelText: l10n.amount),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
+          inputFormatters: amountFormatters(allowFraction: true),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),

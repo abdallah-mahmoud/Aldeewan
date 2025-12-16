@@ -25,6 +25,7 @@ class BudgetNotifier extends StateNotifier<BudgetState> {
   StreamSubscription? _transactionSubscription;
   StreamSubscription? _budgetSubscription;
   StreamSubscription? _goalSubscription;
+  Timer? _recalculateDebounceTimer;
 
   BudgetNotifier(this._realm) : super(const BudgetState()) {
     if (_realm != null) {
@@ -43,10 +44,13 @@ class BudgetNotifier extends StateNotifier<BudgetState> {
     _recalculateAllBudgets();
     _updateState();
 
-    // Listen to Transaction changes -> Recalculate Spent & Saved
+    // Listen to Transaction changes -> Recalculate Spent & Saved (debounced)
     _transactionSubscription = realm.all<TransactionModel>().changes.listen((changes) {
-      _recalculateAllBudgets();
-      _recalculateAllGoals();
+      _recalculateDebounceTimer?.cancel();
+      _recalculateDebounceTimer = Timer(const Duration(milliseconds: 500), () {
+        _recalculateAllBudgets();
+        _recalculateAllGoals();
+      });
     });
 
     // Listen to Budget changes -> Update UI
@@ -62,6 +66,7 @@ class BudgetNotifier extends StateNotifier<BudgetState> {
 
   @override
   void dispose() {
+    _recalculateDebounceTimer?.cancel();
     _transactionSubscription?.cancel();
     _budgetSubscription?.cancel();
     _goalSubscription?.cancel();

@@ -143,7 +143,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get developerName => '@motaasl8';
 
   @override
-  String get developerEmail => 'contact@example.com';
+  String get developerEmail => 'abdo13-m.azme@hotmail.com';
 
   @override
   String get version => 'Version';
@@ -840,4 +840,121 @@ class AppLocalizationsEn extends AppLocalizations {
   String goalReachedBody(String goalName) {
     return 'Congratulations! You have reached your goal: $goalName.';
   }
+
+  @override
+  String get insufficientFundsTitle => 'Insufficient Funds';
+
+  @override
+  String insufficientFundsMessage(
+    String balance,
+    String currency,
+    String amount,
+  ) {
+    return 'Your current balance ($balance $currency) is not enough for this expense of $amount $currency. Please add more funds first.';
+  }
+
+  @override
+  String get tourWelcome => 'Welcome to Aldeewan!';
+
+  @override
+  String get tourDashboard => 'See your money at a glance';
+
+  @override
+  String get tourAddTransaction => 'Tap here to add money in or out';
+
+  @override
+  String get tourLedger => 'People who owe you or you owe them';
+
+  @override
+  String get tourCashbook => 'Filter by income or expenses';
+
+  @override
+  String get tourSearch => 'Search by name, amount, or type';
+
+  @override
+  String get tourHelp => 'Need help? Come here anytime';
+
+  @override
+  String get tourSkip => 'Skip';
+
+  @override
+  String get tourNext => 'Next';
+
+  @override
+  String get tourFinish => 'Get Started';
+
+  @override
+  String get tourPrevious => 'Previous';
+
+  @override
+  String get tipQuickActions => 'Use Quick Actions for faster entry';
+
+  @override
+  String get tipFilterTransactions =>
+      'Filter and search transactions by date, type, or name';
+
+  @override
+  String get tipPersonBalance => 'Tap a person to see their account';
+
+  @override
+  String get tipBudgetAlert => 'We\'ll tell you if you spend too much';
+
+  @override
+  String get tipGoalProgress => 'Track your savings here';
+
+  @override
+  String get tipExportReport => 'Save reports as files';
+
+  @override
+  String get tipGotIt => 'Got it';
+
+  @override
+  String get helpCenter => 'Help Center';
+
+  @override
+  String get helpCenterSubtitle => 'FAQs and tutorials';
+
+  @override
+  String get restartTour => 'Restart Tutorial';
+
+  @override
+  String get restartTourSubtitle => 'See the app guide again';
+
+  @override
+  String get contactSupport => 'Contact Support';
+
+  @override
+  String get contactSupportSubtitle => 'Need help? Reach out to us';
+
+  @override
+  String get faqGettingStarted => 'Getting Started';
+
+  @override
+  String get faqWhatIsAldeewan => 'What is Aldeewan?';
+
+  @override
+  String get faqWhatIsAldeewaAnswer =>
+      'Aldeewan is a smart accounting app to manage your money, track debts, and set budgets.';
+
+  @override
+  String get faqHowToAddTransaction => 'How to add a transaction?';
+
+  @override
+  String get faqHowToAddTransactionAnswer =>
+      'Tap the + button on any screen to add income or expense.';
+
+  @override
+  String get faqCashbook => 'Cashbook';
+
+  @override
+  String get faqLedger => 'Ledger';
+
+  @override
+  String get faqBudgetsGoals => 'Budgets & Goals';
+
+  @override
+  String get faqReports => 'Reports';
+
+  @override
+  String get faqSettings => 'Settings';
 }

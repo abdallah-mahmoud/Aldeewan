@@ -16,6 +16,9 @@ import 'package:aldeewan_mobile/presentation/providers/cashbook_provider.dart';
 import 'package:aldeewan_mobile/utils/category_helper.dart';
 import 'package:aldeewan_mobile/data/services/sound_service.dart';
 import 'package:aldeewan_mobile/presentation/widgets/debounced_search_bar.dart';
+import 'package:aldeewan_mobile/utils/transaction_label_mapper.dart';
+import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
+import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
 
 class CashbookScreen extends ConsumerStatefulWidget {
   const CashbookScreen({super.key});
@@ -106,6 +109,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
     final theme = Theme.of(context);
     final numberFormat = NumberFormat('#,##0.##');
     final searchQuery = ref.watch(cashbookSearchProvider);
+    final isSimpleMode = ref.watch(settingsProvider);
 
     return cashbookAsync.when(
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -120,8 +124,12 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
           filteredList = filteredList.where((tx) {
             // Search by note
             if ((tx.note ?? '').toLowerCase().contains(lowerQuery)) return true;
-            // Search by category
-            if ((tx.category ?? '').toLowerCase().contains(lowerQuery)) return true;
+            
+            // Search by category (EN + AR localized)
+            final categoryEN = (tx.category ?? '').toLowerCase();
+            final categoryAR = CategoryHelper.getLocalizedCategory(tx.category ?? '', l10n).toLowerCase();
+            if (categoryEN.contains(lowerQuery) || categoryAR.contains(lowerQuery)) return true;
+            
             // Search by person name
             if (tx.personId != null) {
               try {
@@ -130,6 +138,16 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
                 if (person.name.toLowerCase().contains(lowerQuery)) return true;
               } catch (_) {}
             }
+            
+            // Search by amount (raw + formatted)
+            final amountStr = tx.amount.toString();
+            final formattedAmount = numberFormat.format(tx.amount);
+            if (amountStr.contains(lowerQuery) || formattedAmount.contains(lowerQuery)) return true;
+            
+            // Search by transaction type (bilingual EN/AR)
+            final typeLabel = TransactionLabelMapper.getLabel(tx.type, isSimpleMode, l10n);
+            if (typeLabel.toLowerCase().contains(lowerQuery)) return true;
+            
             return false;
           }).toList();
         }
@@ -366,6 +384,8 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {
                   ),
                 ),
                 const SizedBox(height: 8),
+                // Filter transactions tip
+                const FilterTransactionsTip(),
                 const Divider(height: 1),
                 // List of transactions
                 Expanded(

@@ -15,6 +15,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:realm/realm.dart';
 import 'package:intl/intl.dart';
 import 'package:aldeewan_mobile/utils/category_helper.dart';
+import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
 
 class BudgetScreen extends ConsumerStatefulWidget {
   const BudgetScreen({super.key});
@@ -200,6 +201,9 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> with SingleTickerPr
                     ),
                   ),
                   const SizedBox(height: 24),
+                  
+                  // Budget alert tip
+                  const BudgetAlertTip(),
                   
                   // Budget List
                   if (activeBudgets.isEmpty)
@@ -430,7 +434,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> with SingleTickerPr
                 controller: amountController,
                 decoration: InputDecoration(labelText: l10n.monthlyLimit),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
+                inputFormatters: amountFormatters(allowFraction: true),
               ),
             ],
           ),

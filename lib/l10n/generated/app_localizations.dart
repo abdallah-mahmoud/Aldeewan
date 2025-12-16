@@ -353,7 +353,7 @@ abstract class AppLocalizations {
   /// No description provided for @developerEmail.
   ///
   /// In en, this message translates to:
-  /// **'contact@example.com'**
+  /// **'abdo13-m.azme@hotmail.com'**
   String get developerEmail;
 
   /// No description provided for @version.
@@ -1669,6 +1669,226 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Congratulations! You have reached your goal: {goalName}.'**
   String goalReachedBody(String goalName);
+
+  /// No description provided for @insufficientFundsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient Funds'**
+  String get insufficientFundsTitle;
+
+  /// No description provided for @insufficientFundsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your current balance ({balance} {currency}) is not enough for this expense of {amount} {currency}. Please add more funds first.'**
+  String insufficientFundsMessage(
+    String balance,
+    String currency,
+    String amount,
+  );
+
+  /// No description provided for @tourWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Aldeewan!'**
+  String get tourWelcome;
+
+  /// No description provided for @tourDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'See your money at a glance'**
+  String get tourDashboard;
+
+  /// No description provided for @tourAddTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap here to add money in or out'**
+  String get tourAddTransaction;
+
+  /// No description provided for @tourLedger.
+  ///
+  /// In en, this message translates to:
+  /// **'People who owe you or you owe them'**
+  String get tourLedger;
+
+  /// No description provided for @tourCashbook.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by income or expenses'**
+  String get tourCashbook;
+
+  /// No description provided for @tourSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name, amount, or type'**
+  String get tourSearch;
+
+  /// No description provided for @tourHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Need help? Come here anytime'**
+  String get tourHelp;
+
+  /// No description provided for @tourSkip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get tourSkip;
+
+  /// No description provided for @tourNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get tourNext;
+
+  /// No description provided for @tourFinish.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get tourFinish;
+
+  /// No description provided for @tourPrevious.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get tourPrevious;
+
+  /// No description provided for @tipQuickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Quick Actions for faster entry'**
+  String get tipQuickActions;
+
+  /// No description provided for @tipFilterTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter and search transactions by date, type, or name'**
+  String get tipFilterTransactions;
+
+  /// No description provided for @tipPersonBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a person to see their account'**
+  String get tipPersonBalance;
+
+  /// No description provided for @tipBudgetAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll tell you if you spend too much'**
+  String get tipBudgetAlert;
+
+  /// No description provided for @tipGoalProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your savings here'**
+  String get tipGoalProgress;
+
+  /// No description provided for @tipExportReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Save reports as files'**
+  String get tipExportReport;
+
+  /// No description provided for @tipGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get tipGotIt;
+
+  /// No description provided for @helpCenter.
+  ///
+  /// In en, this message translates to:
+  /// **'Help Center'**
+  String get helpCenter;
+
+  /// No description provided for @helpCenterSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'FAQs and tutorials'**
+  String get helpCenterSubtitle;
+
+  /// No description provided for @restartTour.
+  ///
+  /// In en, this message translates to:
+  /// **'Restart Tutorial'**
+  String get restartTour;
+
+  /// No description provided for @restartTourSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'See the app guide again'**
+  String get restartTourSubtitle;
+
+  /// No description provided for @contactSupport.
+  ///
+  /// In en, this message translates to:
+  /// **'Contact Support'**
+  String get contactSupport;
+
+  /// No description provided for @contactSupportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Need help? Reach out to us'**
+  String get contactSupportSubtitle;
+
+  /// No description provided for @faqGettingStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting Started'**
+  String get faqGettingStarted;
+
+  /// No description provided for @faqWhatIsAldeewan.
+  ///
+  /// In en, this message translates to:
+  /// **'What is Aldeewan?'**
+  String get faqWhatIsAldeewan;
+
+  /// No description provided for @faqWhatIsAldeewaAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Aldeewan is a smart accounting app to manage your money, track debts, and set budgets.'**
+  String get faqWhatIsAldeewaAnswer;
+
+  /// No description provided for @faqHowToAddTransaction.
+  ///
+  /// In en, this message translates to:
+  /// **'How to add a transaction?'**
+  String get faqHowToAddTransaction;
+
+  /// No description provided for @faqHowToAddTransactionAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap the + button on any screen to add income or expense.'**
+  String get faqHowToAddTransactionAnswer;
+
+  /// No description provided for @faqCashbook.
+  ///
+  /// In en, this message translates to:
+  /// **'Cashbook'**
+  String get faqCashbook;
+
+  /// No description provided for @faqLedger.
+  ///
+  /// In en, this message translates to:
+  /// **'Ledger'**
+  String get faqLedger;
+
+  /// No description provided for @faqBudgetsGoals.
+  ///
+  /// In en, this message translates to:
+  /// **'Budgets & Goals'**
+  String get faqBudgetsGoals;
+
+  /// No description provided for @faqReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get faqReports;
+
+  /// No description provided for @faqSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get faqSettings;
 }
 
 class _AppLocalizationsDelegate

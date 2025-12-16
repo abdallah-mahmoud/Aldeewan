@@ -268,8 +268,16 @@ class SettingsScreen extends ConsumerWidget {
             ),
 
             SettingsSection(
-              title: l10n.aboutDeveloper,
+              title: l10n.helpCenter,
               children: [
+                SettingsTile(
+                  icon: LucideIcons.helpCircle,
+                  iconColor: Colors.blue,
+                  title: l10n.helpCenter,
+                  subtitle: l10n.helpCenterSubtitle,
+                  onTap: () => context.go('/settings/help'),
+                ),
+                const Divider(height: 1, indent: 60),
                 SettingsTile(
                   icon: LucideIcons.info,
                   iconColor: Colors.grey,

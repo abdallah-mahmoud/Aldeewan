@@ -1,79 +1,61 @@
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-class ThousandsSeparatorInputFormatter extends TextInputFormatter {
-  final NumberFormat _formatter;
+/// Formats a number with thousand separators (commas).
+/// Use AFTER FilteringTextInputFormatter to strip non-digits.
+class CommaSeparatorFormatter extends TextInputFormatter {
   final bool allowFraction;
+  final NumberFormat _formatter = NumberFormat.decimalPattern();
 
-  ThousandsSeparatorInputFormatter({this.allowFraction = false})
-      : _formatter = NumberFormat.decimalPattern();
+  CommaSeparatorFormatter({this.allowFraction = false});
 
   @override
   TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.text.isEmpty) {
-      return newValue.copyWith(text: '');
-    }
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    if (newValue.text.isEmpty) return newValue;
 
-    // Handle deletion
-    if (newValue.text.length < oldValue.text.length) {
-      // If deleting a comma, delete the digit before it too? 
-      // Standard behavior usually handles this by reformatting the raw number.
-    }
-
-    String newText = newValue.text;
-    
-    // If allowing fraction, we need to be careful not to strip the decimal point
-    if (allowFraction) {
-      // Check if it ends with a decimal point (user just typed it)
-      if (newText.endsWith('.')) {
-        // Ensure only one decimal point
-        if (newText.indexOf('.') == newText.lastIndexOf('.')) {
-           // It's valid, but we might want to format the integer part
-           List<String> parts = newText.split('.');
-           String integerPart = parts[0].replaceAll(RegExp(r'[^\d]'), '');
-           if (integerPart.isEmpty) integerPart = '0';
-           String formattedInt = _formatter.format(int.parse(integerPart));
-           String result = '$formattedInt.';
-           return TextEditingValue(
-             text: result,
-             selection: TextSelection.collapsed(offset: result.length),
-           );
-        }
-      }
+    // Handle decimal input
+    if (allowFraction && newValue.text.contains('.')) {
+      final parts = newValue.text.split('.');
+      // Multiple decimals - revert
+      if (parts.length > 2) return oldValue;
       
-      // If it has a decimal part
-      if (newText.contains('.')) {
-         List<String> parts = newText.split('.');
-         if (parts.length > 2) {
-           // Multiple dots, revert
-           return oldValue;
-         }
-         String integerPart = parts[0].replaceAll(RegExp(r'[^\d]'), '');
-         String decimalPart = parts[1].replaceAll(RegExp(r'[^\d]'), ''); // Strip non-digits from decimal
-         
-         if (integerPart.isEmpty) integerPart = '0';
-         
-         String formattedInt = _formatter.format(int.parse(integerPart));
-         String result = '$formattedInt.$decimalPart';
-         
-         return TextEditingValue(
-           text: result,
-           selection: TextSelection.collapsed(offset: result.length),
-         );
-      }
+      // Format integer part, keep decimal part as-is
+      final intPart = int.tryParse(parts[0]) ?? 0;
+      final decimalPart = parts.length > 1 ? parts[1] : '';
+      final formatted = '${_formatter.format(intPart)}.$decimalPart';
+      return TextEditingValue(
+        text: formatted,
+        selection: TextSelection.collapsed(offset: formatted.length),
+      );
     }
 
-    // Integer only logic (or if no decimal point yet)
-    String cleanText = newText.replaceAll(RegExp(r'[^\d]'), '');
-    if (cleanText.isEmpty) return newValue.copyWith(text: '');
-    
-    int value = int.tryParse(cleanText) ?? 0;
-    String formatted = _formatter.format(value);
-
+    // Integer only
+    final value = int.tryParse(newValue.text) ?? 0;
+    final formatted = _formatter.format(value);
     return TextEditingValue(
       text: formatted,
       selection: TextSelection.collapsed(offset: formatted.length),
     );
   }
 }
+
+/// Helper function to get standard amount input formatters.
+/// Call this in any TextFormField's inputFormatters property.
+/// 
+/// Example:
+/// ```dart
+/// TextFormField(
+///   inputFormatters: amountFormatters(allowFraction: true),
+/// )
+/// ```
+List<TextInputFormatter> amountFormatters({bool allowFraction = true}) => [
+  // First: Filter to only allow digits (and decimal point if fractions allowed)
+  FilteringTextInputFormatter.allow(
+    allowFraction ? RegExp(r'[\d.]') : RegExp(r'\d'),
+  ),
+  // Second: Add thousand separators
+  CommaSeparatorFormatter(allowFraction: allowFraction),
+];

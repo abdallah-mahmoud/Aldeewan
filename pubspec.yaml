@@ -39,6 +39,7 @@ dependencies:
   flutter_animate: ^4.5.2
   audioplayers: ^6.5.1
   lottie: ^3.3.2
+  showcaseview: ^5.0.1
 
 dev_dependencies:
   flutter_test:

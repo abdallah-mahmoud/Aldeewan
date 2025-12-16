@@ -11,6 +11,8 @@ import 'package:aldeewan_mobile/presentation/widgets/home/hero_section.dart';
 import 'package:aldeewan_mobile/presentation/widgets/home/quick_actions.dart';
 import 'package:aldeewan_mobile/presentation/widgets/home/recent_transactions.dart';
 import 'package:aldeewan_mobile/presentation/widgets/home/summary_grid.dart';
+import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
+import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -80,8 +82,13 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 24),
 
-                  // Hero Section (Net Position + Range Filter)
-                  const HeroSection(),
+                  // Hero Section (Net Position + Range Filter) - Tour Target
+                  ShowcaseTarget(
+                    showcaseKey: ShowcaseKeys.dashboardCards,
+                    title: l10n.tourWelcome,
+                    description: l10n.tourDashboard,
+                    child: const HeroSection(),
+                  ),
                   const SizedBox(height: 16),
 
                   // Budget & Goals Buttons
@@ -94,6 +101,10 @@ class HomeScreen extends ConsumerWidget {
 
                   // Quick Actions
                   const QuickActions(),
+                  const SizedBox(height: 8),
+                  
+                  // Tip Card for Quick Actions
+                  const QuickActionsTip(),
                   const SizedBox(height: 24),
 
                   // Recent Transactions

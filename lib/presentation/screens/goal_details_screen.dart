@@ -335,7 +335,7 @@ class GoalDetailsScreen extends ConsumerWidget {
         content: TextField(
           controller: controller,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
+          inputFormatters: amountFormatters(allowFraction: true),
           decoration: InputDecoration(
             labelText: l10n.amount,
             prefixText: '${ref.read(currencyProvider)} ',

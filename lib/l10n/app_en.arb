@@ -41,7 +41,7 @@
   "exportFailed": "Export failed: {error}",
   "selectCurrency": "Select Currency",
   "developerName": "Abdallah Mahmoud",
-  "developerEmail": "contact@example.com",
+  "developerEmail": "abdo13-m.azme@hotmail.com",
   "version": "Version",
   "cancel": "Cancel",
   "save": "Save",
@@ -332,5 +332,58 @@
         "type": "String"
       }
     }
-  }
+  },
+  "insufficientFundsTitle": "Insufficient Funds",
+  "insufficientFundsMessage": "Your current balance ({balance} {currency}) is not enough for this expense of {amount} {currency}. Please add more funds first.",
+  "@insufficientFundsMessage": {
+    "placeholders": {
+      "balance": {
+        "type": "String"
+      },
+      "currency": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+
+  "tourWelcome": "Welcome to Aldeewan!",
+  "tourDashboard": "See your money at a glance",
+  "tourAddTransaction": "Tap here to add money in or out",
+  "tourLedger": "People who owe you or you owe them",
+  "tourCashbook": "Filter by income or expenses",
+  "tourSearch": "Search by name, amount, or type",
+  "tourHelp": "Need help? Come here anytime",
+  "tourSkip": "Skip",
+  "tourNext": "Next",
+  "tourFinish": "Get Started",
+  "tourPrevious": "Previous",
+
+  "tipQuickActions": "Use Quick Actions for faster entry",
+  "tipFilterTransactions": "Filter and search transactions by date, type, or name",
+  "tipPersonBalance": "Tap a person to see their account",
+  "tipBudgetAlert": "We'll tell you if you spend too much",
+  "tipGoalProgress": "Track your savings here",
+  "tipExportReport": "Save reports as files",
+  "tipGotIt": "Got it",
+
+  "helpCenter": "Help Center",
+  "helpCenterSubtitle": "FAQs and tutorials",
+  "restartTour": "Restart Tutorial",
+  "restartTourSubtitle": "See the app guide again",
+  "contactSupport": "Contact Support",
+  "contactSupportSubtitle": "Need help? Reach out to us",
+
+  "faqGettingStarted": "Getting Started",
+  "faqWhatIsAldeewan": "What is Aldeewan?",
+  "faqWhatIsAldeewaAnswer": "Aldeewan is a smart accounting app to manage your money, track debts, and set budgets.",
+  "faqHowToAddTransaction": "How to add a transaction?",
+  "faqHowToAddTransactionAnswer": "Tap the + button on any screen to add income or expense.",
+  "faqCashbook": "Cashbook",
+  "faqLedger": "Ledger",
+  "faqBudgetsGoals": "Budgets & Goals",
+  "faqReports": "Reports",
+  "faqSettings": "Settings"
 }

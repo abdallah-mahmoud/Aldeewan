@@ -16,6 +16,7 @@ import 'package:aldeewan_mobile/presentation/screens/goals_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/goal_details_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/notifications_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/transaction_details_screen.dart';
+import 'package:aldeewan_mobile/presentation/screens/help_center_screen.dart';
 import 'package:aldeewan_mobile/presentation/widgets/scaffold_with_nav_bar.dart';
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 import 'package:aldeewan_mobile/data/services/sound_service.dart';
@@ -114,6 +115,11 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: 'about',
                 parentNavigatorKey: rootNavigatorKey, // Open about above the shell
                 builder: (context, state) => const AboutScreen(),
+              ),
+              GoRoute(
+                path: 'help',
+                parentNavigatorKey: rootNavigatorKey,
+                builder: (context, state) => const HelpCenterScreen(),
               ),
             ],
           ),

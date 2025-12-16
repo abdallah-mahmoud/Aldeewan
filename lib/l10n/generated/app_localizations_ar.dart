@@ -142,7 +142,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get developerName => 'متآصل';
 
   @override
-  String get developerEmail => 'contact@example.com';
+  String get developerEmail => 'abdo13-m.azme@hotmail.com';
 
   @override
   String get version => 'الإصدار';
@@ -834,4 +834,121 @@ class AppLocalizationsAr extends AppLocalizations {
   String goalReachedBody(String goalName) {
     return 'تهانينا! لقد حققت هدفك: $goalName.';
   }
+
+  @override
+  String get insufficientFundsTitle => 'رصيد غير كافٍ';
+
+  @override
+  String insufficientFundsMessage(
+    String balance,
+    String currency,
+    String amount,
+  ) {
+    return 'رصيدك الحالي ($balance $currency) غير كافٍ لهذا المصروف بقيمة $amount $currency. يرجى إضافة المزيد من الأموال أولاً.';
+  }
+
+  @override
+  String get tourWelcome => 'مرحباً بك في الديوان!';
+
+  @override
+  String get tourDashboard => 'هنا تشوف كل فلوسك';
+
+  @override
+  String get tourAddTransaction => 'اضغط هنا تضيف فلوس داخلة أو خارجة';
+
+  @override
+  String get tourLedger => 'الناس اللي لك أو عليك عندهم فلوس';
+
+  @override
+  String get tourCashbook => 'فلتر حسب الداخل أو الخارج';
+
+  @override
+  String get tourSearch => 'دور بالاسم أو المبلغ أو النوع';
+
+  @override
+  String get tourHelp => 'محتاج مساعدة؟ تعال هنا';
+
+  @override
+  String get tourSkip => 'تخطي';
+
+  @override
+  String get tourNext => 'التالي';
+
+  @override
+  String get tourFinish => 'ابدأ';
+
+  @override
+  String get tourPrevious => 'السابق';
+
+  @override
+  String get tipQuickActions => 'أزرار سريعة تسهل عليك';
+
+  @override
+  String get tipFilterTransactions =>
+      'فلتر الحركات حسب التاريخ أو النوع أو الاسم';
+
+  @override
+  String get tipPersonBalance => 'اضغط على الشخص تشوف حسابه';
+
+  @override
+  String get tipBudgetAlert => 'هنبلغك لو صرفت كتير';
+
+  @override
+  String get tipGoalProgress => 'تابع توفيرك هنا';
+
+  @override
+  String get tipExportReport => 'احفظ التقارير كملفات';
+
+  @override
+  String get tipGotIt => 'فهمت';
+
+  @override
+  String get helpCenter => 'مركز المساعدة';
+
+  @override
+  String get helpCenterSubtitle => 'أسئلة شائعة ودروس';
+
+  @override
+  String get restartTour => 'إعادة الشرح';
+
+  @override
+  String get restartTourSubtitle => 'شوف دليل التطبيق مرة تانية';
+
+  @override
+  String get contactSupport => 'تواصل معنا';
+
+  @override
+  String get contactSupportSubtitle => 'محتاج مساعدة؟ كلمنا';
+
+  @override
+  String get faqGettingStarted => 'البداية';
+
+  @override
+  String get faqWhatIsAldeewan => 'إيش هو الديوان؟';
+
+  @override
+  String get faqWhatIsAldeewaAnswer =>
+      'الديوان تطبيق حسابات ذكي يساعدك تدير فلوسك وتتابع الديون وتحدد ميزانيتك.';
+
+  @override
+  String get faqHowToAddTransaction => 'كيف أضيف فلوس داخلة أو خارجة؟';
+
+  @override
+  String get faqHowToAddTransactionAnswer =>
+      'اضغط على زر + في أي شاشة عشان تضيف دخل أو مصروف.';
+
+  @override
+  String get faqCashbook => 'دفتر الحساب';
+
+  @override
+  String get faqLedger => 'الدفتر (الناس)';
+
+  @override
+  String get faqBudgetsGoals => 'الميزانية والأهداف';
+
+  @override
+  String get faqReports => 'التقارير';
+
+  @override
+  String get faqSettings => 'الإعدادات';
 }

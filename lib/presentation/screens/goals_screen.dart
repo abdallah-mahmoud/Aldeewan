@@ -12,6 +12,7 @@ import 'package:realm/realm.dart';
 import 'package:intl/intl.dart';
 
 import 'package:aldeewan_mobile/utils/icon_helper.dart';
+import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
 
 class GoalsScreen extends ConsumerWidget {
   const GoalsScreen({super.key});
@@ -135,6 +136,9 @@ class GoalsScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
+
+                  // Goal progress tip
+                  const GoalProgressTip(),
 
                   // Goals Grid
                   if (budgetState.goals.isEmpty)
@@ -286,7 +290,7 @@ class GoalsScreen extends ConsumerWidget {
                   controller: targetController,
                   decoration: InputDecoration(labelText: l10n.targetAmount),
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
+                  inputFormatters: amountFormatters(allowFraction: true),
                 ),
                 const SizedBox(height: 24),
                 Text(l10n.selectIcon, style: Theme.of(context).textTheme.titleSmall),
@@ -352,7 +356,7 @@ class GoalsScreen extends ConsumerWidget {
           controller: amountController,
           decoration: InputDecoration(labelText: l10n.amount),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
-          inputFormatters: [ThousandsSeparatorInputFormatter(allowFraction: true)],
+          inputFormatters: amountFormatters(allowFraction: true),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.cancel)),

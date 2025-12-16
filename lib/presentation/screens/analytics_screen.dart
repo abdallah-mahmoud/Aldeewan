@@ -5,7 +5,9 @@ import 'package:aldeewan_mobile/presentation/widgets/cash_flow_report.dart';
 import 'package:aldeewan_mobile/utils/csv_exporter.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
-import 'package:aldeewan_mobile/utils/error_handler.dart';import 'package:intl/intl.dart';
+import 'package:aldeewan_mobile/utils/error_handler.dart';
+import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
+import 'package:intl/intl.dart';
 class AnalyticsScreen extends ConsumerStatefulWidget {
   const AnalyticsScreen({super.key});
 
@@ -90,11 +92,18 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
           ),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: const [
-          PersonStatementReport(),
-          CashFlowReport(),
+      body: Column(
+        children: [
+          const ExportReportTip(),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: const [
+                PersonStatementReport(),
+                CashFlowReport(),
+              ],
+            ),
+          ),
         ],
       ),
       floatingActionButton: null,
