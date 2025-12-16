@@ -18,6 +18,7 @@ import 'package:aldeewan_mobile/presentation/screens/notifications_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/transaction_details_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/help_center_screen.dart';
 import 'package:aldeewan_mobile/presentation/widgets/scaffold_with_nav_bar.dart';
+import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 import 'package:aldeewan_mobile/data/services/sound_service.dart';
 import 'package:aldeewan_mobile/utils/sound_navigation_observer.dart';
@@ -50,7 +51,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       ShellRoute(
         navigatorKey: shellNavigatorKey,
         builder: (context, state, child) {
-          return ScaffoldWithNavBar(child: child);
+          return GlobalShowcaseWrapper(
+            child: ScaffoldWithNavBar(child: child),
+          );
         },
         routes: [
           GoRoute(

@@ -14,11 +14,16 @@ import 'package:aldeewan_mobile/presentation/widgets/home/summary_grid.dart';
 import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
 import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin {
+  @override
+  Widget build(BuildContext context) {
     final ledgerAsync = ref.watch(ledgerProvider);
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:aldeewan_mobile/presentation/providers/theme_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/onboarding_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/locale_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/security_provider.dart';
 import 'package:aldeewan_mobile/config/router.dart';
@@ -26,6 +27,7 @@ Future<void> main() async {
   runApp(ProviderScope(
     overrides: [
       securityProvider.overrideWith((ref) => SecurityNotifier(isAppLockEnabled)),
+      sharedPreferencesProvider.overrideWithValue(prefs),
     ],
     child: MyApp(initialSecurityState: isAppLockEnabled),
   ));

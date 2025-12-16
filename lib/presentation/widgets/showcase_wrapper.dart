@@ -1,3 +1,4 @@
+// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:showcaseview/showcaseview.dart';
@@ -19,34 +20,53 @@ class ShowcaseKeys {
   ];
 }
 
-/// Mixin to add showcase tour functionality to screens
-mixin ShowcaseTourMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
-  bool _showcaseRegistered = false;
+/// Wrapper widget to provide Showcase context to the app
+class GlobalShowcaseWrapper extends ConsumerWidget {
+  final Widget child;
 
-  /// Register the showcase tour
-  void registerShowcase() {
-    if (_showcaseRegistered) return;
-    _showcaseRegistered = true;
+  const GlobalShowcaseWrapper({
+    super.key,
+    required this.child,
+  });
 
-    ShowcaseView.register(
-      blurValue: 1,
-      autoPlayDelay: const Duration(seconds: 3),
-      onComplete: (index, key) {
-        // When tour completes on last key, mark as done
-        if (key == ShowcaseKeys.fabButton) {
-          ref.read(onboardingProvider.notifier).completeTour();
-        }
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return ShowCaseWidget(
+      builder: (context) => child,
+      onFinish: () {
+        // When tour completes
+        ref.read(onboardingProvider.notifier).completeTour();
       },
     );
+  }
+}
+
+/// Mixin to add showcase tour functionality to screens
+mixin ShowcaseTourMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
+  
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      startTourIfNeeded();
+    });
   }
 
   /// Start the tour if not completed
   void startTourIfNeeded() {
+    // Check if widget is mounted and context is valid
+    if (!mounted) return;
+
     final onboarding = ref.read(onboardingProvider);
     if (!onboarding.tourCompleted) {
+      // Small delay to ensure UI is ready
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
-          ShowcaseView.get().startShowCase(ShowcaseKeys.allKeys);
+          try {
+            ShowCaseWidget.of(context).startShowCase(ShowcaseKeys.allKeys);
+          } catch (e) {
+            debugPrint('Showcase error: $e');
+          }
         }
       });
     }
@@ -55,14 +75,12 @@ mixin ShowcaseTourMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
   /// Restart the tour
   void restartTour() {
     ref.read(onboardingProvider.notifier).restartTour();
-    ShowcaseView.get().startShowCase(ShowcaseKeys.allKeys);
-  }
-
-  /// Unregister when done
-  void unregisterShowcase() {
-    if (_showcaseRegistered) {
-      ShowcaseView.get().unregister();
-      _showcaseRegistered = false;
+    if (mounted) {
+       try {
+         ShowCaseWidget.of(context).startShowCase(ShowcaseKeys.allKeys);
+       } catch (e) {
+         debugPrint('Showcase restart error: $e');
+       }
     }
   }
 }
