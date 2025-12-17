@@ -145,8 +145,10 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
             final formattedOverrun = formatter.format(overrun);
 
             // Show confirmation dialog instead of blocking
+            // Use rootNavigator to ensure it appears on top of the BottomSheet
             final shouldProceed = await showDialog<bool>(
               context: context,
+              useRootNavigator: true,
               builder: (context) => AlertDialog(
                 title: Text(l10n.budgetExceededTitle),
                 content: Text(l10n.budgetExceededBody(activeBudget.category, formattedOverrun, currency)),
