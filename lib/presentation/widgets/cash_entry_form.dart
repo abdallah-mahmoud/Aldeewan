@@ -118,11 +118,32 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
         if (currentBalance < amount) {
           final currency = ref.read(currencyProvider);
           final formatter = NumberFormat('#,##0.##');
-          ToastService.showError(context, l10n.insufficientFundsMessage(
+          final errorMessage = l10n.insufficientFundsMessage(
             formatter.format(currentBalance),
             currency,
             formatter.format(amount),
-          ));
+          );
+          
+          // Close the bottom sheet first
+          Navigator.of(context).pop();
+          
+          // Then show error dialog on top using rootNavigator
+          if (mounted) {
+            showDialog(
+              context: context,
+              useRootNavigator: true,
+              builder: (ctx) => AlertDialog(
+                title: Text(l10n.insufficientFundsTitle),
+                content: Text(errorMessage),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: Text(l10n.cancel),
+                  ),
+                ],
+              ),
+            );
+          }
           return;
         }
       }
