@@ -26,7 +26,8 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     ref.read(soundServiceProvider).playStartup();
     
     // Start auth check after animation delay
-    Future.delayed(const Duration(seconds: 3), () {
+    // Increased delay to allow users to read the Quran verse
+    Future.delayed(const Duration(seconds: 5), () {
       if (mounted) {
         _checkAuth();
       }
@@ -135,11 +136,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                       'يَا أَيُّهَا الَّذِينَ آمَنُوا إِذَا تَدَايَنْتُمْ بِدَيْنٍ إِلَىٰ أَجَلٍ مُسَمًّى فَاكْتُبُوهُ وَلْيَكْتُبْ بَيْنَكُمْ كَاتِبٌ بِالْعَدْلِ...',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontFamily: 'Cairo', // Ensure Arabic font is used
-                        fontSize: 16,
-                        height: 1.8,
+                        fontFamily: 'Amiri', // Amiri is elegant and appropriate for Quranic text
+                        fontSize: 18,
+                        height: 2.0,
                         color: isDark ? Colors.white70 : Colors.black87,
-                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 12),

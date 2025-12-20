@@ -381,32 +381,39 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                     ],
                   )
                 : null,
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  NumberFormat.currency(
-                    symbol: currency,
-                    decimalDigits: currency == 'SDG' ? 0 : 2,
-                  ).format(balance.abs()),
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: balanceColor,
+            trailing: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 120),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      NumberFormat.currency(
+                        symbol: currency,
+                        decimalDigits: currency == 'SDG' ? 0 : 2,
+                      ).format(balance.abs()),
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: balanceColor,
+                      ),
+                    ),
                   ),
-                ),
-                Text(
-                  balance == 0 
-                      ? l10n.settled 
-                      : (role == PersonRole.customer 
-                          ? (balance > 0 ? l10n.receivable : l10n.advance) 
-                          : (balance > 0 ? l10n.payable : l10n.advance)),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontSize: 10,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  Text(
+                    balance == 0 
+                        ? l10n.settled 
+                        : (role == PersonRole.customer 
+                            ? (balance > 0 ? l10n.receivable : l10n.advance) 
+                            : (balance > 0 ? l10n.payable : l10n.advance)),
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      fontSize: 10,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             onTap: () {
               context.push('/ledger/${person.id}');

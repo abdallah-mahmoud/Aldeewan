@@ -22,53 +22,64 @@ class SummaryGrid extends ConsumerWidget {
       return NumberFormat.currency(symbol: currency, decimalDigits: isSDG ? 0 : 2).format(amount);
     }
 
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      crossAxisSpacing: 12,
-      mainAxisSpacing: 12,
-      childAspectRatio: 1.5,
-      children: [
-        SummaryStatCard(
-          label: l10n.totalReceivable,
-          value: formatCurrency(ref.watch(totalReceivableProvider)),
-          icon: LucideIcons.arrowDownCircle,
-          color: Colors.green,
-          onTap: () => context.go('/ledger'), // Defaults to Customers tab
-        ),
-        SummaryStatCard(
-          label: l10n.totalPayable,
-          value: formatCurrency(ref.watch(totalPayableProvider)),
-          icon: LucideIcons.arrowUpCircle,
-          color: Colors.red,
-          onTap: () => context.go('/ledger'), // Ideally switch to Suppliers tab
-        ),
-        SummaryStatCard(
-          label: l10n.monthlyIncome,
-          value: formatCurrency(ref.watch(monthlyIncomeProvider)),
-          icon: LucideIcons.arrowDownCircle,
-          color: Colors.green,
-          onTap: () {
-            // Set filters before navigating
-            ref.read(cashFilterProvider.notifier).state = CashFilter.income;
-            ref.read(dateRangePresetProvider.notifier).state = DateRangePreset.thisMonth;
-            context.go('/cashbook');
-          },
-        ),
-        SummaryStatCard(
-          label: l10n.monthlyExpense,
-          value: formatCurrency(ref.watch(monthlyExpenseProvider)),
-          icon: LucideIcons.arrowUpCircle,
-          color: Colors.red,
-          onTap: () {
-            // Set filters before navigating
-            ref.read(cashFilterProvider.notifier).state = CashFilter.expense;
-            ref.read(dateRangePresetProvider.notifier).state = DateRangePreset.thisMonth;
-            context.go('/cashbook');
-          },
-        ),
-      ],
+    // Use LayoutBuilder for responsive aspect ratio on different screen densities
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Calculate dynamic aspect ratio based on available width
+        // This prevents overflow on low DPI/small screens
+        final cardWidth = (constraints.maxWidth - 12) / 2;
+        final cardHeight = cardWidth / 1.4; // Slightly taller ratio for low DPI
+        final aspectRatio = (cardWidth / cardHeight).clamp(1.2, 1.8);
+        
+        return GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: aspectRatio,
+          children: [
+            SummaryStatCard(
+              label: l10n.totalReceivable,
+              value: formatCurrency(ref.watch(totalReceivableProvider)),
+              icon: LucideIcons.arrowDownCircle,
+              color: Colors.green,
+              onTap: () => context.go('/ledger'), // Defaults to Customers tab
+            ),
+            SummaryStatCard(
+              label: l10n.totalPayable,
+              value: formatCurrency(ref.watch(totalPayableProvider)),
+              icon: LucideIcons.arrowUpCircle,
+              color: Colors.red,
+              onTap: () => context.go('/ledger'), // Ideally switch to Suppliers tab
+            ),
+            SummaryStatCard(
+              label: l10n.monthlyIncome,
+              value: formatCurrency(ref.watch(monthlyIncomeProvider)),
+              icon: LucideIcons.arrowDownCircle,
+              color: Colors.green,
+              onTap: () {
+                // Set filters before navigating
+                ref.read(cashFilterProvider.notifier).state = CashFilter.income;
+                ref.read(dateRangePresetProvider.notifier).state = DateRangePreset.thisMonth;
+                context.go('/cashbook');
+              },
+            ),
+            SummaryStatCard(
+              label: l10n.monthlyExpense,
+              value: formatCurrency(ref.watch(monthlyExpenseProvider)),
+              icon: LucideIcons.arrowUpCircle,
+              color: Colors.red,
+              onTap: () {
+                // Set filters before navigating
+                ref.read(cashFilterProvider.notifier).state = CashFilter.expense;
+                ref.read(dateRangePresetProvider.notifier).state = DateRangePreset.thisMonth;
+                context.go('/cashbook');
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

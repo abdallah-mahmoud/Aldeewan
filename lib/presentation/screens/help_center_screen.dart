@@ -51,6 +51,34 @@ class HelpCenterScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
+          // Data & Backup Section
+          _buildSectionHeader(context, l10n.faqDataBackup, LucideIcons.database),
+          const SizedBox(height: 8),
+          _buildFaqCard(
+            context,
+            isDark: isDark,
+            children: [
+              _buildFaqItem(
+                context,
+                question: l10n.faqHowToBackup,
+                answer: l10n.faqHowToBackupAnswer,
+              ),
+              const Divider(height: 1),
+              _buildFaqItem(
+                context,
+                question: l10n.faqHowToRestore,
+                answer: l10n.faqHowToRestoreAnswer,
+              ),
+              const Divider(height: 1),
+              _buildFaqItem(
+                context,
+                question: l10n.faqWhereIsData,
+                answer: l10n.faqWhereIsDataAnswer,
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+
           // Contact Support Section
           _buildSectionHeader(context, l10n.contactSupport, LucideIcons.messageCircle),
           const SizedBox(height: 8),

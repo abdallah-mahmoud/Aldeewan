@@ -957,4 +957,83 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get faqSettings => 'Settings';
+
+  @override
+  String get initialBalanceTitle => 'Set Your Starting Balance';
+
+  @override
+  String get initialBalanceDescription =>
+      'Enter the money you currently have to start tracking accurately.';
+
+  @override
+  String get cashOnHand => 'Cash on Hand';
+
+  @override
+  String get bankBalance => 'Bank Balance';
+
+  @override
+  String get skipForNow => 'Skip for now';
+
+  @override
+  String get letsGo => 'Let\'s Go!';
+
+  @override
+  String get initialBalanceNote => 'Opening Balance';
+
+  @override
+  String get backupToCloud => 'Backup to Cloud';
+
+  @override
+  String get backupToCloudSubtitle =>
+      'Save to Google Drive, Dropbox, OneDrive, etc.';
+
+  @override
+  String get restoreFromCloud => 'Restore from Backup';
+
+  @override
+  String get restoreFromCloudSubtitle => 'Import data from a backup file';
+
+  @override
+  String get restoreHelpTitle => 'How to Restore from Cloud';
+
+  @override
+  String get restoreHelpStep1 =>
+      '1. Open your cloud app (Google Drive, Dropbox, etc.)';
+
+  @override
+  String get restoreHelpStep2 => '2. Find your Aldeewan backup file';
+
+  @override
+  String get restoreHelpStep3 => '3. Download it to your device';
+
+  @override
+  String get restoreHelpStep4 =>
+      '4. Return here and tap \'Restore from Backup\'';
+
+  @override
+  String get restoreHelpStep5 => '5. Select the downloaded file';
+
+  @override
+  String get faqDataBackup => 'Data & Backup';
+
+  @override
+  String get faqHowToBackup => 'How do I backup my data?';
+
+  @override
+  String get faqHowToBackupAnswer =>
+      'Go to Settings > Backup to Cloud. Your data will be saved as a JSON file that you can store in Google Drive, Dropbox, or any cloud app.';
+
+  @override
+  String get faqHowToRestore => 'How do I restore from a backup?';
+
+  @override
+  String get faqHowToRestoreAnswer =>
+      '1. Download your backup file from cloud storage to your device. 2. Go to Settings > Restore from Backup. 3. Select the downloaded JSON file.';
+
+  @override
+  String get faqWhereIsData => 'Where is my data stored?';
+
+  @override
+  String get faqWhereIsDataAnswer =>
+      'Your data is stored locally on your device in an encrypted database. It never leaves your device unless you choose to backup to cloud.';
 }

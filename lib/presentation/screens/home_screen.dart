@@ -5,6 +5,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/data/services/sound_service.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/onboarding_provider.dart';
 import 'package:aldeewan_mobile/presentation/widgets/home/accounts_section.dart';
 import 'package:aldeewan_mobile/presentation/widgets/home/dashboard_buttons.dart';
 import 'package:aldeewan_mobile/presentation/widgets/home/hero_section.dart';
@@ -13,6 +14,7 @@ import 'package:aldeewan_mobile/presentation/widgets/home/recent_transactions.da
 import 'package:aldeewan_mobile/presentation/widgets/home/summary_grid.dart';
 import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
 import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
+import 'package:aldeewan_mobile/presentation/widgets/initial_balance_dialog.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -22,11 +24,32 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin {
+  bool _hasCheckedInitialBalance = false;
+  
   @override
   List<GlobalKey> get showcaseKeys => ShowcaseKeys.homeKeys;
   
   @override
   String get screenTourId => 'home';
+  
+  void _checkInitialBalancePrompt() {
+    if (_hasCheckedInitialBalance) return;
+    _hasCheckedInitialBalance = true;
+    
+    final onboarding = ref.read(onboardingServiceProvider);
+    if (!onboarding.isInitialBalancePromptShown) {
+      // Show dialog after build completes
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: true, // Skippable by tapping outside
+            builder: (_) => const InitialBalanceDialog(),
+          );
+        }
+      });
+    }
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -38,6 +61,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin 
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (err, stack) => Scaffold(body: Center(child: Text(AppLocalizations.of(context)!.errorOccurred(err.toString())))),
       data: (_) {
+        // Check for initial balance prompt on first load
+        _checkInitialBalancePrompt();
+        
         return Scaffold(
           body: SafeArea(
             child: SingleChildScrollView(

@@ -51,4 +51,15 @@ class OnboardingService {
     await resetTour();
     await resetAllTips();
   }
+
+  // Initial balance prompt tracking
+  static const String _initialBalancePromptShownKey = 'initial_balance_prompt_shown';
+
+  /// Check if initial balance prompt has been shown
+  bool get isInitialBalancePromptShown => _prefs.getBool(_initialBalancePromptShownKey) ?? false;
+
+  /// Mark initial balance prompt as shown
+  Future<void> markInitialBalancePromptShown() async {
+    await _prefs.setBool(_initialBalancePromptShownKey, true);
+  }
 }

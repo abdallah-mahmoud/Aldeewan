@@ -211,6 +211,7 @@ class _QuickActionsState extends ConsumerState<QuickActions> {
       },
       borderRadius: BorderRadius.circular(20),
       child: Container(
+        padding: const EdgeInsets.all(8), // Added padding for overflow safety
         decoration: BoxDecoration(
           color: theme.cardTheme.color,
           borderRadius: BorderRadius.circular(20),
@@ -226,20 +227,28 @@ class _QuickActionsState extends ConsumerState<QuickActions> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10), // Reduced padding for icon container
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Icon(icon, color: theme.colorScheme.primary, size: 26),
+              child: Icon(icon, color: theme.colorScheme.primary, size: 24), // Slightly smaller icon
             ),
-            const SizedBox(height: 10),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: 12,
+            const SizedBox(height: 6), // Reduced spacing
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 11, // Slightly smaller base font
+                  ),
+                ),
               ),
             ),
           ],

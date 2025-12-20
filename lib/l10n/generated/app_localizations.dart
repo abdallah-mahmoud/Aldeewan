@@ -1889,6 +1889,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Settings'**
   String get faqSettings;
+
+  /// No description provided for @initialBalanceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Your Starting Balance'**
+  String get initialBalanceTitle;
+
+  /// No description provided for @initialBalanceDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the money you currently have to start tracking accurately.'**
+  String get initialBalanceDescription;
+
+  /// No description provided for @cashOnHand.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash on Hand'**
+  String get cashOnHand;
+
+  /// No description provided for @bankBalance.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Balance'**
+  String get bankBalance;
+
+  /// No description provided for @skipForNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for now'**
+  String get skipForNow;
+
+  /// No description provided for @letsGo.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s Go!'**
+  String get letsGo;
+
+  /// No description provided for @initialBalanceNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening Balance'**
+  String get initialBalanceNote;
+
+  /// No description provided for @backupToCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup to Cloud'**
+  String get backupToCloud;
+
+  /// No description provided for @backupToCloudSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save to Google Drive, Dropbox, OneDrive, etc.'**
+  String get backupToCloudSubtitle;
+
+  /// No description provided for @restoreFromCloud.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from Backup'**
+  String get restoreFromCloud;
+
+  /// No description provided for @restoreFromCloudSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Import data from a backup file'**
+  String get restoreFromCloudSubtitle;
+
+  /// No description provided for @restoreHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How to Restore from Cloud'**
+  String get restoreHelpTitle;
+
+  /// No description provided for @restoreHelpStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Open your cloud app (Google Drive, Dropbox, etc.)'**
+  String get restoreHelpStep1;
+
+  /// No description provided for @restoreHelpStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'2. Find your Aldeewan backup file'**
+  String get restoreHelpStep2;
+
+  /// No description provided for @restoreHelpStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'3. Download it to your device'**
+  String get restoreHelpStep3;
+
+  /// No description provided for @restoreHelpStep4.
+  ///
+  /// In en, this message translates to:
+  /// **'4. Return here and tap \'Restore from Backup\''**
+  String get restoreHelpStep4;
+
+  /// No description provided for @restoreHelpStep5.
+  ///
+  /// In en, this message translates to:
+  /// **'5. Select the downloaded file'**
+  String get restoreHelpStep5;
+
+  /// No description provided for @faqDataBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Data & Backup'**
+  String get faqDataBackup;
+
+  /// No description provided for @faqHowToBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I backup my data?'**
+  String get faqHowToBackup;
+
+  /// No description provided for @faqHowToBackupAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Settings > Backup to Cloud. Your data will be saved as a JSON file that you can store in Google Drive, Dropbox, or any cloud app.'**
+  String get faqHowToBackupAnswer;
+
+  /// No description provided for @faqHowToRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I restore from a backup?'**
+  String get faqHowToRestore;
+
+  /// No description provided for @faqHowToRestoreAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'1. Download your backup file from cloud storage to your device. 2. Go to Settings > Restore from Backup. 3. Select the downloaded JSON file.'**
+  String get faqHowToRestoreAnswer;
+
+  /// No description provided for @faqWhereIsData.
+  ///
+  /// In en, this message translates to:
+  /// **'Where is my data stored?'**
+  String get faqWhereIsData;
+
+  /// No description provided for @faqWhereIsDataAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data is stored locally on your device in an encrypted database. It never leaves your device unless you choose to backup to cloud.'**
+  String get faqWhereIsDataAnswer;
 }
 
 class _AppLocalizationsDelegate

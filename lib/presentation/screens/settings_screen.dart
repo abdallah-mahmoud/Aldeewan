@@ -237,18 +237,22 @@ class SettingsScreen extends ConsumerWidget {
               title: l10n.dataManagement,
               children: [
                 SettingsTile(
-                  icon: LucideIcons.download,
+                  icon: LucideIcons.upload,
                   iconColor: Colors.teal,
-                  title: l10n.backupData,
-                  subtitle: l10n.backupDataSubtitle,
+                  title: l10n.backupToCloud,
+                  subtitle: l10n.backupToCloudSubtitle,
                   onTap: () => _backupData(context, ref),
                 ),
                 const Divider(height: 1, indent: 60),
                 SettingsTile(
-                  icon: LucideIcons.upload,
+                  icon: LucideIcons.download,
                   iconColor: Colors.amber,
-                  title: l10n.restoreData,
-                  subtitle: l10n.restoreDataSubtitle,
+                  title: l10n.restoreFromCloud,
+                  subtitle: l10n.restoreFromCloudSubtitle,
+                  trailing: IconButton(
+                    icon: Icon(LucideIcons.helpCircle, size: 20, color: Colors.grey),
+                    onPressed: () => _showRestoreHelpDialog(context),
+                  ),
                   onTap: () => _restoreData(context, ref),
                 ),
                 const Divider(height: 1, indent: 60),
@@ -316,6 +320,56 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
+  void _showRestoreHelpDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        icon: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary.withValues(alpha: 0.1),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(
+            LucideIcons.download,
+            size: 28,
+            color: theme.colorScheme.primary,
+          ),
+        ),
+        title: Text(
+          l10n.restoreHelpTitle,
+          textAlign: TextAlign.center,
+          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l10n.restoreHelpStep1, style: theme.textTheme.bodyMedium),
+            const SizedBox(height: 8),
+            Text(l10n.restoreHelpStep2, style: theme.textTheme.bodyMedium),
+            const SizedBox(height: 8),
+            Text(l10n.restoreHelpStep3, style: theme.textTheme.bodyMedium),
+            const SizedBox(height: 8),
+            Text(l10n.restoreHelpStep4, style: theme.textTheme.bodyMedium),
+            const SizedBox(height: 8),
+            Text(l10n.restoreHelpStep5, style: theme.textTheme.bodyMedium),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.cancel),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _backupData(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
     try {
@@ -346,7 +400,7 @@ class SettingsScreen extends ConsumerWidget {
       };
 
       final jsonString = jsonEncode(data);
-      final fileName = 'aldeewan_backup_${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.json';
+      final fileName = 'Aldeewan_Backup_${DateFormat('yyyy-MM-dd_HH-mm').format(DateTime.now())}.json';
       
       final directory = await getTemporaryDirectory();
       final file = File('${directory.path}/$fileName');

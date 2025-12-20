@@ -385,5 +385,31 @@
   "faqLedger": "Ledger",
   "faqBudgetsGoals": "Budgets & Goals",
   "faqReports": "Reports",
-  "faqSettings": "Settings"
+  "faqSettings": "Settings",
+
+  "initialBalanceTitle": "Set Your Starting Balance",
+  "initialBalanceDescription": "Enter the money you currently have to start tracking accurately.",
+  "cashOnHand": "Cash on Hand",
+  "bankBalance": "Bank Balance",
+  "skipForNow": "Skip for now",
+  "letsGo": "Let's Go!",
+  "initialBalanceNote": "Opening Balance",
+
+  "backupToCloud": "Backup to Cloud",
+  "backupToCloudSubtitle": "Save to Google Drive, Dropbox, OneDrive, etc.",
+  "restoreFromCloud": "Restore from Backup",
+  "restoreFromCloudSubtitle": "Import data from a backup file",
+  "restoreHelpTitle": "How to Restore from Cloud",
+  "restoreHelpStep1": "1. Open your cloud app (Google Drive, Dropbox, etc.)",
+  "restoreHelpStep2": "2. Find your Aldeewan backup file",
+  "restoreHelpStep3": "3. Download it to your device",
+  "restoreHelpStep4": "4. Return here and tap 'Restore from Backup'",
+  "restoreHelpStep5": "5. Select the downloaded file",
+  "faqDataBackup": "Data & Backup",
+  "faqHowToBackup": "How do I backup my data?",
+  "faqHowToBackupAnswer": "Go to Settings > Backup to Cloud. Your data will be saved as a JSON file that you can store in Google Drive, Dropbox, or any cloud app.",
+  "faqHowToRestore": "How do I restore from a backup?",
+  "faqHowToRestoreAnswer": "1. Download your backup file from cloud storage to your device. 2. Go to Settings > Restore from Backup. 3. Select the downloaded JSON file.",
+  "faqWhereIsData": "Where is my data stored?",
+  "faqWhereIsDataAnswer": "Your data is stored locally on your device in an encrypted database. It never leaves your device unless you choose to backup to cloud."
 }

@@ -951,4 +951,84 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get faqSettings => 'الإعدادات';
+
+  @override
+  String get initialBalanceTitle => 'أدخل رصيدك الحالي';
+
+  @override
+  String get initialBalanceDescription =>
+      'أدخل المبلغ الموجود لديك الآن لبدء التتبع بدقة.';
+
+  @override
+  String get cashOnHand => 'النقد المتاح';
+
+  @override
+  String get bankBalance => 'الرصيد البنكي';
+
+  @override
+  String get skipForNow => 'تخطي الآن';
+
+  @override
+  String get letsGo => 'هيا نبدأ!';
+
+  @override
+  String get initialBalanceNote => 'الرصيد الافتتاحي';
+
+  @override
+  String get backupToCloud => 'نسخ احتياطي للسحابة';
+
+  @override
+  String get backupToCloudSubtitle =>
+      'حفظ في جوجل درايف، دروبوكس، وان درايف، إلخ';
+
+  @override
+  String get restoreFromCloud => 'استعادة من النسخة الاحتياطية';
+
+  @override
+  String get restoreFromCloudSubtitle =>
+      'استيراد البيانات من ملف النسخة الاحتياطية';
+
+  @override
+  String get restoreHelpTitle => 'كيفية الاستعادة من السحابة';
+
+  @override
+  String get restoreHelpStep1 =>
+      '١. افتح تطبيق السحابة (جوجل درايف، دروبوكس، إلخ)';
+
+  @override
+  String get restoreHelpStep2 => '٢. ابحث عن ملف النسخة الاحتياطية للديوان';
+
+  @override
+  String get restoreHelpStep3 => '٣. حمّله على جهازك';
+
+  @override
+  String get restoreHelpStep4 =>
+      '٤. ارجع هنا واضغط \'استعادة من النسخة الاحتياطية\'';
+
+  @override
+  String get restoreHelpStep5 => '٥. اختر الملف المُحمَّل';
+
+  @override
+  String get faqDataBackup => 'البيانات والنسخ الاحتياطي';
+
+  @override
+  String get faqHowToBackup => 'كيف أنسخ بياناتي احتياطياً؟';
+
+  @override
+  String get faqHowToBackupAnswer =>
+      'اذهب إلى الإعدادات > نسخ احتياطي للسحابة. سيتم حفظ بياناتك كملف JSON يمكنك تخزينه في جوجل درايف أو دروبوكس أو أي تطبيق سحابي.';
+
+  @override
+  String get faqHowToRestore => 'كيف أستعيد من النسخة الاحتياطية؟';
+
+  @override
+  String get faqHowToRestoreAnswer =>
+      '١. حمّل ملف النسخة الاحتياطية من السحابة إلى جهازك. ٢. اذهب إلى الإعدادات > استعادة من النسخة الاحتياطية. ٣. اختر ملف JSON المُحمَّل.';
+
+  @override
+  String get faqWhereIsData => 'أين يتم تخزين بياناتي؟';
+
+  @override
+  String get faqWhereIsDataAnswer =>
+      'يتم تخزين بياناتك محلياً على جهازك في قاعدة بيانات مشفرة. لا تغادر بياناتك جهازك أبداً إلا إذا اخترت النسخ الاحتياطي للسحابة.';
 }
