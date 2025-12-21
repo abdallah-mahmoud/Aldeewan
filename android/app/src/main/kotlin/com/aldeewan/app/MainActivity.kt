@@ -1,4 +1,4 @@
-package com.aldeewan.aldeewan_mobile
+package com.aldeewan.app
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 
