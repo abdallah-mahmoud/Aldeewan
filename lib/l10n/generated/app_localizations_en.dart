@@ -755,6 +755,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get budgetNotFound => 'Budget not found';
 
   @override
+  String get sortBy => 'Sort by';
+
+  @override
+  String get sortNewest => 'Newest First';
+
+  @override
+  String get sortOldest => 'Oldest First';
+
+  @override
+  String get sortHighestAmount => 'Highest Amount';
+
+  @override
+  String get sortLowestAmount => 'Lowest Amount';
+
+  @override
   String get goalExceededError =>
       'Cannot add funds. Total saved would exceed the target amount.';
 
@@ -897,7 +912,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tipPersonBalance => 'Tap a person to see their account';
 
   @override
-  String get tipBudgetAlert => 'We\'ll tell you if you spend too much';
+  String get tipBudgetAlert => 'We\'ll remind you when nearing your budget';
 
   @override
   String get tipGoalProgress => 'Track your savings here';
@@ -1036,4 +1051,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get faqWhereIsDataAnswer =>
       'Your data is stored locally on your device in an encrypted database. It never leaves your device unless you choose to backup to cloud.';
+
+  @override
+  String get loadMore => 'Load More';
+
+  @override
+  String get moreItems => 'more';
 }

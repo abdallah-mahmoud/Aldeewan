@@ -17,6 +17,9 @@ import 'package:intl/intl.dart';
 import 'package:aldeewan_mobile/utils/category_helper.dart';
 import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
 
+// Static formatter to avoid creating new instance on every build
+final _currencyFormatter = NumberFormat('#,##0.##');
+
 class BudgetScreen extends ConsumerStatefulWidget {
   const BudgetScreen({super.key});
 
@@ -46,7 +49,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> with SingleTickerPr
     final currency = ref.watch(currencyProvider);
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final formatter = NumberFormat('#,##0.##');
+    final formatter = _currencyFormatter;
 
     // Filter budgets
     final now = DateTime.now();

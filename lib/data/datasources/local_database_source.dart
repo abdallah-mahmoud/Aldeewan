@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:realm/realm.dart';
@@ -35,8 +36,24 @@ class LocalDatabaseSource {
       encryptionKey: key,
       schemaVersion: 4, // Incremented for goalId field
       migrationCallback: (migration, oldSchemaVersion) {
-        // Schema changes are handled automatically by Realm for adding nullable fields
-        // No manual migration needed for adding optional properties
+        const targetVersion = 4;
+        debugPrint('🔄 Realm migration: v$oldSchemaVersion -> v$targetVersion');
+        
+        // Version-specific migrations (add as needed)
+        if (oldSchemaVersion < 2) {
+          debugPrint('  📦 Migrating v1 -> v2');
+          // v1 -> v2: Initial person/transaction schema
+        }
+        if (oldSchemaVersion < 3) {
+          debugPrint('  📦 Migrating v2 -> v3: Added budgets and goals');
+          // v2 -> v3: Added budgets and savings goals
+        }
+        if (oldSchemaVersion < 4) {
+          debugPrint('  📦 Migrating v3 -> v4: Added goalId to transactions');
+          // v3 -> v4: Added goalId field to transactions
+        }
+        
+        debugPrint('✅ Migration completed successfully');
       },
     );
     

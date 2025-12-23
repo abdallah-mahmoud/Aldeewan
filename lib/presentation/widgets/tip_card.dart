@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/config/app_colors.dart';
@@ -44,11 +45,11 @@ class TipCard extends ConsumerWidget {
     final tipColor = color ?? AppColors.info;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: tipColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: tipColor.withValues(alpha: 0.3),
           width: 1,
@@ -60,9 +61,9 @@ class TipCard extends ConsumerWidget {
           Icon(
             icon,
             color: tipColor,
-            size: 20,
+            size: 20.sp,
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,7 +93,7 @@ class TipCard extends ConsumerWidget {
           IconButton(
             icon: Icon(
               LucideIcons.x,
-              size: 16,
+              size: 16.sp,
               color: theme.colorScheme.onSurfaceVariant,
             ),
             onPressed: () {

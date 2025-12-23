@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aldeewan_mobile/presentation/widgets/person_statement_report.dart';
 import 'package:aldeewan_mobile/presentation/widgets/cash_flow_report.dart';
@@ -59,31 +60,33 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
             ),
         ],
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
+          preferredSize: Size.fromHeight(60.h),
           child: Container(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            margin: EdgeInsets.fromLTRB(16.w, 0, 16.w, 8.h),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.r),
             ),
             child: TabBar(
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.tab,
               indicator: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(12.r),
+                color: Theme.of(context).colorScheme.primaryContainer,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
+                    color: Colors.black.withValues(alpha: 0.12),
+                    blurRadius: 8.r,
+                    offset: Offset(0, 3.h),
                   ),
                 ],
+                border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), width: 1),
               ),
-              labelColor: Theme.of(context).colorScheme.onSurface,
+              labelColor: Theme.of(context).colorScheme.onPrimaryContainer,
+              labelStyle: const TextStyle(fontWeight: FontWeight.bold),
               unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
               dividerColor: Colors.transparent,
-              padding: const EdgeInsets.all(4),
+              padding: EdgeInsets.all(4.w),
               tabs: [
                 Tab(text: l10n.personStatement),
                 Tab(text: l10n.cashFlow),

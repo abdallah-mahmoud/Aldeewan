@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 import 'package:uuid/uuid.dart';
@@ -226,9 +227,9 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 16,
-        right: 16,
-        top: 16,
+        left: 16.w,
+        right: 16.w,
+        top: 16.h,
       ),
       child: SingleChildScrollView(
         child: Form(
@@ -242,7 +243,7 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
               style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             DropdownButtonFormField<TransactionType>(
               initialValue: _type,
               decoration: InputDecoration(
@@ -272,7 +273,7 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
                 }
               },
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             TextFormField(
               controller: _amountController,
               decoration: InputDecoration(
@@ -292,7 +293,7 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
                 return null;
               },
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             InkWell(
               onTap: () {
                 // Determine filter type based on transaction type
@@ -337,7 +338,7 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             InkWell(
               onTap: () => _selectDate(context),
               child: InputDecorator(
@@ -354,7 +355,7 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             TextFormField(
               controller: _noteController,
               decoration: InputDecoration(
@@ -362,12 +363,12 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
                 border: const OutlineInputBorder(),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             ElevatedButton(
               onPressed: () => _save(l10n),
               child: Text(l10n.save),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
           ],
         ),
         ),

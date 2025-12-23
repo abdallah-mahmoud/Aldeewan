@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -32,21 +33,37 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin 
   @override
   String get screenTourId => 'home';
   
-  void _checkInitialBalancePrompt() {
+  void _checkInitialBalancePrompt() async {
     if (_hasCheckedInitialBalance) return;
     _hasCheckedInitialBalance = true;
     
     final onboarding = ref.read(onboardingServiceProvider);
+    
+    // Step 1: Show initial balance dialog if not shown
     if (!onboarding.isInitialBalancePromptShown) {
-      // Show dialog after build completes
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          showDialog(
-            context: context,
-            barrierDismissible: true, // Skippable by tapping outside
-            builder: (_) => const InitialBalanceDialog(),
-          );
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        if (!mounted) return;
+        
+        await showDialog<bool>(
+          context: context,
+          barrierDismissible: false, // Force user action to prevent conflict with tour
+          builder: (_) => const InitialBalanceDialog(),
+        );
+        
+        // Mark as shown after dialog completes
+        await onboarding.markInitialBalancePromptShown();
+        
+        // Step 2: Start tour AFTER dialog closes
+        if (!onboarding.isTourCompleted && mounted) {
+          // Short delay to ensure dialog is fully dismissed
+          await Future.delayed(const Duration(milliseconds: 300));
+          if (mounted) startTourIfNeeded();
         }
+      });
+    } else if (!onboarding.isTourCompleted) {
+      // If balance already shown but tour not done, start tour
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) startTourIfNeeded();
       });
     }
   }
@@ -67,7 +84,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin 
         return Scaffold(
           body: SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20.0),
+              padding: EdgeInsets.all(20.w),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -87,7 +104,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin 
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4.h),
                             Text(
                               l10n.tagline,
                               style: theme.textTheme.bodyMedium?.copyWith(
@@ -98,18 +115,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin 
                           ],
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      SizedBox(width: 16.w),
                       InkWell(
                         onTap: () {
                           ref.read(soundServiceProvider).playClick();
                           context.push('/notifications');
                         },
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(12.r),
                         child: Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: EdgeInsets.all(8.w),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
                           ),
                           child: Icon(LucideIcons.bell, color: theme.colorScheme.onSurface),
@@ -117,7 +134,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin 
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
 
                   // Hero Section (Net Position + Range Filter) - Tour Target
                   ShowcaseTarget(
@@ -126,15 +143,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin 
                     description: l10n.tourDashboard,
                     child: const HeroSection(),
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: 16.h),
 
                   // Budget & Goals Buttons
                   const DashboardButtons(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
 
                   // Summary Stats Grid
                   const SummaryGrid(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
 
                   // Quick Actions - Tour Target Step 2
                   ShowcaseTarget(
@@ -143,15 +160,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin 
                     description: l10n.tourAddTransaction,
                     child: const QuickActions(),
                   ),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   
                   // Tip Card for Quick Actions
                   const QuickActionsTip(),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
 
                   // Recent Transactions
                   const RecentTransactions(),
-                  const SizedBox(height: 32),
+                  SizedBox(height: 32.h),
 
                   // Accounts Section
                   const AccountsSection(),

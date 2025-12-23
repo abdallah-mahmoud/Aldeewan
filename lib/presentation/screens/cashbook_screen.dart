@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
@@ -30,6 +31,10 @@ class CashbookScreen extends ConsumerStatefulWidget {
 
 class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTourMixin {
   bool _initialActionHandled = false;
+  
+  // Pagination: initial display count, increases on "Load More"
+  static const int _pageSize = 50;
+  int _displayCount = _pageSize;
 
   @override
   List<GlobalKey> get showcaseKeys => ShowcaseKeys.cashbookKeys;
@@ -191,7 +196,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
               children: [
                 // Search bar - Tour Target Step 5
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                  padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 4.h),
                   child: ShowcaseTarget(
                     showcaseKey: ShowcaseKeys.searchBar,
                     title: l10n.tourWelcome,
@@ -210,29 +215,29 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                   title: l10n.tourWelcome,
                   description: l10n.tourCashbook,
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                    padding: EdgeInsets.fromLTRB(16.w, 4.h, 16.w, 8.h),
                     child: Row(
                       children: [
                       // Type filter dropdown
                       Expanded(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          padding: EdgeInsets.symmetric(horizontal: 12.w),
                           decoration: BoxDecoration(
                             color: theme.colorScheme.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(12.r),
                           ),
                           child: DropdownButtonHideUnderline(
                             child: DropdownButton<CashFilter>(
                               value: filter,
                               isExpanded: true,
-                              icon: Icon(LucideIcons.chevronDown, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                              icon: Icon(LucideIcons.chevronDown, size: 18.sp, color: theme.colorScheme.onSurfaceVariant),
                               items: [
                                 DropdownMenuItem(
                                   value: CashFilter.all,
                                   child: Row(
                                     children: [
-                                      Icon(LucideIcons.list, size: 16, color: theme.colorScheme.primary),
-                                      const SizedBox(width: 8),
+                                      Icon(LucideIcons.list, size: 16.sp, color: theme.colorScheme.primary),
+                                      SizedBox(width: 8.w),
                                       Text(l10n.allTransactions),
                                     ],
                                   ),
@@ -241,8 +246,8 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                                   value: CashFilter.income,
                                   child: Row(
                                     children: [
-                                      Icon(LucideIcons.arrowDownLeft, size: 16, color: AppColors.success),
-                                      const SizedBox(width: 8),
+                                      Icon(LucideIcons.arrowDownLeft, size: 16.sp, color: AppColors.success),
+                                      SizedBox(width: 8.w),
                                       Text(l10n.income),
                                     ],
                                   ),
@@ -251,8 +256,8 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                                   value: CashFilter.expense,
                                   child: Row(
                                     children: [
-                                      Icon(LucideIcons.arrowUpRight, size: 16, color: AppColors.error),
-                                      const SizedBox(width: 8),
+                                      Icon(LucideIcons.arrowUpRight, size: 16.sp, color: AppColors.error),
+                                      SizedBox(width: 8.w),
                                       Text(l10n.expense),
                                     ],
                                   ),
@@ -267,7 +272,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                           ),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12.w),
                       // Date filter dropdown
                       Expanded(
                         child: Container(
@@ -286,8 +291,8 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                                   value: DateRangePreset.all,
                                   child: Row(
                                     children: [
-                                      Icon(LucideIcons.infinity, size: 16, color: theme.colorScheme.primary),
-                                      const SizedBox(width: 8),
+                                      Icon(LucideIcons.infinity, size: 16.sp, color: theme.colorScheme.primary),
+                                      SizedBox(width: 8.w),
                                       Text(l10n.all),
                                     ],
                                   ),
@@ -296,8 +301,8 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                                   value: DateRangePreset.today,
                                   child: Row(
                                     children: [
-                                      Icon(LucideIcons.calendarCheck, size: 16, color: theme.colorScheme.primary),
-                                      const SizedBox(width: 8),
+                                      Icon(LucideIcons.calendarCheck, size: 16.sp, color: theme.colorScheme.primary),
+                                      SizedBox(width: 8.w),
                                       Text(l10n.today),
                                     ],
                                   ),
@@ -306,8 +311,8 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                                   value: DateRangePreset.thisWeek,
                                   child: Row(
                                     children: [
-                                      Icon(LucideIcons.calendarDays, size: 16, color: theme.colorScheme.primary),
-                                      const SizedBox(width: 8),
+                                      Icon(LucideIcons.calendarDays, size: 16.sp, color: theme.colorScheme.primary),
+                                      SizedBox(width: 8.w),
                                       Text(l10n.thisWeek),
                                     ],
                                   ),
@@ -316,8 +321,8 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                                   value: DateRangePreset.thisMonth,
                                   child: Row(
                                     children: [
-                                      Icon(LucideIcons.calendar, size: 16, color: theme.colorScheme.primary),
-                                      const SizedBox(width: 8),
+                                      Icon(LucideIcons.calendar, size: 16.sp, color: theme.colorScheme.primary),
+                                      SizedBox(width: 8.w),
                                       Text(l10n.thisMonth),
                                     ],
                                   ),
@@ -326,8 +331,8 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                                   value: DateRangePreset.custom,
                                   child: Row(
                                     children: [
-                                      Icon(LucideIcons.calendarRange, size: 16, color: theme.colorScheme.primary),
-                                      const SizedBox(width: 8),
+                                      Icon(LucideIcons.calendarRange, size: 16.sp, color: theme.colorScheme.primary),
+                                      SizedBox(width: 8.w),
                                       Text(datePreset == DateRangePreset.custom 
                                           ? _formatDateRange(ref.watch(customDateRangeProvider))
                                           : l10n.custom),
@@ -400,7 +405,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                     ),
                   ),
                 ),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 // Filter transactions tip
                 const FilterTransactionsTip(),
                 const Divider(height: 1),
@@ -412,125 +417,179 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                           icon: LucideIcons.history,
                           lottieAsset: 'assets/animations/empty_list.json',
                         )
-                      : ListView.separated(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: filteredTransactions.length,
-                          separatorBuilder: (context, index) => const SizedBox(height: 8),
-                          itemBuilder: (context, index) {
-                            final tx = filteredTransactions[index];
-                            // Income = cash came in (including borrowed money)
-                            final isIncome = tx.type == TransactionType.paymentReceived ||
-                                tx.type == TransactionType.cashSale ||
-                                tx.type == TransactionType.cashIncome ||
-                                tx.type == TransactionType.debtTaken; // Borrowed = cash in
-                            
-                            String? personName;
-                            if (tx.personId != null) {
-                              try {
-                                final persons = ledgerAsync.value?.persons ?? [];
-                                final person = persons.firstWhere((p) => p.id == tx.personId);
-                                personName = person.name;
-                              } catch (_) {}
-                            }
-
-                            // Find category
-                            final category = categories.where((c) => c.name == tx.category).firstOrNull;
-
-                            return Card(
-                              margin: EdgeInsets.zero,
-                              elevation: 0,
-                              color: theme.cardTheme.color,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                side: BorderSide(color: theme.dividerColor.withValues(alpha: 0.05)),
-                              ),
-                              child: ListTile(
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => TransactionDetailsScreen(transaction: tx),
-                                    ),
-                                  );
-                                },
-                                leading: Container(
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: category != null 
-                                        ? category.color.withValues(alpha: 0.1)
-                                        : (isIncome ? AppColors.success.withValues(alpha: 0.1) : AppColors.error.withValues(alpha: 0.1)),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Icon(
-                                    category != null ? category.icon : (isIncome ? LucideIcons.arrowDownLeft : LucideIcons.arrowUpRight),
-                                    color: category != null ? category.color : (isIncome ? AppColors.success : AppColors.error),
-                                    size: 20,
-                                  ),
-                                ),
-                                title: Text(
-                                  category != null ? CategoryHelper.getLocalizedCategory(category.name, l10n) : _getTransactionLabel(tx.type, l10n),
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const SizedBox(height: 4),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          DateFormat.yMMMd().format(tx.date),
-                                          style: Theme.of(context).textTheme.bodySmall,
-                                        ),
-                                        if (personName != null) ...[
-                                          const SizedBox(width: 8),
-                                          Icon(LucideIcons.user, size: 12, color: theme.colorScheme.onSurfaceVariant),
-                                          const SizedBox(width: 4),
-                                          Expanded(
-                                            child: Text(
-                                              personName,
-                                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                                color: theme.colorScheme.onSurfaceVariant,
-                                                fontStyle: FontStyle.italic,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ],
-                                    ),
-                                    if (tx.note != null && tx.note!.isNotEmpty) ...[
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        tx.note!,
-                                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                          color: theme.colorScheme.onSurfaceVariant,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                                trailing: Text(
-                                  '$currency ${numberFormat.format(tx.amount)}',
-                                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: isIncome ? AppColors.success : AppColors.error,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+                      : _buildPaginatedList(
+                          context: context,
+                          theme: theme,
+                          l10n: l10n,
+                          filteredTransactions: filteredTransactions,
+                          ledgerAsync: ledgerAsync,
+                          categories: categories,
+                          currency: currency,
+                          numberFormat: numberFormat,
                         ),
                 ),
               ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddCashEntryModal(context, ref),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: filteredTransactions.isEmpty && ref.watch(cashbookSearchProvider).isEmpty
+          ? null
+          : FloatingActionButton(
+              onPressed: () => _showAddCashEntryModal(context, ref),
+              child: Icon(Icons.add, size: 24.sp),
+            ),
     );
+      },
+    );
+  }
+
+  /// Builds a paginated ListView with "Load More" button
+  Widget _buildPaginatedList({
+    required BuildContext context,
+    required ThemeData theme,
+    required AppLocalizations l10n,
+    required List<Transaction> filteredTransactions,
+    required AsyncValue<dynamic> ledgerAsync,
+    required List<dynamic> categories,
+    required String currency,
+    required NumberFormat numberFormat,
+  }) {
+    // Reset display count if filter changed and list is smaller
+    final effectiveDisplayCount = _displayCount.clamp(0, filteredTransactions.length);
+    final displayedTransactions = filteredTransactions.take(effectiveDisplayCount).toList();
+    final hasMore = filteredTransactions.length > effectiveDisplayCount;
+    final remaining = filteredTransactions.length - effectiveDisplayCount;
+    
+    return ListView.builder(
+      padding: EdgeInsets.all(16.w),
+      // +1 for Load More button if there are more items
+      itemCount: displayedTransactions.length + (hasMore ? 1 : 0),
+      itemBuilder: (context, index) {
+        // Load More button at the end
+        if (index == displayedTransactions.length) {
+          return Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.h),
+            child: Center(
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  setState(() {
+                    _displayCount += _pageSize;
+                  });
+                },
+                icon: Icon(LucideIcons.chevronsDown, size: 18.sp),
+                label: Text(
+                  '${l10n.loadMore} ($remaining ${l10n.moreItems})',
+                ),
+              ),
+            ),
+          );
+        }
+        
+        final tx = displayedTransactions[index];
+        // Income = cash came in (including borrowed money)
+        final isIncome = tx.type == TransactionType.paymentReceived ||
+            tx.type == TransactionType.cashSale ||
+            tx.type == TransactionType.cashIncome ||
+            tx.type == TransactionType.debtTaken;
+        
+        String? personName;
+        if (tx.personId != null) {
+          try {
+            final persons = ledgerAsync.value?.persons ?? [];
+            final person = persons.firstWhere((p) => p.id == tx.personId);
+            personName = person.name;
+          } catch (_) {}
+        }
+
+        // Find category
+        final category = categories.where((c) => c.name == tx.category).firstOrNull;
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: 8.h),
+          child: Card(
+            margin: EdgeInsets.zero,
+            elevation: 0,
+            color: theme.cardTheme.color,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12.r),
+              side: BorderSide(color: theme.dividerColor.withValues(alpha: 0.05)),
+            ),
+            child: ListTile(
+              contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => TransactionDetailsScreen(transaction: tx),
+                  ),
+                );
+              },
+              leading: Container(
+                padding: EdgeInsets.all(10.w),
+                decoration: BoxDecoration(
+                  color: category != null 
+                      ? category.color.withValues(alpha: 0.1)
+                      : (isIncome ? AppColors.success.withValues(alpha: 0.1) : AppColors.error.withValues(alpha: 0.1)),
+                  borderRadius: BorderRadius.circular(12.r),
+                ),
+                child: Icon(
+                  category != null ? category.icon : (isIncome ? LucideIcons.arrowDownLeft : LucideIcons.arrowUpRight),
+                  color: category != null ? category.color : (isIncome ? AppColors.success : AppColors.error),
+                  size: 20.sp,
+                ),
+              ),
+              title: Text(
+                category != null ? CategoryHelper.getLocalizedCategory(category.name, l10n) : _getTransactionLabel(tx.type, l10n),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 4.h),
+                  Row(
+                    children: [
+                      Text(
+                        DateFormat.yMMMd().format(tx.date),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                      if (personName != null) ...[
+                        SizedBox(width: 8.w),
+                        Icon(LucideIcons.user, size: 12.sp, color: theme.colorScheme.onSurfaceVariant),
+                        SizedBox(width: 4.w),
+                        Expanded(
+                          child: Text(
+                            personName,
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontStyle: FontStyle.italic,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                  if (tx.note != null && tx.note!.isNotEmpty) ...[
+                    SizedBox(height: 2.h),
+                    Text(
+                      tx.note!,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ],
+              ),
+              trailing: Text(
+                '$currency ${numberFormat.format(tx.amount)}',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: isIncome ? AppColors.success : AppColors.error,
+                ),
+              ),
+            ),
+          ),
+        );
       },
     );
   }
@@ -551,7 +610,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
           label,
           style: theme.textTheme.bodySmall,
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: 4.h),
         FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(

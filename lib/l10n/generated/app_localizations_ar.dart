@@ -751,6 +751,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get budgetNotFound => 'الميزانية غير موجودة';
 
   @override
+  String get sortBy => 'ترتيب حسب';
+
+  @override
+  String get sortNewest => 'الأحدث أولاً';
+
+  @override
+  String get sortOldest => 'الأقدم أولاً';
+
+  @override
+  String get sortHighestAmount => 'الأعلى مبلغاً';
+
+  @override
+  String get sortLowestAmount => 'الأقل مبلغاً';
+
+  @override
   String get goalExceededError =>
       'لا يمكن إضافة الأموال. إجمالي المدخرات سيتجاوز المبلغ المستهدف.';
 
@@ -891,7 +906,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tipPersonBalance => 'اضغط على الشخص تشوف حسابه';
 
   @override
-  String get tipBudgetAlert => 'هنبلغك لو صرفت كتير';
+  String get tipBudgetAlert => 'سنذكرك عند اقتراب ميزانيتك';
 
   @override
   String get tipGoalProgress => 'تابع توفيرك هنا';
@@ -1031,4 +1046,10 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get faqWhereIsDataAnswer =>
       'يتم تخزين بياناتك محلياً على جهازك في قاعدة بيانات مشفرة. لا تغادر بياناتك جهازك أبداً إلا إذا اخترت النسخ الاحتياطي للسحابة.';
+
+  @override
+  String get loadMore => 'تحميل المزيد';
+
+  @override
+  String get moreItems => 'المزيد';
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:lottie/lottie.dart';
 
@@ -27,24 +28,24 @@ class EmptyState extends StatelessWidget {
     return Center(
       child: SingleChildScrollView(
         child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: EdgeInsets.all(32.w),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (lottieAsset != null)
               Lottie.asset(
                 lottieAsset!,
-                width: 200,
-                height: 200,
+                width: 200.w,
+                height: 200.h,
                 fit: BoxFit.contain,
               )
             else
               Icon(
                 icon ?? LucideIcons.inbox,
-                size: 64,
+                size: 64.sp,
                 color: theme.colorScheme.onSurface.withValues(alpha: 0.2),
               ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             if (title != null) ...[
               Text(
                 title!,
@@ -64,7 +65,7 @@ class EmptyState extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             if (onAction != null && actionLabel != null) ...[
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
               FilledButton(
                 onPressed: onAction,
                 child: Text(actionLabel!),

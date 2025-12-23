@@ -79,9 +79,14 @@ class SoundService {
   /// Play sound on dedicated player without awaiting to minimize latency.
   /// Fire-and-forget pattern for UI sounds.
   void _playOnPlayer(AudioPlayer player, String assetPath) {
-    // Don't await - fire and forget for minimal latency
-    player.play(AssetSource(assetPath)).catchError((_) {
-      // Ignore errors (e.g. asset not found) to not crash app
+    // Stop first to reset player state and prevent it from getting stuck
+    player.stop().then((_) {
+      player.play(AssetSource(assetPath)).catchError((_) {
+        // Ignore errors (e.g. asset not found) to not crash app
+      });
+    }).catchError((_) {
+      // If stop fails, try playing anyway
+      player.play(AssetSource(assetPath)).catchError((_) {});
     });
   }
 

@@ -1520,6 +1520,36 @@ abstract class AppLocalizations {
   /// **'Budget not found'**
   String get budgetNotFound;
 
+  /// No description provided for @sortBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort by'**
+  String get sortBy;
+
+  /// No description provided for @sortNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest First'**
+  String get sortNewest;
+
+  /// No description provided for @sortOldest.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest First'**
+  String get sortOldest;
+
+  /// No description provided for @sortHighestAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Highest Amount'**
+  String get sortHighestAmount;
+
+  /// No description provided for @sortLowestAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest Amount'**
+  String get sortLowestAmount;
+
   /// No description provided for @goalExceededError.
   ///
   /// In en, this message translates to:
@@ -1773,7 +1803,7 @@ abstract class AppLocalizations {
   /// No description provided for @tipBudgetAlert.
   ///
   /// In en, this message translates to:
-  /// **'We\'ll tell you if you spend too much'**
+  /// **'We\'ll remind you when nearing your budget'**
   String get tipBudgetAlert;
 
   /// No description provided for @tipGoalProgress.
@@ -2033,6 +2063,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your data is stored locally on your device in an encrypted database. It never leaves your device unless you choose to backup to cloud.'**
   String get faqWhereIsDataAnswer;
+
+  /// No description provided for @loadMore.
+  ///
+  /// In en, this message translates to:
+  /// **'Load More'**
+  String get loadMore;
+
+  /// No description provided for @moreItems.
+  ///
+  /// In en, this message translates to:
+  /// **'more'**
+  String get moreItems;
 }
 
 class _AppLocalizationsDelegate

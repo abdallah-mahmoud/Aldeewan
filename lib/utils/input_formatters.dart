@@ -5,7 +5,8 @@ import 'package:intl/intl.dart';
 /// Use AFTER FilteringTextInputFormatter to strip non-digits.
 class CommaSeparatorFormatter extends TextInputFormatter {
   final bool allowFraction;
-  final NumberFormat _formatter = NumberFormat.decimalPattern();
+  // Static to avoid creating new NumberFormat on every keystroke
+  static final NumberFormat _formatter = NumberFormat.decimalPattern();
 
   CommaSeparatorFormatter({this.allowFraction = false});
 

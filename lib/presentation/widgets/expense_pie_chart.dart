@@ -14,10 +14,24 @@ class ExpensePieChart extends StatefulWidget {
 
 class _ExpensePieChartState extends State<ExpensePieChart> {
   int touchedIndex = -1;
+  
+  // Memoization: cache expensive calculation
+  Map<String, double>? _cachedGroupedExpenses;
+  List<Transaction>? _lastTransactions;
+
+  Map<String, double> _getGroupedExpenses() {
+    // Return cached if transactions haven't changed (same list reference)
+    if (_lastTransactions == widget.transactions && _cachedGroupedExpenses != null) {
+      return _cachedGroupedExpenses!;
+    }
+    _lastTransactions = widget.transactions;
+    _cachedGroupedExpenses = _groupExpensesByCategory();
+    return _cachedGroupedExpenses!;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final groupedExpenses = _groupExpensesByCategory();
+    final groupedExpenses = _getGroupedExpenses();
     final l10n = AppLocalizations.of(context)!;
     
     if (groupedExpenses.isEmpty) {
@@ -27,40 +41,48 @@ class _ExpensePieChartState extends State<ExpensePieChart> {
       );
     }
 
-    return AspectRatio(
-      aspectRatio: 1.3,
-      child: Row(
-        children: [
-          const SizedBox(height: 18),
-          Expanded(
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: PieChart(
-                PieChartData(
-                  pieTouchData: PieTouchData(
-                    touchCallback: (FlTouchEvent event, pieTouchResponse) {
-                      setState(() {
-                        if (!event.isInterestedForInteractions ||
-                            pieTouchResponse == null ||
-                            pieTouchResponse.touchedSection == null) {
-                          touchedIndex = -1;
-                          return;
-                        }
-                        touchedIndex = pieTouchResponse
-                            .touchedSection!.touchedSectionIndex;
-                      });
-                    },
+    // Build semantic label for accessibility
+    final semanticParts = groupedExpenses.entries
+        .map((e) => '${e.key}: ${e.value.toStringAsFixed(0)}')
+        .join(', ');
+
+    return Semantics(
+      label: '${l10n.expenseBreakdown}: $semanticParts',
+      child: AspectRatio(
+        aspectRatio: 1.3,
+        child: Row(
+          children: [
+            const SizedBox(height: 18),
+            Expanded(
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: PieChart(
+                  PieChartData(
+                    pieTouchData: PieTouchData(
+                      touchCallback: (FlTouchEvent event, pieTouchResponse) {
+                        setState(() {
+                          if (!event.isInterestedForInteractions ||
+                              pieTouchResponse == null ||
+                              pieTouchResponse.touchedSection == null) {
+                            touchedIndex = -1;
+                            return;
+                          }
+                          touchedIndex = pieTouchResponse
+                              .touchedSection!.touchedSectionIndex;
+                        });
+                      },
+                    ),
+                    borderData: FlBorderData(show: false),
+                    sectionsSpace: 0,
+                    centerSpaceRadius: 40,
+                    sections: _showingSections(groupedExpenses),
                   ),
-                  borderData: FlBorderData(show: false),
-                  sectionsSpace: 0,
-                  centerSpaceRadius: 40,
-                  sections: _showingSections(groupedExpenses),
                 ),
               ),
             ),
-          ),
-          const SizedBox(width: 28),
-        ],
+            const SizedBox(width: 28),
+          ],
+        ),
       ),
     );
   }

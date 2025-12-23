@@ -7,7 +7,7 @@ import 'package:aldeewan_mobile/presentation/widgets/empty_state.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/utils/input_formatters.dart';
-import 'package:intl/intl.dart';
+import 'package:aldeewan_mobile/utils/currency_formatter.dart';
 
 class GoalList extends ConsumerWidget {
   const GoalList({super.key});
@@ -17,7 +17,6 @@ class GoalList extends ConsumerWidget {
     final budgetState = ref.watch(budgetProvider);
     final currency = ref.watch(currencyProvider);
     final l10n = AppLocalizations.of(context)!;
-    final formatter = NumberFormat('#,##0.##');
 
     if (budgetState.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -51,7 +50,7 @@ class GoalList extends ConsumerWidget {
                   color: Theme.of(context).colorScheme.primary,
                 ),
                 const SizedBox(height: 4),
-                Text('$currency ${formatter.format(goal.currentSaved)} / $currency ${formatter.format(goal.targetAmount)}'),
+                Text('${CurrencyFormatter.format(goal.currentSaved, currency)} / ${CurrencyFormatter.format(goal.targetAmount, currency)}'),
               ],
             ),
             trailing: IconButton(
