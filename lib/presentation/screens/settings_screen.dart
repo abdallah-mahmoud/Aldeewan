@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
@@ -27,6 +28,7 @@ import 'package:aldeewan_mobile/presentation/widgets/settings/settings_section.d
 import 'package:aldeewan_mobile/presentation/widgets/settings/settings_tile.dart';
 import 'package:aldeewan_mobile/presentation/widgets/settings/theme_selector.dart';
 import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
+import 'package:aldeewan_mobile/presentation/widgets/currency_selector_sheet.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -52,7 +54,7 @@ class SettingsScreen extends ConsumerWidget {
         elevation: 0,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 40),
+        padding: EdgeInsets.only(bottom: 40.h),
         child: Column(
           children: [
             // Appearance Section
@@ -73,7 +75,7 @@ class SettingsScreen extends ConsumerWidget {
                   trailing: DropdownButton<Locale>(
                     value: locale,
                     underline: const SizedBox(),
-                    icon: const Icon(Icons.chevron_right, size: 20, color: Colors.grey),
+                    icon: Icon(Icons.chevron_right, size: 20.sp, color: Colors.grey),
                     onChanged: (Locale? newValue) {
                       if (newValue != null) {
                         ref.read(localeProvider.notifier).setLocale(newValue);
@@ -177,7 +179,6 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
 
-            // General Section
             SettingsSection(
               title: l10n.general,
               children: [
@@ -185,25 +186,29 @@ class SettingsScreen extends ConsumerWidget {
                   icon: LucideIcons.banknote,
                   iconColor: Colors.green,
                   title: l10n.currency,
-                  trailing: DropdownButton<String>(
-                    value: currency,
-                    underline: const SizedBox(),
-                    icon: const Icon(Icons.chevron_right, size: 20, color: Colors.grey),
-                    onChanged: (String? newValue) {
-                      if (newValue != null) {
-                        ref.read(currencyProvider.notifier).setCurrency(newValue);
-                      }
-                    },
-                    items: [
-                      DropdownMenuItem(value: 'QAR', child: Text(l10n.currencyQAR)),
-                      DropdownMenuItem(value: 'SAR', child: Text(l10n.currencySAR)),
-                      DropdownMenuItem(value: 'EGP', child: Text(l10n.currencyEGP)),
-                      DropdownMenuItem(value: 'SDG', child: Text(l10n.currencySDG)),
-                      DropdownMenuItem(value: 'KWD', child: Text(l10n.currencyKWD)),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        currency,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: 4.w),
+                      Icon(LucideIcons.chevronRight, size: 20.sp, color: theme.colorScheme.onSurfaceVariant),
                     ],
                   ),
+                  onTap: () async {
+                    final selected = await CurrencySelectorSheet.show(context, currency);
+                    if (selected != null) {
+                      ref.read(currencyProvider.notifier).setCurrency(selected);
+                    }
+                  },
                 ),
-                const Divider(height: 1, indent: 60),
+                const Divider(height: 1, indent: 60), // Not apply .w here usually for consistency, but let's check others. Wait, usually indent is fixed or .w. Let's use 60.w.
+
                 SettingsTile(
                   icon: LucideIcons.lock,
                   iconColor: Colors.blue,
@@ -250,7 +255,7 @@ class SettingsScreen extends ConsumerWidget {
                   title: l10n.restoreFromCloud,
                   subtitle: l10n.restoreFromCloudSubtitle,
                   trailing: IconButton(
-                    icon: Icon(LucideIcons.helpCircle, size: 20, color: Colors.grey),
+                    icon: Icon(LucideIcons.helpCircle, size: 20.sp, color: Colors.grey),
                     onPressed: () => _showRestoreHelpDialog(context),
                   ),
                   onTap: () => _restoreData(context, ref),
@@ -298,15 +303,15 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
 
-            const SizedBox(height: 32),
+            SizedBox(height: 32.h),
             Center(
               child: Column(
                 children: [
                   Text(
-                    l10n.appVersionInfo('2.0.0'),
+                    l10n.appVersionInfo('2.1.0'),
                     style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: 4.h),
                   Text(
                     l10n.madeWithLove,
                     style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
@@ -327,16 +332,16 @@ class SettingsScreen extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
         icon: Container(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(12.w),
           decoration: BoxDecoration(
             color: theme.colorScheme.primary.withValues(alpha: 0.1),
             shape: BoxShape.circle,
           ),
           child: Icon(
             LucideIcons.download,
-            size: 28,
+            size: 28.sp,
             color: theme.colorScheme.primary,
           ),
         ),
@@ -350,13 +355,13 @@ class SettingsScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(l10n.restoreHelpStep1, style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Text(l10n.restoreHelpStep2, style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Text(l10n.restoreHelpStep3, style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Text(l10n.restoreHelpStep4, style: theme.textTheme.bodyMedium),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Text(l10n.restoreHelpStep5, style: theme.textTheme.bodyMedium),
           ],
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -44,7 +45,7 @@ class _CashFlowReportState extends ConsumerState<CashFlowReport> {
     final formatter = NumberFormat('#,##0.##');
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -69,7 +70,7 @@ class _CashFlowReportState extends ConsumerState<CashFlowReport> {
               }
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
           FilledButton.icon(
             onPressed: _dateRange != null
                 ? () {
@@ -80,9 +81,9 @@ class _CashFlowReportState extends ConsumerState<CashFlowReport> {
             label: Text(l10n.generateReport),
           ),
           if (_generated) ...[
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             const Divider(),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             Text(
               l10n.cashFlowReport,
               style: Theme.of(context).textTheme.titleLarge,
@@ -94,34 +95,58 @@ class _CashFlowReportState extends ConsumerState<CashFlowReport> {
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 24),
-            IncomeExpenseBarChart(income: _totalIncome, expense: _totalExpense),
-            const SizedBox(height: 24),
-            if (_totalExpense > 0) ...[
-              Text(
-                l10n.expenseBreakdown,
-                style: Theme.of(context).textTheme.titleMedium,
-                textAlign: TextAlign.center,
+            SizedBox(height: 24.h),
+            if (_totalIncome == 0 && _totalExpense == 0) ...[
+              Padding(
+                padding: EdgeInsets.symmetric(vertical: 32.h),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      LucideIcons.fileX,
+                      size: 48.sp,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    SizedBox(height: 16.h),
+                    Text(
+                      l10n.noEntriesYet,
+                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 16),
-              ExpensePieChart(transactions: _transactions),
+            ] else ...[
+              IncomeExpenseBarChart(income: _totalIncome, expense: _totalExpense),
+              SizedBox(height: 24.h),
+              if (_totalExpense > 0) ...[
+                Text(
+                  l10n.expenseBreakdown,
+                  style: Theme.of(context).textTheme.titleMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ExpensePieChart(transactions: _transactions),
+                const SizedBox(height: 24),
+              ],
+              const SizedBox(height: 12),
+              _buildSummaryCard(l10n.totalExpense, _totalExpense, AppColors.error, currency, formatter),
+              const SizedBox(height: 12),
+              _buildSummaryCard(
+                  l10n.netProfitLoss,
+                  _totalIncome - _totalExpense,
+                  (_totalIncome - _totalExpense) >= 0 ? AppColors.success : AppColors.error,
+                  currency,
+                  formatter),
               const SizedBox(height: 24),
+              OutlinedButton.icon(
+                onPressed: _exportCsv,
+                icon: const Icon(LucideIcons.download),
+                label: Text(l10n.exportCsv),
+              ),
             ],
-            const SizedBox(height: 12),
-            _buildSummaryCard(l10n.totalExpense, _totalExpense, AppColors.error, currency, formatter),
-            const SizedBox(height: 12),
-            _buildSummaryCard(
-                l10n.netProfitLoss,
-                _totalIncome - _totalExpense,
-                (_totalIncome - _totalExpense) >= 0 ? AppColors.success : AppColors.error,
-                currency,
-                formatter),
-            const SizedBox(height: 24),
-            OutlinedButton.icon(
-              onPressed: _exportCsv,
-              icon: const Icon(LucideIcons.download),
-              label: Text(l10n.exportCsv),
-            ),
           ],
         ],
       ),
@@ -164,10 +189,10 @@ class _CashFlowReportState extends ConsumerState<CashFlowReport> {
   Widget _buildSummaryCard(String label, double amount, Color color, String currency, NumberFormat formatter) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
         color: theme.cardTheme.color,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(12.r),
         border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
       ),
       child: Row(

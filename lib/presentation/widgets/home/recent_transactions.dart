@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:aldeewan_mobile/utils/currency_formatter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
-import 'package:aldeewan_mobile/presentation/widgets/empty_state.dart';
 import 'package:aldeewan_mobile/config/app_colors.dart';
 import 'package:aldeewan_mobile/utils/animation_extensions.dart';
 
@@ -22,17 +22,28 @@ class RecentTransactions extends ConsumerWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    String formatCurrency(double amount) {
-      final isSDG = currency == 'SDG';
-      return NumberFormat.currency(symbol: currency, decimalDigits: isSDG ? 0 : 2).format(amount);
-    }
 
     if (transactions.isEmpty) {
-      return EmptyState(
-        message: l10n.noEntriesYet,
-        icon: LucideIcons.history,
-        // TODO: Add 'assets/animations/empty_list.json'
-        lottieAsset: 'assets/animations/empty_list.json',
+      // Compact empty state for home screen - no large animation
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              LucideIcons.history,
+              size: 20,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              l10n.noEntriesYet,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
       );
     }
 
@@ -90,7 +101,7 @@ class RecentTransactions extends ConsumerWidget {
                 style: theme.textTheme.bodySmall,
               ),
               trailing: Text(
-                '${isPositive ? '+' : '-'} ${formatCurrency(tx.amount)}',
+                '${isPositive ? '+' : '-'} ${CurrencyFormatter.format(tx.amount, currency)}',
                 style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: isPositive ? AppColors.success : AppColors.error,

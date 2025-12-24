@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -54,7 +55,7 @@ class _PersonStatementReportState extends ConsumerState<PersonStatementReport> {
       error: (e, s) => Center(child: Text(l10n.errorOccurred(e.toString()))),
       data: (ledgerState) {
         return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16.w),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -64,7 +65,7 @@ class _PersonStatementReportState extends ConsumerState<PersonStatementReport> {
                 icon: LucideIcons.user,
                 onTap: () => _showPersonSelector(context, ledgerState.persons),
               ),
-              const SizedBox(height: 12),
+              SizedBox(height: 12.h),
               FilterActionTile(
                 label: l10n.dateRange,
                 value: _dateRange == null
@@ -86,7 +87,7 @@ class _PersonStatementReportState extends ConsumerState<PersonStatementReport> {
                   }
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               FilledButton.icon(
                 onPressed: _selectedPerson != null && _dateRange != null && !_isGenerating
                     ? () {
@@ -99,9 +100,9 @@ class _PersonStatementReportState extends ConsumerState<PersonStatementReport> {
                 label: Text(_isGenerating ? l10n.loading : l10n.generateReport),
               ),
               if (_generated) ...[
-                const SizedBox(height: 24),
+                SizedBox(height: 24.h),
                 const Divider(),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 Text(
                   l10n.statementFor(_selectedPerson!.name),
                   style: Theme.of(context).textTheme.titleLarge,
@@ -116,10 +117,10 @@ class _PersonStatementReportState extends ConsumerState<PersonStatementReport> {
                 const SizedBox(height: 16),
                 if (_statementTransactions.isNotEmpty) ...[
                   SizedBox(
-                    height: 200,
+                    height: 200.h,
                     child: _buildTrendChart(),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   const Divider(),
                   ListView.builder(
                     shrinkWrap: true,
@@ -137,13 +138,36 @@ class _PersonStatementReportState extends ConsumerState<PersonStatementReport> {
                   const Divider(),
                   _buildSummaryRow(
                       l10n.closingBalance, _calculateClosingBalance(), currency, formatter),
-                  const SizedBox(height: 8),
+                  SizedBox(height: 8.h),
                   _buildNetPositionRow(context, _calculateClosingBalance(), l10n),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24.h),
                   OutlinedButton.icon(
                     onPressed: _exportCsv,
                     icon: const Icon(LucideIcons.download),
                     label: Text(l10n.exportCsv),
+                  ),
+                ] else ...[
+                  // Empty state when no transactions found for person in date range
+                  Padding(
+                    padding: EdgeInsets.symmetric(vertical: 32.h),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          LucideIcons.fileX,
+                          size: 48.sp,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        ),
+                        SizedBox(height: 16.h),
+                        Text(
+                          l10n.noEntriesYet,
+                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:uuid/uuid.dart';
@@ -87,16 +88,16 @@ class _InitialBalanceDialogState extends ConsumerState<InitialBalanceDialog> {
     final currency = ref.watch(currencyProvider);
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24.r)),
       icon: Container(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16.w),
         decoration: BoxDecoration(
           color: theme.colorScheme.primary.withValues(alpha: 0.1),
           shape: BoxShape.circle,
         ),
         child: Icon(
           LucideIcons.wallet,
-          size: 32,
+          size: 32.sp,
           color: theme.colorScheme.primary,
         ),
       ),
@@ -120,7 +121,7 @@ class _InitialBalanceDialogState extends ConsumerState<InitialBalanceDialog> {
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
               // Cash on Hand field
               TextFormField(
                 controller: _cashController,
@@ -129,13 +130,13 @@ class _InitialBalanceDialogState extends ConsumerState<InitialBalanceDialog> {
                   prefixText: '$currency ',
                   prefixIcon: Icon(LucideIcons.banknote, color: theme.colorScheme.primary),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: amountFormatters(allowFraction: true),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               // Bank Balance field
               TextFormField(
                 controller: _bankController,
@@ -144,7 +145,7 @@ class _InitialBalanceDialogState extends ConsumerState<InitialBalanceDialog> {
                   prefixText: '$currency ',
                   prefixIcon: Icon(LucideIcons.landmark, color: theme.colorScheme.primary),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r),
                   ),
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -155,7 +156,7 @@ class _InitialBalanceDialogState extends ConsumerState<InitialBalanceDialog> {
         ),
       ),
       actionsAlignment: MainAxisAlignment.center,
-      actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      actionsPadding: EdgeInsets.fromLTRB(24.w, 0, 24.w, 24.h),
       actions: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -163,12 +164,12 @@ class _InitialBalanceDialogState extends ConsumerState<InitialBalanceDialog> {
             FilledButton(
               onPressed: () => _save(l10n),
               style: FilledButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                padding: EdgeInsets.symmetric(vertical: 16.h),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
               ),
               child: Text(l10n.letsGo),
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             TextButton(
               onPressed: _skip,
               child: Text(l10n.skipForNow),

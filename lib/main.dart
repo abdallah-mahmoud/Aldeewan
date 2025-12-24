@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -159,23 +160,30 @@ class _MyAppState extends ConsumerState<MyApp> with WidgetsBindingObserver {
     final locale = ref.watch(localeProvider);
     final router = ref.watch(routerProvider);
 
-    return MaterialApp.router(
-      title: 'Aldeewan',
-      debugShowCheckedModeBanner: false,
-      themeMode: themeMode,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      locale: locale,
-      supportedLocales: AppLocalizations.supportedLocales,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      routerConfig: router,
-      builder: (context, child) {
-        return PrivacyBlur(
-          isLocked: _isLocked,
-          onUnlock: _checkAuth,
-          child: child!,
-        );
-      },
+    // ScreenUtilInit wraps the app for responsive scaling
+    // Design size: iPhone 14 (390x844) as baseline
+    return ScreenUtilInit(
+      designSize: const Size(390, 844),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (context, child) => MaterialApp.router(
+        title: 'Aldeewan',
+        debugShowCheckedModeBanner: false,
+        themeMode: themeMode,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        locale: locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        routerConfig: router,
+        builder: (context, child) {
+          return PrivacyBlur(
+            isLocked: _isLocked,
+            onUnlock: _checkAuth,
+            child: child!,
+          );
+        },
+      ),
     );
   }
 }

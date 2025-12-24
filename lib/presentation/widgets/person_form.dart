@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aldeewan_mobile/domain/entities/person.dart';
 import 'package:uuid/uuid.dart';
@@ -59,9 +60,9 @@ class _PersonFormState extends ConsumerState<PersonForm> {
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 16,
-        right: 16,
-        top: 16,
+        left: 16.w,
+        right: 16.w,
+        top: 16.h,
       ),
       child: Form(
         key: _formKey,
@@ -74,7 +75,7 @@ class _PersonFormState extends ConsumerState<PersonForm> {
               style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             TextFormField(
               controller: _nameController,
               decoration: InputDecoration(
@@ -88,7 +89,7 @@ class _PersonFormState extends ConsumerState<PersonForm> {
                 return null;
               },
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             TextFormField(
               controller: _phoneController,
               decoration: InputDecoration(
@@ -109,7 +110,7 @@ class _PersonFormState extends ConsumerState<PersonForm> {
                 return null;
               },
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12.h),
             DropdownButtonFormField<PersonRole>(
               initialValue: _role,
               decoration: InputDecoration(
@@ -134,12 +135,12 @@ class _PersonFormState extends ConsumerState<PersonForm> {
                 }
               },
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             FilledButton(
               onPressed: () => _save(l10n),
               child: Text(l10n.save),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
           ],
         ),
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:aldeewan_mobile/utils/currency_formatter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/config/gradients.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
@@ -37,10 +37,7 @@ class _AccountsSectionState extends ConsumerState<AccountsSection> {
     final accountState = ref.watch(accountProvider);
     final currency = ref.watch(currencyProvider);
 
-    String formatCurrency(double amount) {
-      final isSDG = currency == 'SDG';
-      return NumberFormat.currency(symbol: currency, decimalDigits: isSDG ? 0 : 2).format(amount);
-    }
+
 
     return Column(
       children: [
@@ -173,7 +170,7 @@ class _AccountsSectionState extends ConsumerState<AccountsSection> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                formatCurrency(account.balance),
+                                CurrencyFormatter.format(account.balance, currency),
                                 style: theme.textTheme.headlineSmall?.copyWith(
                                   fontWeight: FontWeight.bold,
                                   color: Colors.white,

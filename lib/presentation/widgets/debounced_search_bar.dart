@@ -131,6 +131,7 @@ class _DebouncedSearchBarState extends State<DebouncedSearchBar> {
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
+          filled: false,
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),

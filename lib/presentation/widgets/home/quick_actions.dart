@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -144,10 +145,10 @@ class _QuickActionsState extends ConsumerState<QuickActions> {
             GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 3, // Increased to fit more buttons
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 1.0, // Square buttons
+              crossAxisCount: 3,
+              crossAxisSpacing: 12.w,
+              mainAxisSpacing: 12.h,
+              childAspectRatio: 1.0,
               children: [
                 _buildActionButton(
                   context,
@@ -209,12 +210,12 @@ class _QuickActionsState extends ConsumerState<QuickActions> {
         ref.read(soundServiceProvider).playClick();
         onTap();
       },
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(20.r),
       child: Container(
-        padding: const EdgeInsets.all(8), // Added padding for overflow safety
+        padding: EdgeInsets.all(8.w),
         decoration: BoxDecoration(
           color: theme.cardTheme.color,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20.r),
           boxShadow: [
             BoxShadow(
               color: theme.shadowColor.withValues(alpha: 0.05),
@@ -227,16 +228,16 @@ class _QuickActionsState extends ConsumerState<QuickActions> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              padding: const EdgeInsets.all(10), // Reduced padding for icon container
+              padding: EdgeInsets.all(10.w),
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(14.r),
               ),
-              child: Icon(icon, color: theme.colorScheme.primary, size: 24), // Slightly smaller icon
+              child: Icon(icon, color: theme.colorScheme.primary, size: 24.sp),
             ),
-            const SizedBox(height: 6), // Reduced spacing
+            SizedBox(height: 6.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+              padding: EdgeInsets.symmetric(horizontal: 4.w),
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(

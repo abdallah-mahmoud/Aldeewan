@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -16,6 +17,7 @@ import 'package:aldeewan_mobile/data/services/sound_service.dart';
 import 'package:aldeewan_mobile/presentation/widgets/debounced_search_bar.dart';
 import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
 import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
+import 'package:aldeewan_mobile/presentation/providers/ledger_sort_provider.dart';
 
 class LedgerScreen extends ConsumerStatefulWidget {
   const LedgerScreen({super.key});
@@ -72,24 +74,24 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
       showModalBottomSheet(
         context: context,
         builder: (context) => Container(
-          padding: const EdgeInsets.all(24.0),
+          padding: EdgeInsets.all(24.0.w),
           width: double.infinity,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(LucideIcons.users, size: 48, color: Colors.grey),
-              const SizedBox(height: 16),
+              Icon(LucideIcons.users, size: 48.sp, color: Colors.grey),
+              SizedBox(height: 16.h),
               Text(
                 l10n.noPersonsFound,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8.h),
               Text(
                 l10n.addPersonPrompt,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium,
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
               FilledButton.icon(
                 onPressed: () {
                   Navigator.pop(context);
@@ -98,7 +100,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                 icon: const Icon(LucideIcons.userPlus),
                 label: Text(l10n.addPerson),
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
             ],
           ),
         ),
@@ -112,7 +114,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(16.0.w),
             child: Text(
               l10n.selectPerson,
               style: Theme.of(context).textTheme.titleLarge,
@@ -223,31 +225,33 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
       appBar: AppBar(
         title: Text(l10n.ledger),
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
+          preferredSize: Size.fromHeight(60.h),
           child: Container(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+            margin: EdgeInsets.fromLTRB(16.w, 0, 16.w, 8.h),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.r),
             ),
             child: TabBar(
               controller: _tabController,
               indicatorSize: TabBarIndicatorSize.tab,
               indicator: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.circular(12.r),
+                color: Theme.of(context).colorScheme.primaryContainer,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.05),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
+                    color: Colors.black.withValues(alpha: 0.12),
+                    blurRadius: 8.r,
+                    offset: Offset(0, 3.h),
                   ),
                 ],
+                border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), width: 1),
               ),
-              labelColor: Theme.of(context).colorScheme.onSurface,
+              labelColor: Theme.of(context).colorScheme.onPrimaryContainer,
+              labelStyle: const TextStyle(fontWeight: FontWeight.bold),
               unselectedLabelColor: Theme.of(context).colorScheme.onSurfaceVariant,
               dividerColor: Colors.transparent,
-              padding: const EdgeInsets.all(4),
+              padding: EdgeInsets.all(4.w),
               tabs: [
                 Tab(text: l10n.customer),
                 Tab(text: l10n.supplier),
@@ -259,26 +263,45 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
       body: ledgerAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, s) => Center(child: Text(l10n.errorOccurred(e.toString()))),
-        data: (ledgerState) => TabBarView(
-          controller: _tabController,
-          children: [
-            _buildPersonList(context, ledgerState.persons, PersonRole.customer, notifier, l10n, currency),
-            _buildPersonList(context, ledgerState.persons, PersonRole.supplier, notifier, l10n, currency),
-          ],
-        ),
+        data: (ledgerState) {
+          return Stack(
+            children: [
+              TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildPersonList(context, ledgerState.persons, PersonRole.customer, notifier, l10n, currency),
+                  _buildPersonList(context, ledgerState.persons, PersonRole.supplier, notifier, l10n, currency),
+                ],
+              ),
+            ],
+          );
+        },
       ),
       resizeToAvoidBottomInset: false,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddPersonModal(context),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
-        child: const Icon(Icons.add),
+      floatingActionButton: ledgerAsync.maybeWhen(
+        data: (ledgerState) {
+          final searchQuery = ref.watch(ledgerSearchProvider);
+          final currentRole = _tabController.index == 0 ? PersonRole.customer : PersonRole.supplier;
+          final currentTabHasPeople = ledgerState.persons.any((p) => p.role == currentRole);
+          // Hide FAB when empty state shows CTA button
+          if (!currentTabHasPeople && searchQuery.isEmpty) return null;
+          
+          return FloatingActionButton(
+            onPressed: () => _showAddPersonModal(context),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            child: const Icon(Icons.add),
+          );
+        },
+        orElse: () => null,
       ),
     );
   }
 
   Widget _buildPersonList(BuildContext context, List<Person> persons, PersonRole role, LedgerNotifier notifier, AppLocalizations l10n, String currency) {
     final searchQuery = ref.watch(ledgerSearchProvider);
+    final sortOption = ref.watch(ledgerSortProvider);
+    final theme = Theme.of(context);
     
     // Filter by role first, then by search query
     var filteredPersons = persons.where((p) => p.role == role).toList();
@@ -290,17 +313,106 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
         return name.contains(searchQuery) || phone.contains(searchQuery);
       }).toList();
     }
+    
+    // Apply sorting
+    filteredPersons.sort((a, b) {
+      final balanceA = notifier.calculatePersonBalance(a);
+      final balanceB = notifier.calculatePersonBalance(b);
+      switch (sortOption) {
+        case LedgerSortOption.dateAddedNew:
+          return b.createdAt.compareTo(a.createdAt);
+        case LedgerSortOption.dateAddedOld:
+          return a.createdAt.compareTo(b.createdAt);
+        case LedgerSortOption.amountHigh:
+          return balanceB.abs().compareTo(balanceA.abs());
+        case LedgerSortOption.amountLow:
+          return balanceA.abs().compareTo(balanceB.abs());
+      }
+    });
 
     return Column(
       children: [
-        // Search bar
+        // Search bar and sort dropdown row
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-          child: DebouncedSearchBar(
-            hintText: l10n.search,
-            onSearch: (query) {
-              ref.read(ledgerSearchProvider.notifier).state = query;
-            },
+          padding: EdgeInsets.fromLTRB(16.w, 8.h, 16.w, 8.h),
+          child: Row(
+            children: [
+              Expanded(
+                child: DebouncedSearchBar(
+                  hintText: l10n.search,
+                  onSearch: (query) {
+                    ref.read(ledgerSearchProvider.notifier).state = query;
+                  },
+                ),
+              ),
+              SizedBox(width: 8.w),
+              // Sort dropdown
+              PopupMenuButton<LedgerSortOption>(
+                icon: Icon(LucideIcons.arrowUpDown, color: theme.colorScheme.primary),
+                tooltip: l10n.sortBy,
+                onSelected: (value) {
+                  ref.read(ledgerSortProvider.notifier).state = value;
+                },
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    value: LedgerSortOption.dateAddedNew,
+                    child: Row(
+                      children: [
+                        Icon(
+                          sortOption == LedgerSortOption.dateAddedNew ? LucideIcons.check : null,
+                          size: 18.sp,
+                          color: theme.colorScheme.primary,
+                        ),
+                        SizedBox(width: 8.w),
+                        Text(l10n.sortNewest),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: LedgerSortOption.dateAddedOld,
+                    child: Row(
+                      children: [
+                        Icon(
+                          sortOption == LedgerSortOption.dateAddedOld ? LucideIcons.check : null,
+                          size: 18.sp,
+                          color: theme.colorScheme.primary,
+                        ),
+                        SizedBox(width: 8.w),
+                        Text(l10n.sortOldest),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: LedgerSortOption.amountHigh,
+                    child: Row(
+                      children: [
+                        Icon(
+                          sortOption == LedgerSortOption.amountHigh ? LucideIcons.check : null,
+                          size: 18.sp,
+                          color: theme.colorScheme.primary,
+                        ),
+                        SizedBox(width: 8.w),
+                        Text(l10n.sortHighestAmount),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    value: LedgerSortOption.amountLow,
+                    child: Row(
+                      children: [
+                        Icon(
+                          sortOption == LedgerSortOption.amountLow ? LucideIcons.check : null,
+                          size: 18.sp,
+                          color: theme.colorScheme.primary,
+                        ),
+                        SizedBox(width: 8.w),
+                        Text(l10n.sortLowestAmount),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
         ),
         // Person balance tip
@@ -320,7 +432,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                     onAction: searchQuery.isEmpty ? () => _showAddPersonModal(context) : null,
                   )
                 : ListView.builder(
-                    padding: const EdgeInsets.only(top: 0, bottom: 80),
+                    padding: EdgeInsets.only(top: 0, bottom: 80.h),
                     itemCount: filteredPersons.length,
         itemBuilder: (context, index) {
         final person = filteredPersons[index];
@@ -340,21 +452,21 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
         }
 
         return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          margin: EdgeInsets.symmetric(horizontal: 16.w, vertical: 4.h),
           elevation: 0,
           color: Theme.of(context).cardTheme.color,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(12.r),
             side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.05)),
           ),
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
             leading: Container(
-              width: 48,
-              height: 48,
+              width: 48.w,
+              height: 48.h,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.r),
               ),
               alignment: Alignment.center,
               child: Text(
@@ -372,8 +484,8 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
             subtitle: person.phone != null && person.phone!.isNotEmpty
                 ? Row(
                     children: [
-                      Icon(LucideIcons.phone, size: 12, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                      const SizedBox(width: 4),
+                      Icon(LucideIcons.phone, size: 12.sp, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      SizedBox(width: 4.w),
                       Text(
                         person.phone!,
                         style: Theme.of(context).textTheme.bodySmall,
@@ -382,7 +494,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                   )
                 : null,
             trailing: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 120),
+              constraints: BoxConstraints(maxWidth: 120.w),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -408,7 +520,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                             ? (balance > 0 ? l10n.receivable : l10n.advance) 
                             : (balance > 0 ? l10n.payable : l10n.advance)),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      fontSize: 10,
+                      fontSize: 10.sp,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
