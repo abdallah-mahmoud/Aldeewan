@@ -137,11 +137,11 @@ class LocalDatabaseSource {
   /// Retrieves a single [PersonModel] object by its unique identifier.
   ///
   /// - Parameters:
-  ///   - `uuid`: The unique ID of the person to retrieve.
+  ///   - `person_id`: The unique ID of the person to retrieve.
   /// - Returns: A `Future<PersonModel?>` containing the found person, or `null` if not found.
-  Future<PersonModel?> getPerson(String uuid) async {
+  Future<PersonModel?> getPerson(String person_id) async {
     final realm = await db;
-    return realm.find<PersonModel>(uuid);
+    return realm.find<PersonModel>(person_id);
   }
 
   /// Adds a new [PersonModel] or updates an existing one in the database.
