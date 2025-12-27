@@ -1,10 +1,17 @@
-/// Currency information model
+/// A model class representing detailed information about a currency.
+///
+/// This includes its ISO code, English and Arabic names, and its symbol.
 class CurrencyInfo {
+  /// The ISO 4217 currency code (e.g., 'USD', 'SDG').
   final String code;
+  /// The name of the currency in English (e.g., 'Sudanese Pound').
   final String nameEn;
+  /// The name of the currency in Arabic (e.g., 'الجنيه السوداني').
   final String nameAr;
+  /// The symbol used for the currency (e.g., '\$', 'ج.س').
   final String symbol;
 
+  /// Creates a [CurrencyInfo] instance with the given details.
   const CurrencyInfo({
     required this.code,
     required this.nameEn,
@@ -13,10 +20,12 @@ class CurrencyInfo {
   });
 }
 
-/// Default currency for the app
+/// The default currency code used across the application.
 const String defaultCurrency = 'SDG';
 
-/// List of all supported currencies (40+ currencies, mostly Islamic countries)
+/// A comprehensive list of [CurrencyInfo] objects representing all supported currencies.
+///
+/// This list primarily includes currencies from Islamic countries, along with major world currencies.
 const List<CurrencyInfo> supportedCurrencies = [
   // === Middle East ===
   CurrencyInfo(code: 'SDG', nameEn: 'Sudanese Pound', nameAr: 'الجنيه السوداني', symbol: 'ج.س'),
@@ -78,7 +87,11 @@ const List<CurrencyInfo> supportedCurrencies = [
   CurrencyInfo(code: 'INR', nameEn: 'Indian Rupee', nameAr: 'الروبية الهندية', symbol: '₹'),
 ];
 
-/// Find a currency by its code
+/// Finds a [CurrencyInfo] object from the [supportedCurrencies] list based on its currency code.
+///
+/// - Parameters:
+///   - `code`: The ISO 4217 currency code to search for.
+/// - Returns: The [CurrencyInfo] object if found, otherwise `null`.
 CurrencyInfo? findCurrencyByCode(String code) {
   try {
     return supportedCurrencies.firstWhere((c) => c.code == code);
