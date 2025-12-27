@@ -162,11 +162,11 @@ class LocalDatabaseSource {
   ///
   /// If the person is found, it will be removed from the database.
   /// - Parameters:
-  ///   - `uuid`: The unique ID of the person to delete.
+  ///   - `person_id`: The unique ID of the person to delete.
   /// - Returns: A `Future<void>` that completes when the operation is done.
-  Future<void> deletePerson(String uuid) async {
+  Future<void> deletePerson(String person_id) async {
     final realm = await db;
-    final person = realm.find<PersonModel>(uuid);
+    final person = realm.find<PersonModel>(person_id);
     if (person != null) {
       realm.write(() {
         realm.delete(person);
