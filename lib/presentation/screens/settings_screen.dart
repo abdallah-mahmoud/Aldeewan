@@ -29,12 +29,47 @@ import 'package:aldeewan_mobile/presentation/widgets/settings/settings_tile.dart
 import 'package:aldeewan_mobile/presentation/widgets/settings/theme_selector.dart';
 import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
 import 'package:aldeewan_mobile/presentation/widgets/currency_selector_sheet.dart';
+import 'package:aldeewan_mobile/presentation/providers/guided_tour_provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Auto-start settings tour if guided tour is active
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final tourNotifier = ref.read(guidedTourProvider.notifier);
+      if (tourNotifier.canStartTourForScreen(TourScreen.settings)) {
+        tourNotifier.markScreenTourStarted();
+        _startSettingsShowcase();
+      }
+    });
+  }
+  
+  void _startSettingsShowcase() {
+    if (!mounted) return;
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) {
+        try {
+          // ignore: deprecated_member_use
+          ShowCaseWidget.of(context).startShowCase(ShowcaseKeys.settingsKeys);
+        } catch (e) {
+          debugPrint('Settings showcase error: $e');
+        }
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final themeMode = ref.watch(themeProvider);
     final locale = ref.watch(localeProvider);
     final currency = ref.watch(currencyProvider);
@@ -111,8 +146,8 @@ class SettingsScreen extends ConsumerWidget {
                 SettingsTile(
                   icon: LucideIcons.volume2,
                   iconColor: Colors.teal,
-                  title: l10n.appSounds, // Need to add this to l10n
-                  subtitle: l10n.appSoundsSubtitle, // Need to add this to l10n
+                  title: l10n.appSounds,
+                  subtitle: l10n.appSoundsSubtitle,
                   trailing: Switch.adaptive(
                     value: isSoundEnabled,
                     activeTrackColor: theme.colorScheme.primary,
@@ -241,12 +276,18 @@ class SettingsScreen extends ConsumerWidget {
             SettingsSection(
               title: l10n.dataManagement,
               children: [
-                SettingsTile(
-                  icon: LucideIcons.upload,
-                  iconColor: Colors.teal,
-                  title: l10n.backupToCloud,
-                  subtitle: l10n.backupToCloudSubtitle,
-                  onTap: () => _backupData(context, ref),
+                // Backup to cloud tile - Tour Step 11
+                ShowcaseTarget(
+                  showcaseKey: ShowcaseKeys.backupTile,
+                  title: l10n.tour11Title,
+                  description: l10n.tour11Desc,
+                  child: SettingsTile(
+                    icon: LucideIcons.upload,
+                    iconColor: Colors.teal,
+                    title: l10n.backupToCloud,
+                    subtitle: l10n.backupToCloudSubtitle,
+                    onTap: () => _backupData(context, ref),
+                  ),
                 ),
                 const Divider(height: 1, indent: 60),
                 SettingsTile(
@@ -280,11 +321,11 @@ class SettingsScreen extends ConsumerWidget {
             SettingsSection(
               title: l10n.helpCenter,
               children: [
-                // Help Center tile - Tour Target Step 6
+                // Help Center tile - Tour Step 12
                 ShowcaseTarget(
                   showcaseKey: ShowcaseKeys.helpButton,
-                  title: l10n.tourWelcome,
-                  description: l10n.tourHelp,
+                  title: l10n.tour12Title,
+                  description: l10n.tour12Desc,
                   child: SettingsTile(
                     icon: LucideIcons.helpCircle,
                     iconColor: Colors.blue,
@@ -296,9 +337,16 @@ class SettingsScreen extends ConsumerWidget {
                 const Divider(height: 1, indent: 60),
                 SettingsTile(
                   icon: LucideIcons.info,
+                  iconColor: Colors.blue,
+                  title: l10n.aboutApp,
+                  onTap: () => context.go('/settings/about'),
+                ),
+                const Divider(height: 1, indent: 60),
+                SettingsTile(
+                  icon: LucideIcons.user,
                   iconColor: Colors.grey,
                   title: l10n.aboutDeveloper,
-                  onTap: () => context.go('/settings/about'),
+                  onTap: () => context.go('/settings/developer'),
                 ),
               ],
             ),
@@ -308,7 +356,7 @@ class SettingsScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   Text(
-                    l10n.appVersionInfo('2.1.0'),
+                    l10n.appVersionInfo('2.2.0'),
                     style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
                   ),
                   SizedBox(height: 4.h),

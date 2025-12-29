@@ -3,11 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aldeewan_mobile/presentation/widgets/person_statement_report.dart';
 import 'package:aldeewan_mobile/presentation/widgets/cash_flow_report.dart';
+import 'package:aldeewan_mobile/presentation/widgets/debt_analysis_report.dart';
 import 'package:aldeewan_mobile/utils/csv_exporter.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
 import 'package:aldeewan_mobile/utils/error_handler.dart';
 import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 class AnalyticsScreen extends ConsumerStatefulWidget {
   const AnalyticsScreen({super.key});
@@ -18,14 +20,29 @@ class AnalyticsScreen extends ConsumerStatefulWidget {
 
 class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool _initialTabHandled = false;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(() {
       if (mounted) setState(() {});
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialTabHandled) {
+      final tab = GoRouterState.of(context).uri.queryParameters['tab'];
+      if (tab == 'debts') {
+        _tabController.animateTo(2);
+      } else if (tab == 'cashflow') {
+        _tabController.animateTo(1);
+      }
+      _initialTabHandled = true;
+    }
   }
 
   @override
@@ -88,8 +105,9 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
               dividerColor: Colors.transparent,
               padding: EdgeInsets.all(4.w),
               tabs: [
-                Tab(text: l10n.personStatement),
-                Tab(text: l10n.cashFlow),
+                Tab(child: FittedBox(fit: BoxFit.scaleDown, child: Text(l10n.personStatement))),
+                Tab(child: FittedBox(fit: BoxFit.scaleDown, child: Text(l10n.cashFlow))),
+                Tab(child: FittedBox(fit: BoxFit.scaleDown, child: Text(l10n.ledger))),
               ],
             ),
           ),
@@ -104,6 +122,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
               children: const [
                 PersonStatementReport(),
                 CashFlowReport(),
+                DebtAnalysisReport(),
               ],
             ),
           ),

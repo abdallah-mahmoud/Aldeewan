@@ -46,6 +46,7 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
   late TextEditingController _noteController;
   late TransactionType _type;
   late DateTime _date;
+  bool _isOpeningBalance = false;
 
   @override
   void initState() {
@@ -60,7 +61,9 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
             ? TransactionType.purchaseOnCredit 
             : TransactionType.saleOnCredit));
     _date = widget.initialDate ?? DateTime.now();
+    // defaulting _isOpeningBalance to false
   }
+
   @override
   void dispose() {
     _amountController.dispose();
@@ -113,6 +116,7 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
         amount: amount,
         date: _date,
         note: _noteController.text.isEmpty ? null : _noteController.text,
+        isOpeningBalance: _isOpeningBalance,
       );
       widget.onSave(transaction);
       ToastService.showSuccess(context, l10n.savedSuccessfully);
@@ -164,7 +168,7 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                l10n.addTransaction,
+                widget.initialAmount != null ? l10n.editTransaction : l10n.addTransaction,
                 style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
@@ -221,13 +225,84 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(DateFormat.yMMMd().format(_date)),
+                      Expanded(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            DateFormat.yMMMd().format(_date),
+                          ),
+                        ),
+                      ),
                       const Icon(LucideIcons.calendar),
                     ],
                   ),
                 ),
               ),
               SizedBox(height: 12.h),
+              SizedBox(height: 12.h),
+              
+              // Old Debt Checkbox (Only for DebtGiven/DebtTaken)
+              if (_type == TransactionType.debtGiven || _type == TransactionType.debtTaken)
+                Padding(
+                  padding: EdgeInsets.only(bottom: 12.h),
+                  child: Container(
+                    padding: EdgeInsets.all(12.w),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          height: 24.h,
+                          width: 24.w,
+                          child: Checkbox(
+                            value: _isOpeningBalance,
+                            onChanged: (value) {
+                              setState(() {
+                                _isOpeningBalance = value ?? false;
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Text(
+                            l10n.oldDebt,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ),
+                        IconButton(
+                          icon: Icon(
+                            LucideIcons.info,
+                            size: 20.sp,
+                            color: Theme.of(context).colorScheme.primary,
+                          ),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: Text(l10n.oldDebt),
+                                content: Text(l10n.oldDebtExplanation),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: Text(l10n.ok),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
               TextFormField(
                 controller: _noteController,
                 decoration: InputDecoration(

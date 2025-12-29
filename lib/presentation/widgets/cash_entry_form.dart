@@ -239,7 +239,7 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
             Text(
-              l10n.addCashEntry,
+              widget.initialAmount != null ? l10n.editTransaction : l10n.addCashEntry,
               style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),

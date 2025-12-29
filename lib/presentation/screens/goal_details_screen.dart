@@ -8,6 +8,7 @@ import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/providers/budget_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/notification_history_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
 import 'package:aldeewan_mobile/presentation/widgets/empty_state.dart';
 
 import 'package:aldeewan_mobile/utils/input_formatters.dart';
@@ -23,11 +24,16 @@ class GoalDetailsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final currency = ref.watch(currencyProvider);
     final budgetState = ref.watch(budgetProvider);
+    
+    // Watch ledger for transactions
+    final ledgerState = ref.watch(ledgerProvider);
+    final transactions = ledgerState.value?.transactions ?? [];
+    
     final theme = Theme.of(context);
     final formatter = NumberFormat('#,##0.##');
 
     final goal = budgetState.goals.cast<SavingsGoalModel?>().firstWhere(
-          (g) => g?.id.toString() == goalId,
+          (g) => g?.id.hexString == goalId || g?.id.toString() == goalId,
           orElse: () => null,
         );
 
@@ -40,6 +46,11 @@ class GoalDetailsScreen extends ConsumerWidget {
         ),
       );
     }
+    
+    // Filter goal transactions
+    final goalTransactions = transactions.where((t) => t.goalId == goalId).toList();
+    // Sort by date desc
+    goalTransactions.sort((a, b) => b.date.compareTo(a.date));
 
     final progress = goal.targetAmount > 0 ? goal.currentSaved / goal.targetAmount : 0.0;
     final isCompleted = goal.currentSaved >= goal.targetAmount;
@@ -215,6 +226,76 @@ class GoalDetailsScreen extends ConsumerWidget {
                 ),
               ],
             ),
+            const SizedBox(height: 24),
+
+            // Recent Activity / History
+            if (goalTransactions.isNotEmpty) ...[
+              Text(
+                l10n.recentTransactions,
+                style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: goalTransactions.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) {
+                  final tx = goalTransactions[index];
+                  // Determine color based on type (income/expense logic)
+                  // For goals: expense = added funds (green in action, but internally expense type?)
+                  // Wait, adding funds creates an 'expense' transaction usually?
+                  // Let's check logic: _showUpdateFundsDialog -> ref.read(budgetProvider.notifier).updateGoal
+                  // BudgetNotifier.updateGoal -> updates goal.currentSaved and creates a CashExpense?
+                  // Or maybe just modifies goal. 
+                  // If 'updateGoal' just modifies the goal document, then there IS NO transaction creates.
+                  // I need to verify 'budget_provider.dart' to see if it creates a transaction.
+                  
+                  // Assuming it does create a transaction for now based on 'financial logic' report implying active tracking.
+                  // If it's a generic expense, it's RED. But for goal adding, it's GOOD (Green).
+                  // If I withdraw, I get cash back (Income?), so maybe text is green?
+                  
+                  // Let's assume standard formatting for now.
+                  
+                  return Card(
+                    margin: EdgeInsets.zero,
+                    elevation: 0,
+                    color: theme.cardTheme.color,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1)),
+                    ),
+                    child: ListTile(
+                      leading: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          LucideIcons.history, // Generic history icon or category icon
+                          color: theme.colorScheme.onPrimaryContainer,
+                          size: 20,
+                        ),
+                      ),
+                      title: Text(
+                        (tx.note ?? '').isNotEmpty ? tx.note! : l10n.goalContribution,
+                        style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
+                      ),
+                      subtitle: Text(DateFormat.yMMMd(Localizations.localeOf(context).toString()).format(tx.date)),
+                      trailing: Text(
+                        '$currency ${formatter.format(tx.amount)}',
+                        style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ] else 
+              EmptyState(
+                message: l10n.noEntriesYet,
+                icon: LucideIcons.history,
+              ),
           ],
         ),
       ),

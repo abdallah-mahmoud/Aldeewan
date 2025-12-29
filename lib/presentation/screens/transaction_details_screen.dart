@@ -6,11 +6,12 @@ import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
-import 'package:aldeewan_mobile/presentation/widgets/cash_entry_form.dart';
+import 'package:aldeewan_mobile/presentation/widgets/transaction_form.dart';
 import 'package:aldeewan_mobile/utils/category_helper.dart';
 import 'package:aldeewan_mobile/data/services/sound_service.dart';
 import 'package:aldeewan_mobile/utils/transaction_label_mapper.dart';
 import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
+import 'package:aldeewan_mobile/presentation/widgets/cash_entry_form.dart';
 
 class TransactionDetailsScreen extends ConsumerWidget {
   final Transaction transaction;
@@ -81,6 +82,28 @@ class TransactionDetailsScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
+                  if (transaction.isOpeningBalance)
+                    Container(
+                      margin: const EdgeInsets.only(top: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.secondaryContainer,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(LucideIcons.history, size: 14, color: theme.colorScheme.onSecondaryContainer),
+                          const SizedBox(width: 6),
+                          Text(
+                            l10n.oldDebt,
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.onSecondaryContainer,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   const SizedBox(height: 16),
                   // Direction Indicator
                   Consumer(
@@ -276,33 +299,66 @@ class TransactionDetailsScreen extends ConsumerWidget {
   }
 
   void _showEditModal(BuildContext context, WidgetRef ref) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => CashEntryForm(
-        initialAmount: transaction.amount,
-        initialDate: transaction.date,
-        initialNote: transaction.note,
-        // We need to handle the update logic. 
-        // Currently CashEntryForm only supports 'onSave' which creates a NEW transaction usually.
-        // We might need to update CashEntryForm to support editing or handle it here.
-        // For now, let's assume we delete old and add new (simplest update), 
-        // OR we update the provider to support 'updateTransaction'.
-        // LedgerNotifier has 'addTransaction' and 'deleteTransaction'. It might not have 'updateTransaction'.
-        // Let's check LedgerProvider.
-        onSave: (updatedTx) {
-           // Hack: Delete old, Add new (Preserving ID if possible, but Realm might want new object)
-           // Better: Add updateTransaction to LedgerNotifier.
-           // For now, let's just add new and delete old to simulate update.
-           // Ideally we should update the existing record.
-           
-           // Since we don't have updateTransaction exposed yet, let's do:
-           ref.read(ledgerProvider.notifier).deleteTransaction(transaction.id);
-           ref.read(ledgerProvider.notifier).addTransaction(updatedTx);
-           
-           Navigator.pop(context); // Close screen (go back to list)
-        },
-      ),
-    );
+    if (transaction.personId != null) {
+      // It's a Ledger Transaction
+      final ledger = ref.read(ledgerProvider).value;
+      final person = ledger?.persons.where((p) => p.id == transaction.personId).firstOrNull;
+      
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) => TransactionForm(
+          initialAmount: transaction.amount,
+          initialDate: transaction.date,
+          initialNote: transaction.note,
+          initialType: transaction.type,
+          personId: transaction.personId,
+          personRole: person?.role,
+          onSave: (updatedTx) {
+             // Create a new transaction that preserves the original ID for "update"
+             final preservationTx = Transaction(
+               id: transaction.id, // Preserving ID!
+               type: updatedTx.type,
+               personId: updatedTx.personId,
+               amount: updatedTx.amount,
+               date: updatedTx.date,
+               note: updatedTx.note,
+               category: updatedTx.category,
+               goalId: updatedTx.goalId,
+               isOpeningBalance: updatedTx.isOpeningBalance,
+             );
+             ref.read(ledgerProvider.notifier).updateTransaction(preservationTx);
+             Navigator.pop(context); // Close the details screen
+          },
+        ),
+      );
+    } else {
+      // It's a Cashbook Transaction
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        builder: (context) => CashEntryForm(
+          initialAmount: transaction.amount,
+          initialDate: transaction.date,
+          initialNote: transaction.note,
+          onSave: (updatedTx) {
+             // Preserve ID
+             final preservationTx = Transaction(
+               id: transaction.id,
+               type: updatedTx.type,
+               personId: updatedTx.personId,
+               amount: updatedTx.amount,
+               date: updatedTx.date,
+               note: updatedTx.note,
+               category: updatedTx.category,
+               goalId: updatedTx.goalId,
+               isOpeningBalance: updatedTx.isOpeningBalance,
+             );
+             ref.read(ledgerProvider.notifier).updateTransaction(preservationTx);
+             Navigator.pop(context);
+          },
+        ),
+      );
+    }
   }
 }

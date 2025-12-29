@@ -2,43 +2,61 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:showcaseview/showcaseview.dart';
-import 'package:aldeewan_mobile/presentation/providers/onboarding_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/guided_tour_provider.dart';
 
-/// Global keys for showcase targets
+/// Global keys for showcase targets - 12 step guided tour
 class ShowcaseKeys {
-  // Home Screen (Steps 1-2)
+  // Home Screen (Steps 1-4)
   static final GlobalKey dashboardCards = GlobalKey();
   static final GlobalKey quickActions = GlobalKey();
+  static final GlobalKey budgetCard = GlobalKey();
+  static final GlobalKey goalsCard = GlobalKey();
   
-  // Ledger Screen (Step 3)
+  // Ledger Screen (Steps 5-6)
   static final GlobalKey ledgerList = GlobalKey();
+  static final GlobalKey ledgerFab = GlobalKey();
   
-  // Cashbook Screen (Steps 4-5)
+  // Cashbook Screen (Steps 7-9)
   static final GlobalKey cashbookFilter = GlobalKey();
   static final GlobalKey searchBar = GlobalKey();
+  static final GlobalKey transactionList = GlobalKey();
   
-  // Settings Screen (Step 6)
+  // Analytics Screen (Step 10)
+  static final GlobalKey analyticsTab = GlobalKey();
+  
+  // Settings Screen (Steps 11-12)
+  static final GlobalKey backupTile = GlobalKey();
   static final GlobalKey helpButton = GlobalKey();
 
-  /// Keys for Home Screen tour
+  /// Keys for Home Screen tour (4 steps)
   static List<GlobalKey> get homeKeys => [
     dashboardCards,
     quickActions,
+    budgetCard,
+    goalsCard,
   ];
   
-  /// Keys for Ledger Screen tour
+  /// Keys for Ledger Screen tour (1 step - only person list has ShowcaseTarget)
   static List<GlobalKey> get ledgerKeys => [
     ledgerList,
+    // NOTE: ledgerFab removed - no widget is wrapped with this key
   ];
   
-  /// Keys for Cashbook Screen tour
+  /// Keys for Cashbook Screen tour (2 steps - filter and search only)
   static List<GlobalKey> get cashbookKeys => [
     cashbookFilter,
     searchBar,
+    // NOTE: transactionList removed - no widget is wrapped with this key
   ];
   
-  /// Keys for Settings Screen tour
+  /// Keys for Analytics Screen tour (1 step)
+  static List<GlobalKey> get analyticsKeys => [
+    analyticsTab,
+  ];
+  
+  /// Keys for Settings Screen tour (2 steps - backup and help)
   static List<GlobalKey> get settingsKeys => [
+    backupTile,
     helpButton,
   ];
 }
@@ -55,67 +73,22 @@ class GlobalShowcaseWrapper extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ShowCaseWidget(
-      builder: (context) => child,
+      builder: (showcaseContext) => child,
       onFinish: () {
-        // Mark current screen's tour as complete
-        // The full tour completion is handled by individual screens
+        // When a screen's showcase finishes, notify the tour orchestrator
+        final tourState = ref.read(guidedTourProvider);
+        if (tourState.isActive) {
+          ref.read(guidedTourProvider.notifier).onScreenTourComplete(context);
+        }
       },
     );
   }
 }
 
-/// Mixin to add showcase tour functionality to screens
-mixin ShowcaseTourMixin<T extends ConsumerStatefulWidget> on ConsumerState<T> {
-  /// Override this in each screen to provide screen-specific keys
-  List<GlobalKey> get showcaseKeys => [];
-  
-  /// Override this to provide a unique ID for this screen's tour
-  String get screenTourId => 'default';
-  
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      startTourIfNeeded();
-    });
-  }
-
-  /// Start the tour if not completed for this screen
-  void startTourIfNeeded() {
-    if (!mounted) return;
-    if (showcaseKeys.isEmpty) return;
-
-    final onboarding = ref.read(onboardingProvider);
-    final tourKey = 'tour_$screenTourId';
-    
-    // Check if this specific screen's tour was shown
-    if (!onboarding.dismissedTips.contains(tourKey)) {
-      Future.delayed(const Duration(milliseconds: 800), () {
-        if (mounted) {
-          try {
-            ShowCaseWidget.of(context).startShowCase(showcaseKeys);
-            // Mark this screen's tour as shown
-            ref.read(onboardingProvider.notifier).dismissTip(tourKey);
-          } catch (e) {
-            debugPrint('Showcase error: $e');
-          }
-        }
-      });
-    }
-  }
-
-  /// Restart the tour for this screen
-  void restartScreenTour() {
-    if (showcaseKeys.isEmpty) return;
-    if (mounted) {
-      try {
-        ShowCaseWidget.of(context).startShowCase(showcaseKeys);
-      } catch (e) {
-        debugPrint('Showcase restart error: $e');
-      }
-    }
-  }
-}
+// NOTE: ShowcaseTourMixin was REMOVED - it was an old per-screen tour system
+// that conflicted with the new GuidedTourProvider cross-screen tour.
+// The guided tour now uses canStartTourForScreen() and markScreenTourStarted()
+// in each screen's didChangeDependencies() to coordinate the cross-screen tour.
 
 /// Helper widget to wrap showcase targets
 class ShowcaseTarget extends StatelessWidget {

@@ -4,6 +4,7 @@ class GetMonthlyExpenseUseCase {
   double call(List<Transaction> transactions) {
     final now = DateTime.now();
     return transactions
+        .where((t) => !t.isOpeningBalance) // Exclude old debts / opening balances
         .where((t) => t.date.year == now.year && t.date.month == now.month)
         .where((t) =>
             t.type == TransactionType.paymentMade ||

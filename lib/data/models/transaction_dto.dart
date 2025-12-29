@@ -12,6 +12,8 @@ class TransactionDto {
   final String? externalId;
   final String? status;
   final int? accountId;
+  final String? goalId;
+  final bool isOpeningBalance;
 
   TransactionDto({
     required this.id,
@@ -25,6 +27,8 @@ class TransactionDto {
     this.externalId,
     this.status,
     this.accountId,
+    this.goalId,
+    this.isOpeningBalance = false,
   });
 
   Transaction toEntity() {
@@ -40,6 +44,8 @@ class TransactionDto {
       externalId: externalId,
       status: status,
       accountId: accountId,
+      goalId: goalId,
+      isOpeningBalance: isOpeningBalance,
     );
   }
 }

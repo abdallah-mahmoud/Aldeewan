@@ -6,9 +6,16 @@ import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/providers/onboarding_provider.dart';
 import 'package:aldeewan_mobile/config/app_colors.dart';
 
-class HelpCenterScreen extends ConsumerWidget {
+class HelpCenterScreen extends ConsumerStatefulWidget {
   const HelpCenterScreen({super.key});
 
+  @override
+  ConsumerState<HelpCenterScreen> createState() => _HelpCenterScreenState();
+}
+
+class _HelpCenterScreenState extends ConsumerState<HelpCenterScreen> {
+  // Track expanded state for sections if needed, or rely on ExpansionTile automatic behavior
+  
   Future<void> _launchUrl(String urlString) async {
     final Uri url = Uri.parse(urlString);
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
@@ -17,205 +24,282 @@ class HelpCenterScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.helpCenter),
+        centerTitle: true,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Getting Started Section
-          _buildSectionHeader(context, l10n.faqGettingStarted, LucideIcons.bookOpen),
-          const SizedBox(height: 8),
-          _buildFaqCard(
-            context,
-            isDark: isDark,
-            children: [
-              _buildFaqItem(
-                context,
-                question: l10n.faqWhatIsAldeewan,
-                answer: l10n.faqWhatIsAldeewaAnswer,
-              ),
-              const Divider(height: 1),
-              _buildFaqItem(
-                context,
-                question: l10n.faqHowToAddTransaction,
-                answer: l10n.faqHowToAddTransactionAnswer,
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Data & Backup Section
-          _buildSectionHeader(context, l10n.faqDataBackup, LucideIcons.database),
-          const SizedBox(height: 8),
-          _buildFaqCard(
-            context,
-            isDark: isDark,
-            children: [
-              _buildFaqItem(
-                context,
-                question: l10n.faqHowToBackup,
-                answer: l10n.faqHowToBackupAnswer,
-              ),
-              const Divider(height: 1),
-              _buildFaqItem(
-                context,
-                question: l10n.faqHowToRestore,
-                answer: l10n.faqHowToRestoreAnswer,
-              ),
-              const Divider(height: 1),
-              _buildFaqItem(
-                context,
-                question: l10n.faqWhereIsData,
-                answer: l10n.faqWhereIsDataAnswer,
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Contact Support Section
-          _buildSectionHeader(context, l10n.contactSupport, LucideIcons.messageCircle),
-          const SizedBox(height: 8),
-          _buildContactCard(
-            context,
-            isDark: isDark,
-            children: [
-              ListTile(
-                leading: const Icon(LucideIcons.mail, color: AppColors.primary),
-                title: Text(l10n.email),
-                subtitle: Text(l10n.developerEmail),
-                trailing: const Icon(LucideIcons.chevronRight, size: 18),
-                onTap: () => _launchUrl('mailto:${l10n.developerEmail}'),
-              ),
-              const Divider(height: 1, indent: 56),
-              ListTile(
-                leading: const Icon(LucideIcons.phone, color: AppColors.success),
-                title: Text(l10n.phone),
-                subtitle: const Text('+249 111 950 191'),
-                trailing: const Icon(LucideIcons.chevronRight, size: 18),
-                onTap: () => _launchUrl('tel:+249111950191'),
-              ),
-              const Divider(height: 1, indent: 56),
-              ListTile(
-                leading: Icon(LucideIcons.facebook, color: Colors.blue[700]),
-                title: Text(l10n.facebook),
-                subtitle: const Text('@motaasl8'),
-                trailing: const Icon(LucideIcons.chevronRight, size: 18),
-                onTap: () => _launchUrl('https://www.facebook.com/motaasl8'),
-              ),
-              const Divider(height: 1, indent: 56),
-              ListTile(
-                leading: Icon(LucideIcons.instagram, color: Colors.pink[400]),
-                title: Text(l10n.instagram),
-                subtitle: const Text('@motaasl8'),
-                trailing: const Icon(LucideIcons.chevronRight, size: 18),
-                onTap: () => _launchUrl('https://www.instagram.com/motaasl8'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-
-          // Restart Tour Button
-          _buildSectionHeader(context, l10n.restartTour, LucideIcons.refreshCcw),
-          const SizedBox(height: 8),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(
-                color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
-              ),
+          // Hero Header
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(16),
             ),
-            child: ListTile(
-              leading: const Icon(LucideIcons.play, color: AppColors.primary),
-              title: Text(l10n.restartTour),
-              subtitle: Text(l10n.restartTourSubtitle),
-              trailing: const Icon(LucideIcons.chevronRight, size: 18),
-              onTap: () {
-                ref.read(onboardingProvider.notifier).resetAll();
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(l10n.restartTourSubtitle),
-                    behavior: SnackBarBehavior.floating,
+            child: Row(
+              children: [
+                Icon(LucideIcons.lifeBuoy, size: 32, color: theme.colorScheme.primary),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.helpCenterSubtitle,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        l10n.tourHelp,
+                        style: theme.textTheme.bodySmall,
+                      ),
+                    ],
                   ),
-                );
-              },
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
+
+          // 1. Dashboard & Basics
+          _buildCategorySection(
+            context,
+            title: l10n.faqDashboard,
+            icon: LucideIcons.layoutDashboard,
+            children: [
+              _buildFaqItem(context, l10n.faqWhatIsAldeewan, l10n.faqWhatIsAldeewaAnswer),
+              _buildFaqItem(context, l10n.faqWhatIsNetPosition, l10n.faqWhatIsNetPositionAnswer),
+              _buildFaqItem(context, l10n.faqWhatIsTrueIncome, l10n.faqWhatIsTrueIncomeAnswer),
+            ],
+          ),
+
+          // 2. Ledger (People)
+          _buildCategorySection(
+            context,
+            title: l10n.faqLedger,
+            icon: LucideIcons.users,
+            children: [
+              _buildFaqItem(context, l10n.faqHowToTrackDebt, l10n.faqHowToTrackDebtAnswer),
+              _buildFaqItem(context, l10n.faqWhatIsOldDebt, l10n.faqWhatIsOldDebtAnswer),
+            ],
+          ),
+
+          // 3. Cashbook
+          _buildCategorySection(
+            context,
+            title: l10n.faqCashbook,
+            icon: LucideIcons.wallet,
+            children: [
+              _buildFaqItem(context, l10n.faqCashbookVsLedger, l10n.faqCashbookVsLedgerAnswer),
+              _buildFaqItem(context, l10n.faqHowToAddTransaction, l10n.faqHowToAddTransactionAnswer),
+            ],
+          ),
+
+          // 4. Budgets & Goals
+          _buildCategorySection(
+            context,
+            title: l10n.faqBudgetsGoals,
+            icon: LucideIcons.target,
+            children: [
+              _buildFaqItem(context, l10n.faqHowToBudget, l10n.faqHowToBudgetAnswer),
+            ],
+          ),
+
+          // 5. Reports
+          _buildCategorySection(
+            context,
+            title: l10n.faqReports,
+            icon: LucideIcons.barChart2,
+            children: [
+              _buildFaqItem(context, l10n.faqHowToExport, l10n.faqHowToExportAnswer),
+            ],
+          ),
+
+          // 6. Data & Backup
+          _buildCategorySection(
+            context,
+            title: l10n.faqDataBackup,
+            icon: LucideIcons.database,
+            children: [
+              _buildFaqItem(context, l10n.faqWhereIsData, l10n.faqWhereIsDataAnswer),
+              _buildFaqItem(context, l10n.faqHowToBackup, l10n.faqHowToBackupAnswer),
+              _buildFaqItem(context, l10n.faqHowToRestore, l10n.faqHowToRestoreAnswer),
+            ],
+          ),
+
+          const SizedBox(height: 24),
+          
+          // Contact & Actions
+          Text(
+            l10n.contactSupport,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          
+           _buildActionCard(
+            context,
+            title: l10n.restartTour,
+            subtitle: l10n.restartTourSubtitle,
+            icon: LucideIcons.refreshCcw,
+            color: Colors.orange,
+            onTap: () {
+              ref.read(onboardingProvider.notifier).resetAll();
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.restartTourSubtitle)),
+              );
+            },
+          ),
+          const SizedBox(height: 12),
+          _buildActionCard(
+            context,
+            title: l10n.email,
+            subtitle: l10n.developerEmail,
+            icon: LucideIcons.mail,
+            color: AppColors.primary,
+            onTap: () => _launchUrl('mailto:${l10n.developerEmail}'),
+          ),
+          const SizedBox(height: 12),
+          _buildActionCard(
+            context,
+            title: l10n.facebook,
+            subtitle: '@motaasl8',
+            icon: LucideIcons.facebook,
+            color: Colors.blue[800]!,
+            onTap: () => _launchUrl('https://www.facebook.com/motaasl8'),
+          ),
+          
+          const SizedBox(height: 48),
         ],
       ),
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, IconData icon) {
+  Widget _buildCategorySection(
+    BuildContext context, {
+    required String title,
+    required IconData icon,
+    required List<Widget> children,
+  }) {
     final theme = Theme.of(context);
-    return Row(
-      children: [
-        Icon(icon, size: 20, color: theme.colorScheme.primary),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.bold,
+    
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1)),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: ExpansionTile(
+          shape: Border.all(color: Colors.transparent),
+          collapsedShape: Border.all(color: Colors.transparent),
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: theme.colorScheme.primary, size: 20),
           ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFaqCard(BuildContext context, {required bool isDark, required List<Widget> children}) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+          title: Text(
+            title,
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          children: children,
         ),
       ),
-      child: Column(children: children),
     );
   }
 
-  Widget _buildContactCard(BuildContext context, {required bool isDark, required List<Widget> children}) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
-        ),
-      ),
-      child: Column(children: children),
-    );
-  }
-
-  Widget _buildFaqItem(BuildContext context, {required String question, required String answer}) {
+  Widget _buildFaqItem(BuildContext context, String question, String answer) {
     final theme = Theme.of(context);
-    return ExpansionTile(
-      title: Text(
-        question,
-        style: theme.textTheme.bodyLarge?.copyWith(
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-      children: [
-        Text(
-          answer,
+    
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: ExpansionTile(
+        title: Text(
+          question,
           style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurface,
           ),
         ),
-      ],
+        dense: true,
+        tilePadding: const EdgeInsets.symmetric(horizontal: 16),
+        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        shape: const Border(),
+        collapsedShape: const Border(),
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 6, right: 8), // Localized margin? RTL safe if Directionality used
+                width: 4,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.5),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              Expanded(
+                child: Text(
+                  answer,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionCard(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+    
+    return Card(
+      elevation: 0,
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: theme.dividerColor.withValues(alpha: 0.1)),
+      ),
+      child: ListTile(
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, color: color, size: 20),
+        ),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
+        subtitle: Text(subtitle, style: theme.textTheme.bodySmall),
+        trailing: const Icon(LucideIcons.chevronRight, size: 16),
+        onTap: onTap,
+      ),
     );
   }
 }

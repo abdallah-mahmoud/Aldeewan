@@ -7,6 +7,11 @@
   "cashbook": "Cashbook",
   "reports": "Reports",
   "settings": "Settings",
+  "featureManageCash": "Manage Cash & Bank",
+  "featureTrackDebts": "Track Debts & People",
+  "featureAnalytics": "Financial Analytics",
+  "featureBackup": "Secure Cloud Backup",
+  "comingSoon": "Coming Soon",
   "general": "General",
   "dashboard": "Dashboard",
   "recentTransactions": "Recent Transactions",
@@ -47,6 +52,7 @@
   "save": "Save",
   "delete": "Delete",
   "edit": "Edit",
+  "editTransaction": "Edit Transaction",
   "name": "Name",
   "phone": "Phone",
   "role": "Role",
@@ -106,10 +112,14 @@
   "allTransactions": "All Transactions",
   "recentActivity": "Recent Activity",
   "noEntriesYet": "No entries yet",
-  "totalReceivable": "Total Receivable",
-  "totalPayable": "Total Payable",
-  "monthlyIncome": "Monthly Income",
-  "monthlyExpense": "Monthly Expense",
+  "totalReceivable": "People Owe You",
+  "totalPayable": "You Owe Others",
+  "moneyIn": "Money In",
+  "moneyOut": "Money Out",
+  "trueIncome": "True Income",
+  "trueExpense": "True Expense",
+  "debtsSection": "Debts",
+  "monthlySection": "Monthly",
   "transactionDetails": "Transaction Details",
   "deleteTransaction": "Delete Transaction",
   "deleteTransactionConfirm": "Are you sure you want to delete this transaction?",
@@ -151,16 +161,18 @@
   "paymentReceived": "Payment Received",
   "purchaseOnCredit": "Purchase (Credit)",
   "paymentMade": "Payment Made",
-  "debtGiven": "Debt (Owed by)",
-  "debtTaken": "Debt (Owed to)",
+  "debtGiven": "Lent (You gave)",
+  "debtTaken": "Borrowed (You received)",
   "cashSale": "Cash Sale",
   "cashIncome": "Extra Income",
   "cashExpense": "Expenses",
   "currentBalance": "Current Balance",
   "settled": "Settled",
-  "receivable": "Receivable",
-  "payable": "Payable",
+  "receivable": "Owes You",
+  "payable": "You Owe",
   "advance": "Advance",
+  "advanceOwesYou": "Owes You (Advance)",
+  "advanceYouOwe": "You Owe (Advance)",
   "income": "Income",
   "expense": "Expense",
   "analytics": "Analytics",
@@ -198,6 +210,9 @@
   "errorOccurred": "Error: {error}",
   "simpleMode": "Simple Mode",
   "simpleModeSubtitle": "Use simplified terminology (Lent/Borrowed)",
+  "oldDebt": "Old Debt / Opening Balance",
+  "oldDebtExplanation": "Use this for debts that existed before you started using this app. It will record the debt on the person's profile but will NOT change your current cash/bank balance.",
+  "ok": "OK",
   "simpleLent": "Lent",
   "simpleBorrowed": "Borrowed",
   "simpleGotPaid": "Got Paid",
@@ -338,6 +353,8 @@
       }
     }
   },
+  "goalContribution": "Contribution",
+  "budgetExceeded": "Budget Exceeded",
   "insufficientFundsTitle": "Insufficient Funds",
   "insufficientFundsMessage": "Your current balance ({balance} {currency}) is not enough for this expense of {amount} {currency}. Please add more funds first.",
   "@insufficientFundsMessage": {
@@ -355,24 +372,53 @@
   },
 
   "tourWelcome": "Welcome to Aldeewan!",
-  "tourDashboard": "See your money at a glance",
-  "tourAddTransaction": "Tap here to add money in or out",
-  "tourLedger": "People who owe you or you owe them",
-  "tourCashbook": "Filter by income or expenses",
-  "tourSearch": "Search by name, amount, or type",
-  "tourHelp": "Need help? Come here anytime",
-  "tourSkip": "Skip",
-  "tourNext": "Next",
-  "tourFinish": "Get Started",
-  "tourPrevious": "Previous",
-
+  "tourDialogTitle": "Welcome to Aldeewan!",
+  "tourDialogBody": "Take a quick tour to discover all features?",
+  "tourStartButton": "Start Tour",
+  "tourSkipButton": "Skip for Now",
+  
+  "tour1Title": "Your Financial Overview",
+  "tour1Desc": "See your net position at a glance. Toggle 'All Time' or 'This Month' for different views.",
+  "tour2Title": "Quick Actions",
+  "tour2Desc": "Add income, expenses, debts, or scan receipts. Everything starts here.",
+  "tour3Title": "Budget Tracking",
+  "tour3Desc": "Set spending limits by category. Get alerts before overspending.",
+  "tour4Title": "Savings Goals",
+  "tour4Desc": "Save toward targets like emergencies, travel, or purchases. Track your progress visually.",
+  "tour5Title": "Your Network",
+  "tour5Desc": "Customers and suppliers you track. Tap anyone to see full history and balance.",
+  "tour6Title": "Add People",
+  "tour6Desc": "Tap here to add new customers or suppliers to your ledger.",
+  "tour7Title": "Smart Filters",
+  "tour7Desc": "Filter by type (Income/Expense) and time period. Find exactly what you need.",
+  "tour8Title": "Powerful Search",
+  "tour8Desc": "Search by amount, note, or category. Works across all transactions.",
+  "tour9Title": "All Transactions",
+  "tour9Desc": "Your complete financial history. Tap any entry for details or to edit.",
+  "tour10Title": "Reports & Insights",
+  "tour10Desc": "View cash flow, income vs expense charts, and debt analysis. Export reports anytime.",
+  "tour11Title": "Backup & Restore",
+  "tour11Desc": "Save your data to cloud storage. Never lose your records.",
+  "tour12Title": "Help Center",
+  "tour12Desc": "FAQs, video tutorials, and support. Restart this tour anytime from here.",
+  
   "tipQuickActions": "Use Quick Actions for faster entry",
   "tipFilterTransactions": "Filter and search transactions by date, type, or name",
   "tipPersonBalance": "Tap a person to see their account",
   "tipBudgetAlert": "We'll remind you when nearing your budget",
   "tipGoalProgress": "Track your savings here",
+  "tipEditTransaction": "Swipe or tap to edit",
+  "tipDeleteTransaction": "Long press to delete",
+  "tipCurrencyChange": "Change currency in Settings",
+  "tipBackup": "Back up regularly to avoid data loss",
+  "tipDarkMode": "Try dark mode for nighttime use",
+  "tipAppLock": "Enable app lock for security",
   "tipExportReport": "Save reports as files",
+  "tourHelp": "Need help? Come here anytime",
   "tipGotIt": "Got it",
+
+  "goalDeposit": "Deposit to Goal",
+  "goalWithdrawal": "Withdrawal from Goal",
 
   "helpCenter": "Help Center",
   "helpCenterSubtitle": "FAQs and tutorials",
@@ -386,11 +432,35 @@
   "faqWhatIsAldeewaAnswer": "Aldeewan is a smart accounting app to manage your money, track debts, and set budgets.",
   "faqHowToAddTransaction": "How to add a transaction?",
   "faqHowToAddTransactionAnswer": "Tap the + button on any screen to add income or expense.",
-  "faqCashbook": "Cashbook",
-  "faqLedger": "Ledger",
+  "faqDataBackup": "Data & Backup",
+  "faqGettingStarted": "Getting Started",
+  "faqDashboard": "Dashboard & Home",
+  "faqLedger": "Leger (People)",
+  "faqCashbook": "Cashbook (Income/Expense)",
   "faqBudgetsGoals": "Budgets & Goals",
-  "faqReports": "Reports",
-  "faqSettings": "Settings",
+  "faqReports": "Analytics & Reports",
+  "faqSettings": "Settings & Data",
+
+  "faqWhatIsTrueIncome": "Money In vs True Income?",
+  "faqWhatIsTrueIncomeAnswer": "• Money In: All cash you received, including loans or debt repayments.\n• True Income: Only your actual earnings (Sales, Salary).\nUse True Income to see your real profit.",
+  
+  "faqWhatIsNetPosition": "What is Net Position?",
+  "faqWhatIsNetPositionAnswer": "It shows your overall financial health: (All Money You Have + People Owe You) minus (Debts You Owe).",
+
+  "faqHowToTrackDebt": "How to track debts?",
+  "faqHowToTrackDebtAnswer": "Go to Ledger > Add Person > Add Transaction > Choose 'Lent' (if they borrow from you) or 'Borrowed' (if you borrow from them).",
+
+  "faqWhatIsOldDebt": "What is 'Old Debt'?",
+  "faqWhatIsOldDebtAnswer": "Use this for debts that existed before you started using the app. It records the debt without changing your current cash balance.",
+  
+  "faqCashbookVsLedger": "Cashbook vs Ledger?",
+  "faqCashbookVsLedgerAnswer": "• Cashbook: For general income/expenses (e.g. Salary, Rent) not linked to a specific person.\n• Ledger: For debts and credits linked to people (Customers/Suppliers).",
+
+  "faqHowToBudget": "How do budget alerts work?",
+  "faqHowToBudgetAnswer": "Set a monthly limit for a category (e.g. Food). The app will notify you when you are close to exceeding it.",
+
+  "faqHowToExport": "How to export reports?",
+  "faqHowToExportAnswer": "• Person Statement: Go to Person Details > Export CSV.\n• Debt Report: Go to Analytics > Ledger > Export CSV.",
 
   "initialBalanceTitle": "Set Your Starting Balance",
   "initialBalanceDescription": "Enter the money you currently have to start tracking accurately.",
@@ -418,5 +488,88 @@
   "faqWhereIsData": "Where is my data stored?",
   "faqWhereIsDataAnswer": "Your data is stored locally on your device in an encrypted database. It never leaves your device unless you choose to backup to cloud.",
   "loadMore": "Load More",
-  "moreItems": "more"
+  "moreItems": "more",
+
+  "deletePerson": "Delete Person",
+  "archivePerson": "Archive Person",
+  "deletePersonConfirm": "Are you sure you want to delete {name}? This action cannot be undone.",
+  "@deletePersonConfirm": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "deletePersonWithTransactions": "{name} has {count} transactions. What would you like to do?",
+  "@deletePersonWithTransactions": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "count": {"type": "int"}
+    }
+  },
+  "cannotDeleteWithBalance": "Cannot delete {name}. Outstanding balance: {amount}. Please settle first or archive.",
+  "@cannotDeleteWithBalance": {
+    "placeholders": {
+      "name": {"type": "String"},
+      "amount": {"type": "String"}
+    }
+  },
+  "personArchived": "Person archived successfully",
+  "personDeleted": "Person deleted successfully",
+  "archive": "Archive",
+  "deleteAll": "Delete All",
+  "archivedPersons": "Archived",
+  "showArchived": "Show Archived",
+  "debtBreakdown": "Debt Breakdown",
+  "debtAnalysis": "Debt Analysis",
+  "exportDebtReport": "Export Debt Report",
+  "customersCount": "Customers ({count})",
+  "@customersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "suppliersCount": "Suppliers ({count})",
+  "@suppliersCount": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "allTime": "All Time",
+  "thisMonth": "This Month",
+  "customRange": "Custom Range",
+  "budgetExceededTitle": "Budget Exceeded",
+  "budgetExceededBody": "{name} exceeded by {amount} {currency}",
+  "@budgetExceededBody": {
+    "placeholders": {
+      "name": {},
+      "amount": {},
+      "currency": {}
+    }
+  },
+  "goalReachedTitle": "Goal Achieved! 🎉",
+  "goalReachedBody": "You've reached your goal: {name}",
+  "@goalReachedBody": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "weeklySummaryTitle": "Weekly Summary",
+  "weeklySummaryBody": "Income: {income} | Expense: {expense}",
+  "@weeklySummaryBody": {
+    "placeholders": {
+      "income": {},
+      "expense": {}
+    }
+  },
+
+  "saveFailed": "Failed to save. Please check storage space.",
+  "lowStorageWarning": "Storage is running low. Please free up space.",
+  "databaseError": "A database error occurred. Your data may not have been saved.",
+  "appSounds": "App Sounds",
+  "appSoundsSubtitle": "Play sounds on save and navigation",
+  "aboutApp": "About App",
+  "appFeatures": "App Features",
+  "termsOfService": "Terms of Service",
+  "privacyPolicy": "Privacy Policy",
+  "aboutAldeewanDescription": "Aldeewan is your ultimate financial companion, designed to help you track your money, manage debts, and achieve your financial goals with ease and intelligence."
 }
+

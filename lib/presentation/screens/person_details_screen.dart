@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,9 +11,11 @@ import 'package:aldeewan_mobile/presentation/widgets/empty_state.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/widgets/transaction_form.dart';
 import 'package:aldeewan_mobile/presentation/widgets/person_form.dart';
+import 'package:aldeewan_mobile/presentation/widgets/delete_person_dialog.dart';
 import 'package:aldeewan_mobile/config/app_colors.dart';
 import 'package:aldeewan_mobile/utils/transaction_label_mapper.dart';
 import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
+import 'package:aldeewan_mobile/utils/toast_service.dart';
 import 'package:go_router/go_router.dart';
 
 class PersonDetailsScreen extends ConsumerWidget {
@@ -30,6 +33,7 @@ class PersonDetailsScreen extends ConsumerWidget {
   }
 
   void _showAddTransactionModal(BuildContext context, WidgetRef ref, Person person) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -39,26 +43,34 @@ class PersonDetailsScreen extends ConsumerWidget {
         initialType: person.role == PersonRole.customer
             ? TransactionType.saleOnCredit
             : TransactionType.purchaseOnCredit,
-        onSave: (transaction) {
-          ref.read(ledgerProvider.notifier).addTransaction(transaction);
+        onSave: (transaction) async {
+          try {
+            await ref.read(ledgerProvider.notifier).addTransaction(transaction);
+          } catch (e) {
+            if (context.mounted) {
+              ToastService.showError(context, l10n.saveFailed);
+            }
+          }
         },
       ),
     );
   }
 
   void _showEditPersonModal(BuildContext context, WidgetRef ref, Person person) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) => PersonForm(
         person: person,
-        onSave: (updatedPerson) {
-          // We need an updatePerson method in LedgerNotifier.
-          // Assuming addPerson handles updates if ID exists or we need a new method.
-          // Usually repositories handle upsert or we need explicit update.
-          // Let's check LedgerNotifier. It has addPerson.
-          // If repository uses Realm/Isar, put usually updates if ID matches.
-          ref.read(ledgerProvider.notifier).addPerson(updatedPerson);
+        onSave: (updatedPerson) async {
+          try {
+            await ref.read(ledgerProvider.notifier).addPerson(updatedPerson);
+          } catch (e) {
+            if (context.mounted) {
+              ToastService.showError(context, l10n.saveFailed);
+            }
+          }
         },
       ),
     );
@@ -132,7 +144,14 @@ class PersonDetailsScreen extends ConsumerWidget {
               IconButton(
                 icon: const Icon(LucideIcons.trash2),
                 onPressed: () {
-                  // TODO: Confirm Delete
+                  showDialog(
+                    context: context,
+                    builder: (context) => DeletePersonDialog(
+                      personId: person.id,
+                      personName: person.name,
+                      onDeleted: () => Navigator.of(context).pop(),
+                    ),
+                  );
                 },
               ),
             ],
@@ -267,7 +286,7 @@ class PersonDetailsScreen extends ConsumerWidget {
                                     tx.amount.toStringAsFixed(2),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 16,
+                                      fontSize: 16.sp,
                                       color: isDebtIncrease ? AppColors.warning : AppColors.info,
                                     ),
                                   ),
@@ -275,7 +294,7 @@ class PersonDetailsScreen extends ConsumerWidget {
                                     Text(
                                       tx.note!,
                                       style: TextStyle(
-                                        fontSize: 12,
+                                        fontSize: 12.sp,
                                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                                       ),
                                       maxLines: 1,

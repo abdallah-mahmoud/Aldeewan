@@ -6,8 +6,8 @@ import 'package:aldeewan_mobile/presentation/screens/ledger_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/cashbook_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/analytics_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/settings_screen.dart';
-import 'package:aldeewan_mobile/presentation/screens/person_details_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/about_screen.dart';
+import 'package:aldeewan_mobile/presentation/screens/developer_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/splash_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/link_account_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/budget_screen.dart';
@@ -17,6 +17,7 @@ import 'package:aldeewan_mobile/presentation/screens/goal_details_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/notifications_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/transaction_details_screen.dart';
 import 'package:aldeewan_mobile/presentation/screens/help_center_screen.dart';
+import 'package:aldeewan_mobile/presentation/screens/person_details_screen.dart';
 import 'package:aldeewan_mobile/presentation/widgets/scaffold_with_nav_bar.dart';
 import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
@@ -116,8 +117,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: 'about',
-                parentNavigatorKey: rootNavigatorKey, // Open about above the shell
+                parentNavigatorKey: rootNavigatorKey,
                 builder: (context, state) => const AboutScreen(),
+              ),
+              GoRoute(
+                path: 'developer',
+                parentNavigatorKey: rootNavigatorKey,
+                builder: (context, state) => const DeveloperScreen(),
               ),
               GoRoute(
                 path: 'help',

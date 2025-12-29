@@ -141,51 +141,81 @@ class _QuickActionsState extends ConsumerState<QuickActions> {
               l10n.quickActions,
               style: theme.textTheme.titleMedium,
             ),
-            const SizedBox(height: 8),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 3,
-              crossAxisSpacing: 12.w,
-              mainAxisSpacing: 12.h,
-              childAspectRatio: 1.0,
-              children: [
-                _buildActionButton(
-                  context,
-                  l10n.addDebt,
-                  LucideIcons.filePlus2,
-                  () => context.push('/ledger?action=debt'),
-                  isDark,
-                ),
-                _buildActionButton(
-                  context,
-                  l10n.recordPayment,
-                  LucideIcons.creditCard,
-                  () => context.push('/ledger?action=payment'),
-                  isDark,
-                ),
-                _buildActionButton(
-                  context,
-                  l10n.scanReceipt,
-                  LucideIcons.scanLine,
-                  () => _scanReceipt(context, ref),
-                  isDark,
-                ),
-                _buildActionButton(
-                  context,
-                  l10n.addCashEntry,
-                  LucideIcons.plusCircle,
-                  () => context.push('/cashbook?action=add'),
-                  isDark,
-                ),
-                _buildActionButton(
-                  context,
-                  l10n.viewBalances,
-                  LucideIcons.scale,
-                  () => context.go('/ledger'),
-                  isDark,
-                ),
-              ],
+            SizedBox(height: 12.h),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                // Calculate responsive height based on screen width
+                final screenWidth = MediaQuery.of(context).size.width;
+                final chipHeight = (screenWidth * 0.22).clamp(75.0, 95.0);
+                
+                return SizedBox(
+                  height: chipHeight,
+                  child: ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return LinearGradient(
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black,
+                          Colors.black,
+                          Colors.transparent,
+                        ],
+                        stops: const [0.0, 0.02, 0.98, 1.0],
+                      ).createShader(bounds);
+                    },
+                    blendMode: BlendMode.dstIn,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      padding: EdgeInsets.symmetric(horizontal: 4.w),
+                      child: Row(
+                        children: [
+                          _buildActionChip(
+                            context,
+                            l10n.addDebt,
+                            LucideIcons.filePlus2,
+                            () => context.push('/ledger?action=debt'),
+                            isDark,
+                          ),
+                          SizedBox(width: 10.w),
+                          _buildActionChip(
+                            context,
+                            l10n.recordPayment,
+                            LucideIcons.creditCard,
+                            () => context.push('/ledger?action=payment'),
+                            isDark,
+                          ),
+                          SizedBox(width: 10.w),
+                          _buildActionChip(
+                            context,
+                            l10n.scanReceipt,
+                            LucideIcons.scanLine,
+                            () => _scanReceipt(context, ref),
+                            isDark,
+                          ),
+                          SizedBox(width: 10.w),
+                          _buildActionChip(
+                            context,
+                            l10n.addCashEntry,
+                            LucideIcons.plusCircle,
+                            () => context.push('/cashbook?action=add'),
+                            isDark,
+                          ),
+                          SizedBox(width: 10.w),
+                          _buildActionChip(
+                            context,
+                            l10n.viewBalances,
+                            LucideIcons.scale,
+                            () => context.go('/analytics?tab=debts'),
+                            isDark,
+                          ),
+                          SizedBox(width: 4.w),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -202,52 +232,64 @@ class _QuickActionsState extends ConsumerState<QuickActions> {
     );
   }
 
-  Widget _buildActionButton(
+  Widget _buildActionChip(
       BuildContext context, String label, IconData icon, VoidCallback onTap, bool isDark) {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    
+    // Responsive sizing: scales with screen but has min/max bounds
+    final chipWidth = (screenWidth * 0.26).clamp(85.0, 110.0);
+    final iconSize = (screenWidth * 0.055).clamp(18.0, 24.0);
+    final iconPadding = (screenWidth * 0.02).clamp(6.0, 10.0);
+    
     return InkWell(
       onTap: () {
         ref.read(soundServiceProvider).playClick();
         onTap();
       },
-      borderRadius: BorderRadius.circular(20.r),
+      borderRadius: BorderRadius.circular(14.r),
       child: Container(
-        padding: EdgeInsets.all(8.w),
+        width: chipWidth,
+        constraints: BoxConstraints(
+          minHeight: 70,
+          maxHeight: 90,
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 8.h),
         decoration: BoxDecoration(
           color: theme.cardTheme.color,
-          borderRadius: BorderRadius.circular(20.r),
+          borderRadius: BorderRadius.circular(14.r),
           boxShadow: [
             BoxShadow(
               color: theme.shadowColor.withValues(alpha: 0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: EdgeInsets.all(10.w),
+              padding: EdgeInsets.all(iconPadding),
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(14.r),
+                borderRadius: BorderRadius.circular(10.r),
               ),
-              child: Icon(icon, color: theme.colorScheme.primary, size: 24.sp),
+              child: Icon(icon, color: theme.colorScheme.primary, size: iconSize),
             ),
-            SizedBox(height: 6.h),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 4.w),
+            SizedBox(height: 4.h),
+            Flexible(
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
                   label,
                   textAlign: TextAlign.center,
-                  maxLines: 2,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodyMedium?.copyWith(
+                  style: theme.textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    fontSize: 11, // Slightly smaller base font
+                    fontSize: 11,
                   ),
                 ),
               ),

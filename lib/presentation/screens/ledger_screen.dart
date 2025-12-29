@@ -18,6 +18,9 @@ import 'package:aldeewan_mobile/presentation/widgets/debounced_search_bar.dart';
 import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
 import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_sort_provider.dart';
+import 'package:aldeewan_mobile/utils/toast_service.dart';
+import 'package:aldeewan_mobile/presentation/providers/guided_tour_provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class LedgerScreen extends ConsumerStatefulWidget {
   const LedgerScreen({super.key});
@@ -40,7 +43,28 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_initialActionHandled) {
-      final action = GoRouterState.of(context).uri.queryParameters['action'];
+      final uri = GoRouterState.of(context).uri;
+      final action = uri.queryParameters['action'];
+      final tab = uri.queryParameters['tab'];
+      final filter = uri.queryParameters['filter'];
+      
+      // Handle tab switching
+      if (tab == 'suppliers' && _tabController.index != 1) {
+        Future.microtask(() => _tabController.animateTo(1));
+      } else if (tab == 'customers' && _tabController.index != 0) {
+        Future.microtask(() => _tabController.animateTo(0));
+      }
+      
+      // Handle balance filter
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        if (filter == 'owes') {
+          ref.read(ledgerBalanceFilterProvider.notifier).state = 'owes';
+        } else {
+          ref.read(ledgerBalanceFilterProvider.notifier).state = 'all';
+        }
+      });
+      
       if (action == 'debt' || action == 'payment' || action == 'scan') {
         _initialActionHandled = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -48,6 +72,30 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
         });
       }
     }
+    
+    // Auto-start ledger tour if guided tour is active
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final tourNotifier = ref.read(guidedTourProvider.notifier);
+      if (tourNotifier.canStartTourForScreen(TourScreen.ledger)) {
+        tourNotifier.markScreenTourStarted();
+        _startLedgerShowcase();
+      }
+    });
+  }
+  
+  void _startLedgerShowcase() {
+    if (!mounted) return;
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) {
+        try {
+          // ignore: deprecated_member_use
+          ShowCaseWidget.of(context).startShowCase(ShowcaseKeys.ledgerKeys);
+        } catch (e) {
+          debugPrint('Ledger showcase error: $e');
+        }
+      }
+    });
   }
 
   void _handleQuickAction(String action) {
@@ -108,6 +156,16 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
       return;
     }
 
+    // Determine modal title based on action
+    String modalTitle;
+    if (action == 'debt') {
+      modalTitle = l10n.customer; // "Select Customer" for debt
+    } else if (action == 'payment') {
+      modalTitle = l10n.supplier; // "Select Supplier" for payment
+    } else {
+      modalTitle = l10n.selectPerson;
+    }
+
     showModalBottomSheet(
       context: context,
       builder: (context) => Column(
@@ -116,7 +174,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
           Padding(
             padding: EdgeInsets.all(16.0.w),
             child: Text(
-              l10n.selectPerson,
+              '${l10n.selectPerson} - $modalTitle',
               style: Theme.of(context).textTheme.titleLarge,
             ),
           ),
@@ -126,10 +184,18 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                 // Re-watch in case it changes while open (unlikely but good practice)
                 final ledgerAsync = ref.watch(ledgerProvider);
                 final currentPersons = ledgerAsync.value?.persons ?? [];
+                
+                // Filter persons based on action type
+                final filteredPersons = action == 'debt' 
+                    ? currentPersons.where((p) => p.role == PersonRole.customer).toList()
+                    : action == 'payment'
+                        ? currentPersons.where((p) => p.role == PersonRole.supplier).toList()
+                        : currentPersons;
+                
                 return ListView.builder(
-                  itemCount: currentPersons.length,
+                  itemCount: filteredPersons.length,
                   itemBuilder: (context, index) {
-                    final person = currentPersons[index];
+                    final person = filteredPersons[index];
                     return ListTile(
                       title: Text(person.name),
                       subtitle: Text(person.role == PersonRole.customer ? l10n.customer : l10n.supplier),
@@ -202,13 +268,20 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
   }
 
   void _showAddPersonModal(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       builder: (context) => PersonForm(
-        onSave: (person) {
-          ref.read(soundServiceProvider).playSuccess();
-          ref.read(ledgerProvider.notifier).addPerson(person);
+        onSave: (person) async {
+          try {
+            await ref.read(ledgerProvider.notifier).addPerson(person);
+            ref.read(soundServiceProvider).playSuccess();
+          } catch (e) {
+            if (context.mounted) {
+              ToastService.showError(context, l10n.saveFailed);
+            }
+          }
         },
       ),
     );
@@ -301,10 +374,27 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
   Widget _buildPersonList(BuildContext context, List<Person> persons, PersonRole role, LedgerNotifier notifier, AppLocalizations l10n, String currency) {
     final searchQuery = ref.watch(ledgerSearchProvider);
     final sortOption = ref.watch(ledgerSortProvider);
+    final showArchived = ref.watch(showArchivedProvider);
+    final balanceFilter = ref.watch(ledgerBalanceFilterProvider);
     final theme = Theme.of(context);
     
-    // Filter by role first, then by search query
+    // Filter by role first, then exclude archived unless showArchived is true
     var filteredPersons = persons.where((p) => p.role == role).toList();
+    
+    // Filter out archived persons unless showArchived is enabled
+    if (!showArchived) {
+      filteredPersons = filteredPersons.where((p) => !p.isArchived).toList();
+    }
+    
+    // Apply balance filter: show only persons with outstanding balance
+    if (balanceFilter == 'owes') {
+      filteredPersons = filteredPersons.where((p) {
+        final balance = notifier.calculatePersonBalance(p);
+        // For customers: balance > 0 means they owe us
+        // For suppliers: balance > 0 means we owe them
+        return balance != 0;
+      }).toList();
+    }
     
     if (searchQuery.isNotEmpty) {
       filteredPersons = filteredPersons.where((p) {
@@ -346,6 +436,18 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                 ),
               ),
               SizedBox(width: 8.w),
+              // Clear filter button (show when any filter is active)
+              if (balanceFilter == 'owes' || searchQuery.isNotEmpty || showArchived)
+                IconButton(
+                  icon: Icon(LucideIcons.filterX, color: theme.colorScheme.error),
+                  tooltip: l10n.all,
+                  onPressed: () {
+                    // Reset all filters
+                    ref.read(ledgerBalanceFilterProvider.notifier).state = 'all';
+                    ref.read(ledgerSearchProvider.notifier).state = '';
+                    ref.read(showArchivedProvider.notifier).state = false;
+                  },
+                ),
               // Sort dropdown
               PopupMenuButton<LedgerSortOption>(
                 icon: Icon(LucideIcons.arrowUpDown, color: theme.colorScheme.primary),
@@ -417,12 +519,12 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
         ),
         // Person balance tip
         const PersonBalanceTip(),
-        // List or empty state - Tour Target Step 3
+        // List or empty state - Tour Step 5
         Expanded(
           child: ShowcaseTarget(
             showcaseKey: ShowcaseKeys.ledgerList,
-            title: l10n.tourWelcome,
-            description: l10n.tourLedger,
+            title: l10n.tour5Title,
+            description: l10n.tour5Desc,
             child: filteredPersons.isEmpty
                 ? EmptyState(
                     message: searchQuery.isEmpty ? l10n.noEntriesYet : l10n.noResults,
@@ -486,9 +588,15 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                     children: [
                       Icon(LucideIcons.phone, size: 12.sp, color: Theme.of(context).colorScheme.onSurfaceVariant),
                       SizedBox(width: 4.w),
-                      Text(
-                        person.phone!,
-                        style: Theme.of(context).textTheme.bodySmall,
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            person.phone!,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
                       ),
                     ],
                   )
@@ -517,8 +625,8 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                     balance == 0 
                         ? l10n.settled 
                         : (role == PersonRole.customer 
-                            ? (balance > 0 ? l10n.receivable : l10n.advance) 
-                            : (balance > 0 ? l10n.payable : l10n.advance)),
+                            ? (balance > 0 ? l10n.receivable : l10n.advanceYouOwe) 
+                            : (balance > 0 ? l10n.payable : l10n.advanceOwesYou)),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       fontSize: 10.sp,
                       color: Theme.of(context).colorScheme.onSurfaceVariant,

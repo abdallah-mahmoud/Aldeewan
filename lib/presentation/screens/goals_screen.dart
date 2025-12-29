@@ -258,7 +258,7 @@ class GoalsScreen extends ConsumerWidget {
                 ],
               ),
             ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: budgetState.goals.isEmpty ? null : FloatingActionButton.extended(
         onPressed: () => _showAddGoalDialog(context, ref),
         icon: const Icon(LucideIcons.plus),
         label: Text(l10n.createGoal),

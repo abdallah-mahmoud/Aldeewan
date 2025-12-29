@@ -1,43 +1,33 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
 
-  Future<void> _launchUrl(String urlString) async {
-    final Uri url = Uri.parse(urlString);
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      // Handle error gracefully, maybe show a snackbar
-      debugPrint('Could not launch $url');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.aboutDeveloper),
+        title: Text(l10n.aboutApp),
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
+        padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 32.h),
         child: Column(
           children: [
-            const SizedBox(height: 16),
-            // Profile Picture
+            // App Logo
             Container(
-              width: 120,
-              height: 120,
+              width: 100.w,
+              height: 100.w,
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: Theme.of(context).colorScheme.surface,
-                  width: 4,
-                ),
+                color: theme.colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(24.r),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.1),
@@ -46,99 +36,84 @@ class AboutScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              child: ClipOval(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(24.r),
                 child: Image.asset(
-                  'assets/images/PFP.png',
-                  fit: BoxFit.cover,
+                  'assets/images/logo.png', // Ensure this exists or use an icon fallback
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    LucideIcons.wallet,
+                    size: 50.sp,
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 16),
-            // Name
+            SizedBox(height: 16.h),
             Text(
-              l10n.developerName,
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                  ),
+              'Aldeewan',
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.primary,
+              ),
             ),
-            const SizedBox(height: 8),
-            // Tagline
             Text(
-              l10n.developerTagline,
+              l10n.appVersionInfo('2.2.0'),
+              style: theme.textTheme.bodySmall,
+            ),
+            SizedBox(height: 32.h),
+            
+            // Description
+            Text(
+              l10n.aboutAldeewanDescription,
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
+              style: theme.textTheme.bodyLarge?.copyWith(height: 1.5),
             ),
-            const SizedBox(height: 32),
-            // Links Card
-            Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(
-                  color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05),
+            
+            SizedBox(height: 40.h),
+            
+            // Features / Info Tiles
+            _buildInfoCard(
+              context,
+              children: [
+                _buildInfoTile(
+                  context,
+                  icon: LucideIcons.checkCircle2,
+                  title: l10n.appFeatures,
+                  onTap: () {
+                    // Could show a dialog with features
+                    _showFeaturesDialog(context, l10n);
+                  },
                 ),
-              ),
-              child: Column(
-                children: [
-                  _buildLinkItem(
-                    context,
-                    icon: LucideIcons.facebook,
-                    label: l10n.facebook,
-                    subLabel: '@motaasl8',
-                    color: const Color(0xFF1877F2),
-                    onTap: () => _launchUrl('https://www.facebook.com/motaasl8'),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  _buildLinkItem(
-                    context,
-                    icon: LucideIcons.instagram,
-                    label: l10n.instagram,
-                    subLabel: '@motaasl8',
-                    color: const Color(0xFFE4405F),
-                    onTap: () => _launchUrl('https://www.instagram.com/motaasl8'),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  _buildLinkItem(
-                    context,
-                    icon: LucideIcons.mail,
-                    label: l10n.email,
-                    subLabel: 'abdo13-m.azme@hotmail.com',
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    onTap: () => _launchUrl('mailto:abdo13-m.azme@hotmail.com'),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  _buildLinkItem(
-                    context,
-                    icon: LucideIcons.phone,
-                    label: l10n.phone,
-                    subLabel: '+249 111 950 191',
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    onTap: () => _launchUrl('tel:+249111950191'),
-                  ),
-                  const Divider(height: 1, indent: 16, endIndent: 16),
-                  _buildLinkItem(
-                    context,
-                    icon: LucideIcons.github,
-                    label: l10n.openSourceLink,
-                    subLabel: '',
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    onTap: () => _launchUrl('https://github.com/abdallah-mahmoud/Aldeewan'),
-                  ),
-                ],
-              ),
+                const Divider(height: 1),
+                _buildInfoTile(
+                  context,
+                  icon: LucideIcons.fileText,
+                  title: l10n.termsOfService,
+                  subtitle: l10n.comingSoon,
+                  onTap: () {},  // No action until document is ready
+                  enabled: false,
+                ),
+                const Divider(height: 1),
+                _buildInfoTile(
+                  context,
+                  icon: LucideIcons.shieldCheck,
+                  title: l10n.privacyPolicy,
+                  onTap: () => _launchUrl('https://docs.google.com/document/d/1mzfbH2PyfqQEV6EXh5fPje8mvmaATbNt57_tYfMwTsE/edit?usp=sharing'),
+                ),
+              ],
             ),
-            const SizedBox(height: 32),
+            
+            SizedBox(height: 48.h),
+            
             // Footer
             Text(
-              l10n.islamicEndowment,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
+              l10n.madeWithLove,
+              style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
+            ),
+            SizedBox(height: 8.h),
+            Text(
+              '© 2025 Motaasl for Software Solutions',
+              style: theme.textTheme.labelSmall?.copyWith(color: Colors.grey),
             ),
           ],
         ),
@@ -146,34 +121,80 @@ class AboutScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLinkItem(
-    BuildContext context, {
+  Widget _buildInfoCard(BuildContext context, {required List<Widget> children}) {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.r),
+        side: BorderSide(color: Theme.of(context).dividerColor.withValues(alpha: 0.1)),
+      ),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _buildInfoTile(BuildContext context, {
     required IconData icon,
-    required String label,
-    required String subLabel,
-    required Color color,
+    required String title,
+    String? subtitle,
     required VoidCallback onTap,
+    bool enabled = true,
   }) {
     return ListTile(
-      onTap: onTap,
-      leading: Icon(icon, color: color),
-      title: Text(
-        label,
-        style: const TextStyle(fontWeight: FontWeight.w600),
+      onTap: enabled ? onTap : null,
+      leading: Icon(icon, size: 20.sp, color: enabled ? Theme.of(context).colorScheme.primary : Colors.grey),
+      title: Text(title, style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+        color: enabled ? null : Colors.grey,
+      )),
+      subtitle: subtitle != null ? Text(subtitle, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)) : null,
+      trailing: enabled ? const Icon(Icons.chevron_right) : null,
+    );
+  }
+
+  void _showFeaturesDialog(BuildContext context, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.appFeatures),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _FeatureItem(icon: LucideIcons.wallet, text: l10n.featureManageCash),
+            _FeatureItem(icon: LucideIcons.users, text: l10n.featureTrackDebts),
+            _FeatureItem(icon: LucideIcons.pieChart, text: l10n.featureAnalytics),
+            _FeatureItem(icon: LucideIcons.cloud, text: l10n.featureBackup),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.ok)),
+        ],
       ),
-      subtitle: subLabel.isNotEmpty
-          ? Text(
-              subLabel,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-                fontSize: 12,
-              ),
-            )
-          : null,
-      trailing: Icon(
-        Icons.chevron_right,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-        size: 20,
+    );
+  }
+
+  Future<void> _launchUrl(String urlString) async {
+    final Uri url = Uri.parse(urlString);
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      debugPrint('Could not launch $url');
+    }
+  }
+}
+
+class _FeatureItem extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  const _FeatureItem({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 8),
+          Expanded(child: Text(text)),
+        ],
       ),
     );
   }

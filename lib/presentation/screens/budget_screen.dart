@@ -34,12 +34,20 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> with SingleTickerPr
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_handleTabSelection);
   }
 
   @override
   void dispose() {
+    _tabController.removeListener(_handleTabSelection);
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _handleTabSelection() {
+    if (_tabController.indexIsChanging) {
+      setState(() {});
+    }
   }
 
   @override
@@ -112,6 +120,10 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> with SingleTickerPr
     }
 
     double totalProgress = totalLimit > 0 ? totalSpent / totalLimit : 0;
+
+    // determine if FAB should be shown
+    // Hide FAB if on Active tab and it's empty (because EmptyState has a button)
+    final showFab = _tabController.index == 0 && activeBudgets.isEmpty ? false : true;
 
     return Scaffold(
       appBar: AppBar(
@@ -379,11 +391,11 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> with SingleTickerPr
                     ),
               ],
             ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: showFab ? FloatingActionButton.extended(
         onPressed: () => _showAddBudgetDialog(context, ref),
         icon: const Icon(LucideIcons.plus),
         label: Text(l10n.createBudget),
-      ),
+      ) : null,
     );
   }
 
@@ -423,7 +435,7 @@ class _BudgetScreenState extends ConsumerState<BudgetScreen> with SingleTickerPr
                       if (selectedCategory != null) ...[
                         Icon(selectedCategory!.icon, color: selectedCategory!.color, size: 20),
                         const SizedBox(width: 8),
-                        Text(selectedCategory!.name),
+                        Text(CategoryHelper.getLocalizedCategory(selectedCategory!.name, l10n)),
                       ] else
                         Text(l10n.category), // "Select Category"
                       const Spacer(),

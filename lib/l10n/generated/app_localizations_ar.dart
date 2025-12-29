@@ -33,6 +33,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settings => 'الإعدادات';
 
   @override
+  String get featureManageCash => 'إدارة النقد والحسابات';
+
+  @override
+  String get featureTrackDebts => 'تتبع الديون والأشخاص';
+
+  @override
+  String get featureAnalytics => 'تحليلات مالية';
+
+  @override
+  String get featureBackup => 'نسخ احتياطي آمن';
+
+  @override
+  String get comingSoon => 'قريباً';
+
+  @override
   String get general => 'عام';
 
   @override
@@ -158,6 +173,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get edit => 'تعديل';
+
+  @override
+  String get editTransaction => 'تعديل المعاملة';
 
   @override
   String get name => 'الاسم';
@@ -311,16 +329,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noEntriesYet => 'لا توجد معاملات حتى الآن';
 
   @override
-  String get totalReceivable => 'إجمالي المستحقات';
+  String get totalReceivable => 'ديون لك';
 
   @override
-  String get totalPayable => 'إجمالي المطلوبات';
+  String get totalPayable => 'ديون عليك';
 
   @override
-  String get monthlyIncome => 'الدخل الشهري';
+  String get moneyIn => 'الأموال الواردة';
 
   @override
-  String get monthlyExpense => 'المصروف الشهري';
+  String get moneyOut => 'الأموال الصادرة';
+
+  @override
+  String get trueIncome => 'الدخل الحقيقي';
+
+  @override
+  String get trueExpense => 'المصروف الحقيقي';
+
+  @override
+  String get debtsSection => 'الديون';
+
+  @override
+  String get monthlySection => 'الحركة الشهرية';
 
   @override
   String get transactionDetails => 'تفاصيل المعاملة';
@@ -451,10 +481,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentMade => 'دفع دفعة';
 
   @override
-  String get debtGiven => 'دين (عليه)';
+  String get debtGiven => 'إقراض (دفعت له)';
 
   @override
-  String get debtTaken => 'دين (له)';
+  String get debtTaken => 'اقتراض (استلمت منه)';
 
   @override
   String get cashSale => 'بيع (نقد)';
@@ -472,13 +502,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get settled => 'خالص';
 
   @override
-  String get receivable => 'مستحق';
+  String get receivable => 'ديون لك';
 
   @override
-  String get payable => 'مطلوب';
+  String get payable => 'ديون عليك';
 
   @override
-  String get advance => 'مستحق';
+  String get advance => 'رصيد مقدم';
+
+  @override
+  String get advanceOwesYou => 'لك (رصيد مقدم)';
+
+  @override
+  String get advanceYouOwe => 'عليك (رصيد مقدم)';
 
   @override
   String get analytics => 'التحليلات';
@@ -494,9 +530,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get myAccounts => 'حساباتي';
-
-  @override
-  String get comingSoon => 'قريباً';
 
   @override
   String get syncAccounts => 'مزامنة الحسابات';
@@ -586,6 +619,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get simpleModeSubtitle => 'استخدام مصطلحات مبسطة (سلف/دين)';
+
+  @override
+  String get oldDebt => 'دين قديم / رصيد افتتاحي';
+
+  @override
+  String get oldDebtExplanation =>
+      'استخدم هذا الخيار للديون التي كانت موجودة قبل استخدامك للتطبيق. سيتم تسجيل الدين في ملف الشخص ولكن لن يغير رصيدك النقدي/البنكي الحالي.';
+
+  @override
+  String get ok => 'حسناً';
 
   @override
   String get simpleLent => 'سلفته (لنا)';
@@ -805,7 +848,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appSounds => 'أصوات التطبيق';
 
   @override
-  String get appSoundsSubtitle => 'تفعيل المؤثرات الصوتية';
+  String get appSoundsSubtitle => 'تشغيل أصوات عند الحفظ أو التنقل';
 
   @override
   String get notifications => 'الإشعارات';
@@ -835,20 +878,26 @@ class AppLocalizationsAr extends AppLocalizations {
   String get reminderTime => 'وقت التذكير';
 
   @override
-  String get budgetExceededTitle => 'تجاوز الميزانية';
+  String get budgetExceededTitle => 'تجاوزت الميزانية';
 
   @override
-  String budgetExceededBody(String category, String amount, String currency) {
-    return 'لقد تجاوزت ميزانيتك لفئة $category بمقدار $amount $currency.';
+  String budgetExceededBody(Object name, Object amount, Object currency) {
+    return 'تجاوز $name بمبلغ $amount $currency';
   }
 
   @override
-  String get goalReachedTitle => 'تم تحقيق الهدف!';
+  String get goalReachedTitle => 'تم تحقيق الهدف! 🎉';
 
   @override
-  String goalReachedBody(String goalName) {
-    return 'تهانينا! لقد حققت هدفك: $goalName.';
+  String goalReachedBody(Object name) {
+    return 'حققت هدفك: $name';
   }
+
+  @override
+  String get goalContribution => 'مساهمة';
+
+  @override
+  String get budgetExceeded => 'تجاوز الميزانية';
 
   @override
   String get insufficientFundsTitle => 'رصيد غير كافٍ';
@@ -866,34 +915,98 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tourWelcome => 'مرحباً بك في الديوان!';
 
   @override
-  String get tourDashboard => 'هنا تشوف كل فلوسك';
+  String get tourDialogTitle => 'مرحباً بك في الديوان!';
 
   @override
-  String get tourAddTransaction => 'اضغط هنا تضيف فلوس داخلة أو خارجة';
+  String get tourDialogBody => 'خذ جولة سريعة لاكتشاف كل الميزات؟';
 
   @override
-  String get tourLedger => 'الناس اللي لك أو عليك عندهم فلوس';
+  String get tourStartButton => 'ابدأ الجولة';
 
   @override
-  String get tourCashbook => 'فلتر حسب الداخل أو الخارج';
+  String get tourSkipButton => 'تخطي الآن';
 
   @override
-  String get tourSearch => 'دور بالاسم أو المبلغ أو النوع';
+  String get tour1Title => 'نظرة مالية شاملة';
 
   @override
-  String get tourHelp => 'محتاج مساعدة؟ تعال هنا';
+  String get tour1Desc =>
+      'شاهد وضعك المالي الإجمالي. بدّل بين \'الكل\' و\'هذا الشهر\' لعرض فترات مختلفة.';
 
   @override
-  String get tourSkip => 'تخطي';
+  String get tour2Title => 'إجراءات سريعة';
 
   @override
-  String get tourNext => 'التالي';
+  String get tour2Desc =>
+      'أضف دخل أو مصاريف أو ديون أو امسح الفواتير. كل شيء يبدأ من هنا.';
 
   @override
-  String get tourFinish => 'ابدأ';
+  String get tour3Title => 'تتبع الميزانية';
 
   @override
-  String get tourPrevious => 'السابق';
+  String get tour3Desc => 'حدد سقف إنفاق لكل فئة. نُنبهك قبل تجاوز الميزانية.';
+
+  @override
+  String get tour4Title => 'أهداف التوفير';
+
+  @override
+  String get tour4Desc =>
+      'وفّر لأهداف مثل الطوارئ أو السفر أو المشتريات. تابع تقدمك بصريًا.';
+
+  @override
+  String get tour5Title => 'شبكتك';
+
+  @override
+  String get tour5Desc =>
+      'العملاء والموردون الذين تتابعهم. اضغط على أي شخص لرؤية سجله الكامل ورصيده.';
+
+  @override
+  String get tour6Title => 'إضافة أشخاص';
+
+  @override
+  String get tour6Desc => 'اضغط هنا لإضافة عملاء أو موردين جدد إلى دفترك.';
+
+  @override
+  String get tour7Title => 'فلاتر ذكية';
+
+  @override
+  String get tour7Desc =>
+      'فلتر حسب النوع (دخل/مصروف) والفترة الزمنية. اعثر على ما تحتاجه بالضبط.';
+
+  @override
+  String get tour8Title => 'بحث قوي';
+
+  @override
+  String get tour8Desc =>
+      'ابحث بالمبلغ أو الملاحظة أو الفئة. يعمل على جميع معاملاتك.';
+
+  @override
+  String get tour9Title => 'كل المعاملات';
+
+  @override
+  String get tour9Desc =>
+      'سجلك المالي الكامل. اضغط على أي عنصر للتفاصيل أو التعديل.';
+
+  @override
+  String get tour10Title => 'التقارير والرؤى';
+
+  @override
+  String get tour10Desc =>
+      'شاهد التدفق النقدي ورسوم الدخل والمصروفات وتحليل الديون. صدّر التقارير في أي وقت.';
+
+  @override
+  String get tour11Title => 'النسخ الاحتياطي والاستعادة';
+
+  @override
+  String get tour11Desc =>
+      'احفظ بياناتك في التخزين السحابي. لا تفقد سجلاتك أبداً.';
+
+  @override
+  String get tour12Title => 'مركز المساعدة';
+
+  @override
+  String get tour12Desc =>
+      'الأسئلة الشائعة والفيديوهات التعليمية والدعم. أعد هذه الجولة في أي وقت من هنا.';
 
   @override
   String get tipQuickActions => 'أزرار سريعة تسهل عليك';
@@ -912,10 +1025,37 @@ class AppLocalizationsAr extends AppLocalizations {
   String get tipGoalProgress => 'تابع توفيرك هنا';
 
   @override
+  String get tipEditTransaction => 'اسحب أو اضغط للتعديل';
+
+  @override
+  String get tipDeleteTransaction => 'اضغط طويلاً للحذف';
+
+  @override
+  String get tipCurrencyChange => 'غيّر العملة من الإعدادات';
+
+  @override
+  String get tipBackup => 'احتفظ بنسخة احتياطية بانتظام';
+
+  @override
+  String get tipDarkMode => 'جرب الوضع الليلي';
+
+  @override
+  String get tipAppLock => 'فعّل قفل التطبيق للأمان';
+
+  @override
   String get tipExportReport => 'احفظ التقارير كملفات';
 
   @override
+  String get tourHelp => 'محتاج مساعدة؟ تعال هنا';
+
+  @override
   String get tipGotIt => 'فهمت';
+
+  @override
+  String get goalDeposit => 'إيداع للهدف';
+
+  @override
+  String get goalWithdrawal => 'سحب من الهدف';
 
   @override
   String get helpCenter => 'مركز المساعدة';
@@ -939,7 +1079,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get faqGettingStarted => 'البداية';
 
   @override
-  String get faqWhatIsAldeewan => 'إيش هو الديوان؟';
+  String get faqWhatIsAldeewan => 'ماهو الديوان؟';
 
   @override
   String get faqWhatIsAldeewaAnswer =>
@@ -953,19 +1093,74 @@ class AppLocalizationsAr extends AppLocalizations {
       'اضغط على زر + في أي شاشة عشان تضيف دخل أو مصروف.';
 
   @override
-  String get faqCashbook => 'دفتر الحساب';
+  String get faqDataBackup => 'البيانات والنسخ الاحتياطي';
 
   @override
-  String get faqLedger => 'الدفتر (الناس)';
+  String get faqDashboard => 'لوحة المعلومات';
 
   @override
-  String get faqBudgetsGoals => 'الميزانية والأهداف';
+  String get faqLedger => 'الديون (الأشخاص)';
 
   @override
-  String get faqReports => 'التقارير';
+  String get faqCashbook => 'دفتر النقدية (الدخل/المصروف)';
 
   @override
-  String get faqSettings => 'الإعدادات';
+  String get faqBudgetsGoals => 'الميزانيات والأهداف';
+
+  @override
+  String get faqReports => 'التحليلات والتقارير';
+
+  @override
+  String get faqSettings => 'الإعدادات والبيانات';
+
+  @override
+  String get faqWhatIsTrueIncome => 'الفرق بين الأموال الواردة والدخل الحقيقي؟';
+
+  @override
+  String get faqWhatIsTrueIncomeAnswer =>
+      '• الأموال الواردة: كل النقد المستلم، بما في ذلك سداد الديون والقروض المستلمة.\n• الدخل الحقيقي: أرباحك الفعلية فقط (مبيعات، راتب).\nاستخدم الدخل الحقيقي لمعرفة ربحك الفعلي.';
+
+  @override
+  String get faqWhatIsNetPosition => 'ما هو صافي المركز المالي؟';
+
+  @override
+  String get faqWhatIsNetPositionAnswer =>
+      'يوضح صحتك المالية: (كل الأموال التي تملكها + ديون لك) - (ديون عليك).';
+
+  @override
+  String get faqHowToTrackDebt => 'كيف أتتبع الديون؟';
+
+  @override
+  String get faqHowToTrackDebtAnswer =>
+      'اذهب إلى الديون > إضافة شخص > إضافة معاملة > اختر \'سلف\' (إذا اقترض منك) أو \'دين\' (إذا اقترضت منه).';
+
+  @override
+  String get faqWhatIsOldDebt => 'ما هو \'الدين القديم\'؟';
+
+  @override
+  String get faqWhatIsOldDebtAnswer =>
+      'استخدم هذا للديون التي كانت موجودة قبل استخدام التطبيق. يسجل الدين دون تغيير رصيدك النقدي الحالي (رصيد افتتاحي).';
+
+  @override
+  String get faqCashbookVsLedger => 'الفرق بين دفتر النقدية والديون؟';
+
+  @override
+  String get faqCashbookVsLedgerAnswer =>
+      '• دفتر النقدية: للمصروفات/الدخل العام (مثل الراتب، الإيجار) غير المرتبط بشخص.\n• سجل الديون: للديون والائتمانات المرتبطة بأشخاص (عملاء/موردين).';
+
+  @override
+  String get faqHowToBudget => 'كيف تعمل تنبيهات الميزانية؟';
+
+  @override
+  String get faqHowToBudgetAnswer =>
+      'حدد حداً شهرياً لفئة (مثل الطعام). سيقوم التطبيق بإشعارك عندما تقترب من تجاوزه.';
+
+  @override
+  String get faqHowToExport => 'كيفية تصدير التقارير؟';
+
+  @override
+  String get faqHowToExportAnswer =>
+      '• كشف حساب شخص: تفاصيل الشخص > تصدير CSV.\n• تقرير الديون: التحليلات > الديون > تصدير CSV.';
 
   @override
   String get initialBalanceTitle => 'أدخل رصيدك الحالي';
@@ -1024,9 +1219,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get restoreHelpStep5 => '٥. اختر الملف المُحمَّل';
 
   @override
-  String get faqDataBackup => 'البيانات والنسخ الاحتياطي';
-
-  @override
   String get faqHowToBackup => 'كيف أنسخ بياناتي احتياطياً؟';
 
   @override
@@ -1052,4 +1244,103 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get moreItems => 'المزيد';
+
+  @override
+  String get deletePerson => 'حذف الشخص';
+
+  @override
+  String get archivePerson => 'أرشفة الشخص';
+
+  @override
+  String deletePersonConfirm(String name) {
+    return 'هل أنت متأكد من حذف $name؟ لا يمكن التراجع عن هذا الإجراء.';
+  }
+
+  @override
+  String deletePersonWithTransactions(String name, int count) {
+    return '$name لديه $count معاملة. ماذا تريد أن تفعل؟';
+  }
+
+  @override
+  String cannotDeleteWithBalance(String name, String amount) {
+    return 'لا يمكن حذف $name. الرصيد المستحق: $amount. يرجى التسوية أولاً أو الأرشفة.';
+  }
+
+  @override
+  String get personArchived => 'تم أرشفة الشخص بنجاح';
+
+  @override
+  String get personDeleted => 'تم حذف الشخص بنجاح';
+
+  @override
+  String get archive => 'أرشفة';
+
+  @override
+  String get deleteAll => 'حذف الكل';
+
+  @override
+  String get archivedPersons => 'المؤرشفون';
+
+  @override
+  String get showArchived => 'إظهار المؤرشفين';
+
+  @override
+  String get debtBreakdown => 'تفاصيل الديون';
+
+  @override
+  String get debtAnalysis => 'تحليل الديون';
+
+  @override
+  String get exportDebtReport => 'تصدير تقرير الديون';
+
+  @override
+  String customersCount(Object count) {
+    return 'العملاء ($count)';
+  }
+
+  @override
+  String suppliersCount(Object count) {
+    return 'الموردون ($count)';
+  }
+
+  @override
+  String get allTime => 'كل الوقت';
+
+  @override
+  String get customRange => 'فترة مخصصة';
+
+  @override
+  String get weeklySummaryTitle => 'ملخص الأسبوع';
+
+  @override
+  String weeklySummaryBody(Object income, Object expense) {
+    return 'الدخل: $income | المصروفات: $expense';
+  }
+
+  @override
+  String get saveFailed => 'فشل الحفظ. تحقق من مساحة التخزين.';
+
+  @override
+  String get lowStorageWarning =>
+      'مساحة التخزين منخفضة. يرجى تفريغ بعض المساحة.';
+
+  @override
+  String get databaseError =>
+      'حدث خطأ في قاعدة البيانات. قد لا يتم حفظ بياناتك.';
+
+  @override
+  String get aboutApp => 'عن التطبيق';
+
+  @override
+  String get appFeatures => 'مميزات التطبيق';
+
+  @override
+  String get termsOfService => 'شروط الخدمة';
+
+  @override
+  String get privacyPolicy => 'سياسة الخصوصية';
+
+  @override
+  String get aboutAldeewanDescription =>
+      'تطبيق الديوان هو رفيقك المالي الأمثل، صُمم لمساعدتك في تتبع أموالك، إدارة الديون، وتحقيق أهدافك المالية بكل سهولة وذكاء.';
 }

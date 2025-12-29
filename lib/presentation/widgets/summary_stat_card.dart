@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SummaryStatCard extends StatelessWidget {
   final String label;
@@ -72,7 +73,7 @@ class SummaryStatCard extends StatelessWidget {
               value,
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
-                fontSize: 16,
+                fontSize: 16.sp,
               ),
             ),
           ),

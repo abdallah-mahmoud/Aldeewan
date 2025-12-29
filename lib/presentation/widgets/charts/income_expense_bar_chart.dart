@@ -1,6 +1,7 @@
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class IncomeExpenseBarChart extends StatelessWidget {
   final double income;
@@ -67,7 +68,13 @@ class IncomeExpenseBarChart extends StatelessWidget {
                   return SideTitleWidget(
                     axisSide: meta.axisSide,
                     space: 4,
-                    child: Text(text, style: style),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 4.w),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(text, style: style),
+                      ),
+                    ),
                   );
                 },
                 reservedSize: 30,

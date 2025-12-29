@@ -86,6 +86,9 @@ CashbookState _calculateCashbookState((LedgerState, CashFilter, DateTimeRange?) 
 
   // 1. Filter for cash-related transactions
   var allCashTransactions = ledgerState.transactions.where((t) {
+    // Exclude opening balances (Old Debts) from cashbook
+    if (t.isOpeningBalance) return false;
+
     return t.type == TransactionType.paymentReceived ||
         t.type == TransactionType.paymentMade ||
         t.type == TransactionType.cashSale ||

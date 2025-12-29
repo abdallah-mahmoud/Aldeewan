@@ -27,6 +27,7 @@ const List<CurrencyInfo> supportedCurrencies = [
   CurrencyInfo(code: 'BHD', nameEn: 'Bahraini Dinar', nameAr: 'الدينار البحريني', symbol: '.د.ب'),
   CurrencyInfo(code: 'OMR', nameEn: 'Omani Rial', nameAr: 'الريال العماني', symbol: '﷼'),
   CurrencyInfo(code: 'JOD', nameEn: 'Jordanian Dinar', nameAr: 'الدينار الأردني', symbol: 'د.ا'),
+  CurrencyInfo(code: 'ILS', nameEn: 'Palestinian Shekel', nameAr: 'الشيكل الفلسطيني', symbol: '₪'), // Used in Palestine
   CurrencyInfo(code: 'IQD', nameEn: 'Iraqi Dinar', nameAr: 'الدينار العراقي', symbol: 'ع.د'),
   CurrencyInfo(code: 'SYP', nameEn: 'Syrian Pound', nameAr: 'الليرة السورية', symbol: '£S'),
   CurrencyInfo(code: 'LBP', nameEn: 'Lebanese Pound', nameAr: 'الليرة اللبنانية', symbol: 'ل.ل'),

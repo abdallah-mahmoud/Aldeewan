@@ -75,7 +75,7 @@
 
 - **Framework:** [Flutter](https://flutter.dev/) (Dart)
 - **State Management:** [Riverpod](https://riverpod.dev/) - لإدارة حالة التطبيق بطريقة تفاعلية وآمنة.
-- **Database:** [Realm](https://realm.io/) - قاعدة بيانات محلية سريعة جداً وحديثة.
+- **Database:** [Realm](https://pub.dev/packages/realm/) - قاعدة بيانات محلية سريعة جداً وحديثة.
 - **Navigation:** [GoRouter](https://pub.dev/packages/go_router) - لإدارة التنقل بين الشاشات والروابط العميقة.
 - **Charts:** [fl_chart](https://pub.dev/packages/fl_chart) - للرسوم البيانية والإحصائيات.
 - **Security:**

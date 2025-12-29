@@ -33,6 +33,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings => 'Settings';
 
   @override
+  String get featureManageCash => 'Manage Cash & Bank';
+
+  @override
+  String get featureTrackDebts => 'Track Debts & People';
+
+  @override
+  String get featureAnalytics => 'Financial Analytics';
+
+  @override
+  String get featureBackup => 'Secure Cloud Backup';
+
+  @override
+  String get comingSoon => 'Coming Soon';
+
+  @override
   String get general => 'General';
 
   @override
@@ -159,6 +174,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get edit => 'Edit';
+
+  @override
+  String get editTransaction => 'Edit Transaction';
 
   @override
   String get name => 'Name';
@@ -313,16 +331,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noEntriesYet => 'No entries yet';
 
   @override
-  String get totalReceivable => 'Total Receivable';
+  String get totalReceivable => 'People Owe You';
 
   @override
-  String get totalPayable => 'Total Payable';
+  String get totalPayable => 'You Owe Others';
 
   @override
-  String get monthlyIncome => 'Monthly Income';
+  String get moneyIn => 'Money In';
 
   @override
-  String get monthlyExpense => 'Monthly Expense';
+  String get moneyOut => 'Money Out';
+
+  @override
+  String get trueIncome => 'True Income';
+
+  @override
+  String get trueExpense => 'True Expense';
+
+  @override
+  String get debtsSection => 'Debts';
+
+  @override
+  String get monthlySection => 'Monthly';
 
   @override
   String get transactionDetails => 'Transaction Details';
@@ -454,10 +484,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentMade => 'Payment Made';
 
   @override
-  String get debtGiven => 'Debt (Owed by)';
+  String get debtGiven => 'Lent (You gave)';
 
   @override
-  String get debtTaken => 'Debt (Owed to)';
+  String get debtTaken => 'Borrowed (You received)';
 
   @override
   String get cashSale => 'Cash Sale';
@@ -475,13 +505,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settled => 'Settled';
 
   @override
-  String get receivable => 'Receivable';
+  String get receivable => 'Owes You';
 
   @override
-  String get payable => 'Payable';
+  String get payable => 'You Owe';
 
   @override
   String get advance => 'Advance';
+
+  @override
+  String get advanceOwesYou => 'Owes You (Advance)';
+
+  @override
+  String get advanceYouOwe => 'You Owe (Advance)';
 
   @override
   String get analytics => 'Analytics';
@@ -497,9 +533,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get myAccounts => 'My Accounts';
-
-  @override
-  String get comingSoon => 'Coming Soon';
 
   @override
   String get syncAccounts => 'Sync Accounts';
@@ -589,6 +622,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get simpleModeSubtitle => 'Use simplified terminology (Lent/Borrowed)';
+
+  @override
+  String get oldDebt => 'Old Debt / Opening Balance';
+
+  @override
+  String get oldDebtExplanation =>
+      'Use this for debts that existed before you started using this app. It will record the debt on the person\'s profile but will NOT change your current cash/bank balance.';
+
+  @override
+  String get ok => 'OK';
 
   @override
   String get simpleLent => 'Lent';
@@ -809,7 +852,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appSounds => 'App Sounds';
 
   @override
-  String get appSoundsSubtitle => 'Enable sound effects';
+  String get appSoundsSubtitle => 'Play sounds on save and navigation';
 
   @override
   String get notifications => 'Notifications';
@@ -844,17 +887,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get budgetExceededTitle => 'Budget Exceeded';
 
   @override
-  String budgetExceededBody(String category, String amount, String currency) {
-    return 'You have exceeded your budget for $category by $amount $currency.';
+  String budgetExceededBody(Object name, Object amount, Object currency) {
+    return '$name exceeded by $amount $currency';
   }
 
   @override
-  String get goalReachedTitle => 'Goal Reached!';
+  String get goalReachedTitle => 'Goal Achieved! 🎉';
 
   @override
-  String goalReachedBody(String goalName) {
-    return 'Congratulations! You have reached your goal: $goalName.';
+  String goalReachedBody(Object name) {
+    return 'You\'ve reached your goal: $name';
   }
+
+  @override
+  String get goalContribution => 'Contribution';
+
+  @override
+  String get budgetExceeded => 'Budget Exceeded';
 
   @override
   String get insufficientFundsTitle => 'Insufficient Funds';
@@ -872,34 +921,100 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tourWelcome => 'Welcome to Aldeewan!';
 
   @override
-  String get tourDashboard => 'See your money at a glance';
+  String get tourDialogTitle => 'Welcome to Aldeewan!';
 
   @override
-  String get tourAddTransaction => 'Tap here to add money in or out';
+  String get tourDialogBody => 'Take a quick tour to discover all features?';
 
   @override
-  String get tourLedger => 'People who owe you or you owe them';
+  String get tourStartButton => 'Start Tour';
 
   @override
-  String get tourCashbook => 'Filter by income or expenses';
+  String get tourSkipButton => 'Skip for Now';
 
   @override
-  String get tourSearch => 'Search by name, amount, or type';
+  String get tour1Title => 'Your Financial Overview';
 
   @override
-  String get tourHelp => 'Need help? Come here anytime';
+  String get tour1Desc =>
+      'See your net position at a glance. Toggle \'All Time\' or \'This Month\' for different views.';
 
   @override
-  String get tourSkip => 'Skip';
+  String get tour2Title => 'Quick Actions';
 
   @override
-  String get tourNext => 'Next';
+  String get tour2Desc =>
+      'Add income, expenses, debts, or scan receipts. Everything starts here.';
 
   @override
-  String get tourFinish => 'Get Started';
+  String get tour3Title => 'Budget Tracking';
 
   @override
-  String get tourPrevious => 'Previous';
+  String get tour3Desc =>
+      'Set spending limits by category. Get alerts before overspending.';
+
+  @override
+  String get tour4Title => 'Savings Goals';
+
+  @override
+  String get tour4Desc =>
+      'Save toward targets like emergencies, travel, or purchases. Track your progress visually.';
+
+  @override
+  String get tour5Title => 'Your Network';
+
+  @override
+  String get tour5Desc =>
+      'Customers and suppliers you track. Tap anyone to see full history and balance.';
+
+  @override
+  String get tour6Title => 'Add People';
+
+  @override
+  String get tour6Desc =>
+      'Tap here to add new customers or suppliers to your ledger.';
+
+  @override
+  String get tour7Title => 'Smart Filters';
+
+  @override
+  String get tour7Desc =>
+      'Filter by type (Income/Expense) and time period. Find exactly what you need.';
+
+  @override
+  String get tour8Title => 'Powerful Search';
+
+  @override
+  String get tour8Desc =>
+      'Search by amount, note, or category. Works across all transactions.';
+
+  @override
+  String get tour9Title => 'All Transactions';
+
+  @override
+  String get tour9Desc =>
+      'Your complete financial history. Tap any entry for details or to edit.';
+
+  @override
+  String get tour10Title => 'Reports & Insights';
+
+  @override
+  String get tour10Desc =>
+      'View cash flow, income vs expense charts, and debt analysis. Export reports anytime.';
+
+  @override
+  String get tour11Title => 'Backup & Restore';
+
+  @override
+  String get tour11Desc =>
+      'Save your data to cloud storage. Never lose your records.';
+
+  @override
+  String get tour12Title => 'Help Center';
+
+  @override
+  String get tour12Desc =>
+      'FAQs, video tutorials, and support. Restart this tour anytime from here.';
 
   @override
   String get tipQuickActions => 'Use Quick Actions for faster entry';
@@ -918,10 +1033,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tipGoalProgress => 'Track your savings here';
 
   @override
+  String get tipEditTransaction => 'Swipe or tap to edit';
+
+  @override
+  String get tipDeleteTransaction => 'Long press to delete';
+
+  @override
+  String get tipCurrencyChange => 'Change currency in Settings';
+
+  @override
+  String get tipBackup => 'Back up regularly to avoid data loss';
+
+  @override
+  String get tipDarkMode => 'Try dark mode for nighttime use';
+
+  @override
+  String get tipAppLock => 'Enable app lock for security';
+
+  @override
   String get tipExportReport => 'Save reports as files';
 
   @override
+  String get tourHelp => 'Need help? Come here anytime';
+
+  @override
   String get tipGotIt => 'Got it';
+
+  @override
+  String get goalDeposit => 'Deposit to Goal';
+
+  @override
+  String get goalWithdrawal => 'Withdrawal from Goal';
 
   @override
   String get helpCenter => 'Help Center';
@@ -959,19 +1101,74 @@ class AppLocalizationsEn extends AppLocalizations {
       'Tap the + button on any screen to add income or expense.';
 
   @override
-  String get faqCashbook => 'Cashbook';
+  String get faqDataBackup => 'Data & Backup';
 
   @override
-  String get faqLedger => 'Ledger';
+  String get faqDashboard => 'Dashboard & Home';
+
+  @override
+  String get faqLedger => 'Leger (People)';
+
+  @override
+  String get faqCashbook => 'Cashbook (Income/Expense)';
 
   @override
   String get faqBudgetsGoals => 'Budgets & Goals';
 
   @override
-  String get faqReports => 'Reports';
+  String get faqReports => 'Analytics & Reports';
 
   @override
-  String get faqSettings => 'Settings';
+  String get faqSettings => 'Settings & Data';
+
+  @override
+  String get faqWhatIsTrueIncome => 'Money In vs True Income?';
+
+  @override
+  String get faqWhatIsTrueIncomeAnswer =>
+      '• Money In: All cash you received, including loans or debt repayments.\n• True Income: Only your actual earnings (Sales, Salary).\nUse True Income to see your real profit.';
+
+  @override
+  String get faqWhatIsNetPosition => 'What is Net Position?';
+
+  @override
+  String get faqWhatIsNetPositionAnswer =>
+      'It shows your overall financial health: (All Money You Have + People Owe You) minus (Debts You Owe).';
+
+  @override
+  String get faqHowToTrackDebt => 'How to track debts?';
+
+  @override
+  String get faqHowToTrackDebtAnswer =>
+      'Go to Ledger > Add Person > Add Transaction > Choose \'Lent\' (if they borrow from you) or \'Borrowed\' (if you borrow from them).';
+
+  @override
+  String get faqWhatIsOldDebt => 'What is \'Old Debt\'?';
+
+  @override
+  String get faqWhatIsOldDebtAnswer =>
+      'Use this for debts that existed before you started using the app. It records the debt without changing your current cash balance.';
+
+  @override
+  String get faqCashbookVsLedger => 'Cashbook vs Ledger?';
+
+  @override
+  String get faqCashbookVsLedgerAnswer =>
+      '• Cashbook: For general income/expenses (e.g. Salary, Rent) not linked to a specific person.\n• Ledger: For debts and credits linked to people (Customers/Suppliers).';
+
+  @override
+  String get faqHowToBudget => 'How do budget alerts work?';
+
+  @override
+  String get faqHowToBudgetAnswer =>
+      'Set a monthly limit for a category (e.g. Food). The app will notify you when you are close to exceeding it.';
+
+  @override
+  String get faqHowToExport => 'How to export reports?';
+
+  @override
+  String get faqHowToExportAnswer =>
+      '• Person Statement: Go to Person Details > Export CSV.\n• Debt Report: Go to Analytics > Ledger > Export CSV.';
 
   @override
   String get initialBalanceTitle => 'Set Your Starting Balance';
@@ -1029,9 +1226,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restoreHelpStep5 => '5. Select the downloaded file';
 
   @override
-  String get faqDataBackup => 'Data & Backup';
-
-  @override
   String get faqHowToBackup => 'How do I backup my data?';
 
   @override
@@ -1057,4 +1251,103 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get moreItems => 'more';
+
+  @override
+  String get deletePerson => 'Delete Person';
+
+  @override
+  String get archivePerson => 'Archive Person';
+
+  @override
+  String deletePersonConfirm(String name) {
+    return 'Are you sure you want to delete $name? This action cannot be undone.';
+  }
+
+  @override
+  String deletePersonWithTransactions(String name, int count) {
+    return '$name has $count transactions. What would you like to do?';
+  }
+
+  @override
+  String cannotDeleteWithBalance(String name, String amount) {
+    return 'Cannot delete $name. Outstanding balance: $amount. Please settle first or archive.';
+  }
+
+  @override
+  String get personArchived => 'Person archived successfully';
+
+  @override
+  String get personDeleted => 'Person deleted successfully';
+
+  @override
+  String get archive => 'Archive';
+
+  @override
+  String get deleteAll => 'Delete All';
+
+  @override
+  String get archivedPersons => 'Archived';
+
+  @override
+  String get showArchived => 'Show Archived';
+
+  @override
+  String get debtBreakdown => 'Debt Breakdown';
+
+  @override
+  String get debtAnalysis => 'Debt Analysis';
+
+  @override
+  String get exportDebtReport => 'Export Debt Report';
+
+  @override
+  String customersCount(Object count) {
+    return 'Customers ($count)';
+  }
+
+  @override
+  String suppliersCount(Object count) {
+    return 'Suppliers ($count)';
+  }
+
+  @override
+  String get allTime => 'All Time';
+
+  @override
+  String get customRange => 'Custom Range';
+
+  @override
+  String get weeklySummaryTitle => 'Weekly Summary';
+
+  @override
+  String weeklySummaryBody(Object income, Object expense) {
+    return 'Income: $income | Expense: $expense';
+  }
+
+  @override
+  String get saveFailed => 'Failed to save. Please check storage space.';
+
+  @override
+  String get lowStorageWarning =>
+      'Storage is running low. Please free up space.';
+
+  @override
+  String get databaseError =>
+      'A database error occurred. Your data may not have been saved.';
+
+  @override
+  String get aboutApp => 'About App';
+
+  @override
+  String get appFeatures => 'App Features';
+
+  @override
+  String get termsOfService => 'Terms of Service';
+
+  @override
+  String get privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get aboutAldeewanDescription =>
+      'Aldeewan is your ultimate financial companion, designed to help you track your money, manage debts, and achieve your financial goals with ease and intelligence.';
 }

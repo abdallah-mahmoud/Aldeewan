@@ -26,6 +26,8 @@ class TransactionRepositoryImpl implements TransactionRepository {
         externalId: m.externalId,
         status: m.status,
         accountId: m.accountId,
+        goalId: m.goalId,
+        isOpeningBalance: m.isOpeningBalance,
       )).toList();
 
       // Perform heavy mapping/processing in a background isolate
@@ -57,14 +59,26 @@ class TransactionRepositoryImpl implements TransactionRepository {
 
   @override
   Future<void> addTransaction(Transaction transaction) async {
-    final model = TransactionModelMapper.fromEntity(transaction);
-    await _dataSource.putTransaction(model);
+    try {
+      final model = TransactionModelMapper.fromEntity(transaction);
+      await _dataSource.putTransaction(model);
+    } catch (e, stackTrace) {
+      debugPrint('❌ Failed to add transaction: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   @override
   Future<void> updateTransaction(Transaction transaction) async {
-    final model = TransactionModelMapper.fromEntity(transaction);
-    await _dataSource.putTransaction(model);
+    try {
+      final model = TransactionModelMapper.fromEntity(transaction);
+      await _dataSource.putTransaction(model);
+    } catch (e, stackTrace) {
+      debugPrint('❌ Failed to update transaction: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      rethrow;
+    }
   }
 
   @override

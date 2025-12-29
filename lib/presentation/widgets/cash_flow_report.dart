@@ -45,7 +45,7 @@ class _CashFlowReportState extends ConsumerState<CashFlowReport> {
     final formatter = NumberFormat('#,##0.##');
 
     return SingleChildScrollView(
-      padding: EdgeInsets.all(16.w),
+      padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

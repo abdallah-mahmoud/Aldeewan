@@ -34,23 +34,27 @@ class LocalDatabaseSource {
         NotificationItemModel.schema,
       ],
       encryptionKey: key,
-      schemaVersion: 4, // Incremented for goalId field
+      schemaVersion: 6, // Incremented for isOpeningBalance field
       migrationCallback: (migration, oldSchemaVersion) {
-        const targetVersion = 4;
+        const targetVersion = 6;
         debugPrint('🔄 Realm migration: v$oldSchemaVersion -> v$targetVersion');
         
-        // Version-specific migrations (add as needed)
+        // Version-specific migrations
         if (oldSchemaVersion < 2) {
           debugPrint('  📦 Migrating v1 -> v2');
-          // v1 -> v2: Initial person/transaction schema
         }
         if (oldSchemaVersion < 3) {
           debugPrint('  📦 Migrating v2 -> v3: Added budgets and goals');
-          // v2 -> v3: Added budgets and savings goals
         }
         if (oldSchemaVersion < 4) {
           debugPrint('  📦 Migrating v3 -> v4: Added goalId to transactions');
-          // v3 -> v4: Added goalId field to transactions
+        }
+        if (oldSchemaVersion < 5) {
+          debugPrint('  📦 Migrating v4 -> v5: Added isArchived to Person');
+        }
+        if (oldSchemaVersion < 6) {
+          debugPrint('  📦 Migrating v5 -> v6: Added isOpeningBalance to Transaction');
+          // v5 -> v6: Added isOpeningBalance to Transaction (auto-defaults to false)
         }
         
         debugPrint('✅ Migration completed successfully');
@@ -105,9 +109,13 @@ class LocalDatabaseSource {
     return realm.all<PersonModel>().toList();
   }
 
-  Future<PersonModel?> getPerson(String uuid) async {
+  /// Retrieves a single person by their unique identifier.
+  ///
+  /// - [personId]: The unique ID of the person to retrieve.
+  /// - Returns: The [PersonModel] if found, or `null` if not found.
+  Future<PersonModel?> getPerson(String personId) async {
     final realm = await db;
-    return realm.find<PersonModel>(uuid);
+    return realm.find<PersonModel>(personId);
   }
 
   Future<void> putPerson(PersonModel person) async {
@@ -117,14 +125,55 @@ class LocalDatabaseSource {
     });
   }
 
-  Future<void> deletePerson(String uuid) async {
+  /// Archives a person (soft delete) instead of permanently removing them.
+  ///
+  /// - [personId]: The unique ID of the person to archive.
+  Future<void> archivePerson(String personId) async {
     final realm = await db;
-    final person = realm.find<PersonModel>(uuid);
+    final person = realm.find<PersonModel>(personId);
+    if (person != null) {
+      realm.write(() {
+        person.isArchived = true;
+      });
+    }
+  }
+
+  /// Permanently deletes a person from the database.
+  ///
+  /// - [personId]: The unique ID of the person to delete.
+  /// - Note: This does NOT delete associated transactions. Use [deletePersonWithTransactions] for that.
+  Future<void> deletePerson(String personId) async {
+    final realm = await db;
+    final person = realm.find<PersonModel>(personId);
     if (person != null) {
       realm.write(() {
         realm.delete(person);
       });
     }
+  }
+
+  /// Permanently deletes a person AND all their associated transactions.
+  ///
+  /// - [personId]: The unique ID of the person to delete.
+  /// - Warning: This is a destructive operation and cannot be undone.
+  Future<void> deletePersonWithTransactions(String personId) async {
+    final realm = await db;
+    realm.write(() {
+      // Delete all transactions for this person first
+      final transactions = realm.query<TransactionModel>("personId == \$0", [personId]);
+      realm.deleteMany(transactions);
+      
+      // Then delete the person
+      final person = realm.find<PersonModel>(personId);
+      if (person != null) {
+        realm.delete(person);
+      }
+    });
+  }
+
+  Future<int> getTransactionCountByPerson(String personId) async {
+    final realm = await db;
+    return realm.query<TransactionModel>("personId == \$0", [personId]).length;
   }
 
   // --- Transaction Operations ---
@@ -156,9 +205,12 @@ class LocalDatabaseSource {
     });
   }
 
-  Future<void> deleteTransaction(String uuid) async {
+  /// Permanently deletes a transaction from the database.
+  ///
+  /// - [transactionId]: The unique ID of the transaction to delete.
+  Future<void> deleteTransaction(String transactionId) async {
     final realm = await db;
-    final transaction = realm.find<TransactionModel>(uuid);
+    final transaction = realm.find<TransactionModel>(transactionId);
     if (transaction != null) {
       realm.write(() {
         realm.delete(transaction);

@@ -31,6 +31,10 @@ class Transaction {
   
   // Goal tracking - links transaction to a savings goal
   final String? goalId;
+  
+  // V1.2.1: Old Debt / Opening Balance support
+  // If true, this transaction does not affect the cash/bank balance.
+  final bool isOpeningBalance;
 
   Transaction({
     required this.id,
@@ -45,6 +49,7 @@ class Transaction {
     this.status,
     this.accountId,
     this.goalId,
+    this.isOpeningBalance = false,
   });
 }
 

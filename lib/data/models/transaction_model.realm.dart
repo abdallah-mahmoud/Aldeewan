@@ -24,6 +24,7 @@ class TransactionModel extends _TransactionModel
     String? status,
     int? accountId,
     String? goalId,
+    bool isOpeningBalance = false,
   }) {
     RealmObjectBase.set(this, 'uuid', uuid);
     RealmObjectBase.set(this, 'type', type);
@@ -37,6 +38,7 @@ class TransactionModel extends _TransactionModel
     RealmObjectBase.set(this, 'status', status);
     RealmObjectBase.set(this, 'accountId', accountId);
     RealmObjectBase.set(this, 'goalId', goalId);
+    RealmObjectBase.set(this, 'isOpeningBalance', isOpeningBalance);
   }
 
   TransactionModel._();
@@ -107,6 +109,13 @@ class TransactionModel extends _TransactionModel
   set goalId(String? value) => RealmObjectBase.set(this, 'goalId', value);
 
   @override
+  bool get isOpeningBalance =>
+      RealmObjectBase.get<bool>(this, 'isOpeningBalance') as bool;
+  @override
+  set isOpeningBalance(bool value) =>
+      RealmObjectBase.set(this, 'isOpeningBalance', value);
+
+  @override
   Stream<RealmObjectChanges<TransactionModel>> get changes =>
       RealmObjectBase.getChanges<TransactionModel>(this);
 
@@ -133,6 +142,7 @@ class TransactionModel extends _TransactionModel
       'status': status.toEJson(),
       'accountId': accountId.toEJson(),
       'goalId': goalId.toEJson(),
+      'isOpeningBalance': isOpeningBalance.toEJson(),
     };
   }
 
@@ -159,6 +169,7 @@ class TransactionModel extends _TransactionModel
           status: fromEJson(ejson['status']),
           accountId: fromEJson(ejson['accountId']),
           goalId: fromEJson(ejson['goalId']),
+          isOpeningBalance: fromEJson(ejson['isOpeningBalance'], defaultValue: false),
         ),
       _ => raiseInvalidEJson(ejson),
     };
@@ -199,6 +210,7 @@ class TransactionModel extends _TransactionModel
           optional: true,
           indexType: RealmIndexType.regular,
         ),
+        SchemaProperty('isOpeningBalance', RealmPropertyType.bool),
       ],
     );
   }();

@@ -1,6 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/utils/auth_service.dart';
@@ -137,7 +138,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Amiri', // Amiri is elegant and appropriate for Quranic text
-                        fontSize: 18,
+                        fontSize: 18.sp,
                         height: 2.0,
                         color: isDark ? Colors.white70 : Colors.black87,
                         fontWeight: FontWeight.w500,

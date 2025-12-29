@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class BalanceTrendChart extends StatelessWidget {
   final List<FlSpot> spots;
@@ -57,8 +58,8 @@ class BalanceTrendChart extends StatelessWidget {
                     if (value == minY || value == maxY) return const SizedBox.shrink();
                     return Text(
                       value.toInt().toString(),
-                      style: const TextStyle(
-                        fontSize: 10,
+                      style: TextStyle(
+                        fontSize: 10.sp,
                       ),
                     );
                   },

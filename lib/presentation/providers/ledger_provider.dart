@@ -6,6 +6,28 @@ import 'package:aldeewan_mobile/presentation/providers/dependency_injection.dart
 import 'package:aldeewan_mobile/presentation/providers/ledger_state.dart';
 import 'package:aldeewan_mobile/data/services/balance_calculator_service.dart';
 
+/// Result of attempting to delete a person
+enum PersonDeletionStatus {
+  /// Person can be deleted permanently (no transactions, zero balance)
+  canDelete,
+  /// Person has transactions but zero balance - can archive or cascade delete
+  hasTransactions,
+  /// Person has non-zero balance - can only archive
+  hasBalance,
+}
+
+class PersonDeletionResult {
+  final PersonDeletionStatus status;
+  final int transactionCount;
+  final double balance;
+
+  const PersonDeletionResult({
+    required this.status,
+    required this.transactionCount,
+    required this.balance,
+  });
+}
+
 class LedgerNotifier extends StateNotifier<AsyncValue<LedgerState>> {
   final Ref ref;
   List<Person>? _persons;
@@ -71,12 +93,49 @@ class LedgerNotifier extends StateNotifier<AsyncValue<LedgerState>> {
     await ref.read(personRepositoryProvider).addPerson(person);
   }
 
+  /// Check if a person can be deleted and get relevant info
+  Future<PersonDeletionResult> checkPersonDeletion(String id) async {
+    final repo = ref.read(personRepositoryProvider);
+    final transactionCount = await repo.getTransactionCount(id);
+    final balance = state.value?.balances[id] ?? 0.0;
+
+    PersonDeletionStatus status;
+    if (balance != 0) {
+      status = PersonDeletionStatus.hasBalance;
+    } else if (transactionCount > 0) {
+      status = PersonDeletionStatus.hasTransactions;
+    } else {
+      status = PersonDeletionStatus.canDelete;
+    }
+
+    return PersonDeletionResult(
+      status: status,
+      transactionCount: transactionCount,
+      balance: balance,
+    );
+  }
+
+  /// Archive a person (soft delete)
+  Future<void> archivePerson(String id) async {
+    await ref.read(personRepositoryProvider).archivePerson(id);
+  }
+
+  /// Delete person only (leaves orphan transactions - use with caution)
   Future<void> deletePerson(String id) async {
     await ref.read(personRepositoryProvider).deletePerson(id);
   }
 
+  /// Delete person and all their transactions
+  Future<void> deletePersonWithTransactions(String id) async {
+    await ref.read(personRepositoryProvider).deletePersonWithTransactions(id);
+  }
+
   Future<void> addTransaction(Transaction transaction) async {
     await ref.read(transactionRepositoryProvider).addTransaction(transaction);
+  }
+
+  Future<void> updateTransaction(Transaction transaction) async {
+    await ref.read(transactionRepositoryProvider).updateTransaction(transaction);
   }
 
   Future<void> deleteTransaction(String id) async {
@@ -120,3 +179,9 @@ final ledgerProvider = StateNotifierProvider<LedgerNotifier, AsyncValue<LedgerSt
 
 /// Search query provider for ledger person filtering
 final ledgerSearchProvider = StateProvider<String>((ref) => '');
+
+// Filter: 'owes' = only show persons with outstanding balance, 'all' = show all
+final ledgerBalanceFilterProvider = StateProvider<String>((ref) => 'all');
+
+/// Toggle to show/hide archived persons
+final showArchivedProvider = StateProvider<bool>((ref) => false);

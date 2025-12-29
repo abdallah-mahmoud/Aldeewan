@@ -15,7 +15,8 @@ class PersonModel extends _PersonModel
     String id,
     String role,
     String name,
-    DateTime createdAt, {
+    DateTime createdAt,
+    bool isArchived, {
     String? phone,
   }) {
     RealmObjectBase.set(this, 'id', id);
@@ -23,6 +24,7 @@ class PersonModel extends _PersonModel
     RealmObjectBase.set(this, 'name', name);
     RealmObjectBase.set(this, 'phone', phone);
     RealmObjectBase.set(this, 'createdAt', createdAt);
+    RealmObjectBase.set(this, 'isArchived', isArchived);
   }
 
   PersonModel._();
@@ -55,6 +57,13 @@ class PersonModel extends _PersonModel
       RealmObjectBase.set(this, 'createdAt', value);
 
   @override
+  bool get isArchived =>
+      RealmObjectBase.get<bool>(this, 'isArchived') as bool;
+  @override
+  set isArchived(bool value) =>
+      RealmObjectBase.set(this, 'isArchived', value);
+
+  @override
   Stream<RealmObjectChanges<PersonModel>> get changes =>
       RealmObjectBase.getChanges<PersonModel>(this);
 
@@ -73,6 +82,7 @@ class PersonModel extends _PersonModel
       'name': name.toEJson(),
       'phone': phone.toEJson(),
       'createdAt': createdAt.toEJson(),
+      'isArchived': isArchived.toEJson(),
     };
   }
 
@@ -85,12 +95,14 @@ class PersonModel extends _PersonModel
         'role': EJsonValue role,
         'name': EJsonValue name,
         'createdAt': EJsonValue createdAt,
+        'isArchived': EJsonValue isArchived,
       } =>
         PersonModel(
           fromEJson(id),
           fromEJson(role),
           fromEJson(name),
           fromEJson(createdAt),
+          fromEJson(isArchived),
           phone: fromEJson(ejson['phone']),
         ),
       _ => raiseInvalidEJson(ejson),
@@ -110,6 +122,7 @@ class PersonModel extends _PersonModel
         SchemaProperty('name', RealmPropertyType.string),
         SchemaProperty('phone', RealmPropertyType.string, optional: true),
         SchemaProperty('createdAt', RealmPropertyType.timestamp),
+        SchemaProperty('isArchived', RealmPropertyType.bool),
       ],
     );
   }();

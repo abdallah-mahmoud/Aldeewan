@@ -21,6 +21,8 @@ import 'package:aldeewan_mobile/utils/transaction_label_mapper.dart';
 import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
 import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
 import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
+import 'package:aldeewan_mobile/presentation/providers/guided_tour_provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class CashbookScreen extends ConsumerStatefulWidget {
   const CashbookScreen({super.key});
@@ -29,18 +31,12 @@ class CashbookScreen extends ConsumerStatefulWidget {
   ConsumerState<CashbookScreen> createState() => _CashbookScreenState();
 }
 
-class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTourMixin {
+class _CashbookScreenState extends ConsumerState<CashbookScreen> {  // REMOVED ShowcaseTourMixin
   bool _initialActionHandled = false;
   
   // Pagination: initial display count, increases on "Load More"
   static const int _pageSize = 50;
   int _displayCount = _pageSize;
-
-  @override
-  List<GlobalKey> get showcaseKeys => ShowcaseKeys.cashbookKeys;
-  
-  @override
-  String get screenTourId => 'cashbook';
 
   @override
   void didChangeDependencies() {
@@ -85,6 +81,30 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
         });
       }
     }
+    
+    // Auto-start cashbook tour if guided tour is active
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final tourNotifier = ref.read(guidedTourProvider.notifier);
+      if (tourNotifier.canStartTourForScreen(TourScreen.cashbook)) {
+        tourNotifier.markScreenTourStarted();
+        _startCashbookShowcase();
+      }
+    });
+  }
+  
+  void _startCashbookShowcase() {
+    if (!mounted) return;
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) {
+        try {
+          // ignore: deprecated_member_use
+          ShowCaseWidget.of(context).startShowCase(ShowcaseKeys.cashbookKeys);
+        } catch (e) {
+          debugPrint('Cashbook showcase error: $e');
+        }
+      }
+    });
   }
 
   void _showAddCashEntryModal(
@@ -194,13 +214,13 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
           resizeToAvoidBottomInset: false,
           body: Column(
               children: [
-                // Search bar - Tour Target Step 5
+                // Search bar - Tour Step 8
                 Padding(
                   padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 4.h),
                   child: ShowcaseTarget(
                     showcaseKey: ShowcaseKeys.searchBar,
-                    title: l10n.tourWelcome,
-                    description: l10n.tourSearch,
+                    title: l10n.tour8Title,
+                    description: l10n.tour8Desc,
                     child: DebouncedSearchBar(
                       hintText: l10n.search,
                       onSearch: (query) {
@@ -209,11 +229,11 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                     ),
                   ),
                 ),
-                // Compact filter row with 2 dropdowns - Tour Target Step 4
+                // Compact filter row with 2 dropdowns - Tour Step 7
                 ShowcaseTarget(
                   showcaseKey: ShowcaseKeys.cashbookFilter,
-                  title: l10n.tourWelcome,
-                  description: l10n.tourCashbook,
+                  title: l10n.tour7Title,
+                  description: l10n.tour7Desc,
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(16.w, 4.h, 16.w, 8.h),
                     child: Row(
@@ -238,7 +258,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                                     children: [
                                       Icon(LucideIcons.list, size: 16.sp, color: theme.colorScheme.primary),
                                       SizedBox(width: 8.w),
-                                      Text(l10n.allTransactions),
+                                      Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: Text(l10n.allTransactions))),
                                     ],
                                   ),
                                 ),
@@ -293,7 +313,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> with ShowcaseTo
                                     children: [
                                       Icon(LucideIcons.infinity, size: 16.sp, color: theme.colorScheme.primary),
                                       SizedBox(width: 8.w),
-                                      Text(l10n.all),
+                                      Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: Text(l10n.all))),
                                     ],
                                   ),
                                 ),

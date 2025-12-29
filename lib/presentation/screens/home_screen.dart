@@ -16,6 +16,10 @@ import 'package:aldeewan_mobile/presentation/widgets/home/summary_grid.dart';
 import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
 import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
 import 'package:aldeewan_mobile/presentation/widgets/initial_balance_dialog.dart';
+import 'package:aldeewan_mobile/presentation/widgets/tour_start_dialog.dart';
+import 'package:aldeewan_mobile/presentation/providers/unread_count_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/guided_tour_provider.dart';
+import 'package:showcaseview/showcaseview.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -24,48 +28,115 @@ class HomeScreen extends ConsumerStatefulWidget {
   ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin {
+class _HomeScreenState extends ConsumerState<HomeScreen> {  // REMOVED ShowcaseTourMixin
   bool _hasCheckedInitialBalance = false;
+  bool _hasTourBeenChecked = false;  // NEW: Prevent multiple tour checks
+  bool _isDialogShowing = false;  // NEW: Prevent multiple dialogs
   
   @override
-  List<GlobalKey> get showcaseKeys => ShowcaseKeys.homeKeys;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    
+    // Only check tour ONCE per screen lifecycle to prevent loops
+    if (!_hasTourBeenChecked) {
+      _hasTourBeenChecked = true;
+      
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        
+        // Check if guided tour is active and waiting for home screen
+        final tourNotifier = ref.read(guidedTourProvider.notifier);
+        if (tourNotifier.canStartTourForScreen(TourScreen.home)) {
+          tourNotifier.markScreenTourStarted();
+          _startHomeShowcase();
+        }
+      });
+    }
+  }
   
-  @override
-  String get screenTourId => 'home';
+  void _startHomeShowcase() {
+    if (!mounted) return;
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) {
+        try {
+          // ignore: deprecated_member_use
+          ShowCaseWidget.of(context).startShowCase(ShowcaseKeys.homeKeys);
+        } catch (e) {
+          debugPrint('Home showcase error: $e');
+        }
+      }
+    });
+  }
   
   void _checkInitialBalancePrompt() async {
     if (_hasCheckedInitialBalance) return;
     _hasCheckedInitialBalance = true;
     
-    final onboarding = ref.read(onboardingServiceProvider);
+    final onboarding = ref.read(onboardingProvider);
+    final guidedTour = ref.read(guidedTourProvider);
     
-    // Step 1: Show initial balance dialog if not shown
-    if (!onboarding.isInitialBalancePromptShown) {
+    // If guided tour is already active, don't show dialogs
+    if (guidedTour.isActive) return;
+    
+    // FIRST APP START: Show initial balance dialog, then tour dialog
+    if (!ref.read(onboardingServiceProvider).isInitialBalancePromptShown) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!mounted) return;
         
+        // Wait for initial balance dialog to close
         await showDialog<bool>(
           context: context,
-          barrierDismissible: false, // Force user action to prevent conflict with tour
+          barrierDismissible: false,
           builder: (_) => const InitialBalanceDialog(),
         );
         
-        // Mark as shown after dialog completes
-        await onboarding.markInitialBalancePromptShown();
-        
-        // Step 2: Start tour AFTER dialog closes
-        if (!onboarding.isTourCompleted && mounted) {
-          // Short delay to ensure dialog is fully dismissed
-          await Future.delayed(const Duration(milliseconds: 300));
-          if (mounted) startTourIfNeeded();
+        // Show tour start dialog after initial balance
+        if (mounted && !_isDialogShowing) {
+          await Future.delayed(const Duration(milliseconds: 500));
+          if (mounted) {
+            _showTourStartDialog();
+          }
         }
       });
-    } else if (!onboarding.isTourCompleted) {
-      // If balance already shown but tour not done, start tour
+      return;
+    }
+    
+    // SUBSEQUENT APP STARTS: Show tour dialog if not completed
+    if (!onboarding.tourCompleted && !_isDialogShowing) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) startTourIfNeeded();
+        if (mounted) _showTourStartDialog();
       });
     }
+  }
+  
+  void _showTourStartDialog() {
+    final onboarding = ref.read(onboardingProvider);
+    final guidedTour = ref.read(guidedTourProvider);
+    
+    // Guards to prevent showing dialog when it shouldn't
+    if (onboarding.tourCompleted) return;
+    if (guidedTour.isActive) return;  // Tour already running
+    if (guidedTour.dialogShown) return; // Dialog already shown/handled in this session
+    if (_isDialogShowing) return;  // Dialog already showing
+    
+    _isDialogShowing = true;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => TourStartDialog(
+        onStartTour: () {
+          _isDialogShowing = false;
+          // Start the cross-screen guided tour
+          ref.read(guidedTourProvider.notifier).startTour(context);
+        },
+        onSkip: () {
+          _isDialogShowing = false;
+          // User skipped - mark tour completed
+          ref.read(guidedTourProvider.notifier).skipTour();
+        },
+      ),
+    );
   }
   
   @override
@@ -129,41 +200,59 @@ class _HomeScreenState extends ConsumerState<HomeScreen> with ShowcaseTourMixin 
                             borderRadius: BorderRadius.circular(12.r),
                             border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
                           ),
-                          child: Icon(LucideIcons.bell, color: theme.colorScheme.onSurface),
+                          child: Badge(
+                            isLabelVisible: ref.watch(unreadNotificationCountProvider) > 0,
+                            label: Text(ref.watch(unreadNotificationCountProvider).toString()),
+                            child: Icon(LucideIcons.bell, color: theme.colorScheme.onSurface),
+                          ),
                         ),
                       ),
                     ],
                   ),
                   SizedBox(height: 24.h),
 
-                  // Hero Section (Net Position + Range Filter) - Tour Target
+                  // Hero Section (Net Position + Range Filter) - Tour Step 1
                   ShowcaseTarget(
                     showcaseKey: ShowcaseKeys.dashboardCards,
-                    title: l10n.tourWelcome,
-                    description: l10n.tourDashboard,
+                    title: l10n.tour1Title,
+                    description: l10n.tour1Desc,
                     child: const HeroSection(),
                   ),
                   SizedBox(height: 16.h),
 
-                  // Budget & Goals Buttons
-                  const DashboardButtons(),
+                  // Budget & Goals Buttons - Tour Steps 3-4 wrapped
+                  ShowcaseTarget(
+                    showcaseKey: ShowcaseKeys.budgetCard,
+                    title: l10n.tour3Title,
+                    description: l10n.tour3Desc,
+                    child: ShowcaseTarget(
+                      showcaseKey: ShowcaseKeys.goalsCard,
+                      title: l10n.tour4Title,
+                      description: l10n.tour4Desc,
+                      child: const DashboardButtons(),
+                    ),
+                  ),
                   SizedBox(height: 24.h),
 
-                  // Summary Stats Grid
-                  const SummaryGrid(),
-                  SizedBox(height: 24.h),
-
-                  // Quick Actions - Tour Target Step 2
+                  // Quick Actions - Tour Step 2
                   ShowcaseTarget(
                     showcaseKey: ShowcaseKeys.quickActions,
-                    title: l10n.tourWelcome,
-                    description: l10n.tourAddTransaction,
+                    title: l10n.tour2Title,
+                    description: l10n.tour2Desc,
                     child: const QuickActions(),
                   ),
                   SizedBox(height: 8.h),
-                  
+
                   // Tip Card for Quick Actions
                   const QuickActionsTip(),
+                  SizedBox(height: 24.h),
+
+                  // Summary Stats Grid - Debts Section
+                  const SummaryGrid(section: SummarySection.debts),
+                  SizedBox(height: 24.h),
+
+                  // Summary Stats Grid - Monthly Section
+                  const SummaryGrid(section: SummarySection.monthly),
                   SizedBox(height: 24.h),
 
                   // Recent Transactions

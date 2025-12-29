@@ -12,6 +12,7 @@ class _PersonModel {
   late String name;
   String? phone;
   late DateTime createdAt;
+  late bool isArchived = false;
 }
 
 extension PersonModelMapper on PersonModel {
@@ -22,6 +23,7 @@ extension PersonModelMapper on PersonModel {
       name: name,
       phone: phone,
       createdAt: createdAt,
+      isArchived: isArchived,
     );
   }
 
@@ -31,6 +33,7 @@ extension PersonModelMapper on PersonModel {
       person.role.name,
       person.name,
       person.createdAt,
+      person.isArchived,
       phone: person.phone,
     );
   }

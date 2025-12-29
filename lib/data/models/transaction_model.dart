@@ -26,6 +26,8 @@ class _TransactionModel {
   
   @Indexed()
   String? goalId; // Links transaction to a savings goal
+  
+  bool isOpeningBalance = false; // Default to false
 }
 
 extension TransactionModelMapper on TransactionModel {
@@ -43,6 +45,7 @@ extension TransactionModelMapper on TransactionModel {
       status: status,
       accountId: accountId,
       goalId: goalId,
+      isOpeningBalance: isOpeningBalance,
     );
   }
 
@@ -60,6 +63,7 @@ extension TransactionModelMapper on TransactionModel {
       status: transaction.status,
       accountId: transaction.accountId,
       goalId: transaction.goalId,
+      isOpeningBalance: transaction.isOpeningBalance,
     );
   }
 }
