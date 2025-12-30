@@ -193,17 +193,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {  // REMOVED ShowcaseT
                           context.push('/notifications');
                         },
                         borderRadius: BorderRadius.circular(12.r),
-                        child: Container(
-                          padding: EdgeInsets.all(8.w),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.surface,
-                            borderRadius: BorderRadius.circular(12.r),
-                            border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
-                          ),
-                          child: Badge(
-                            isLabelVisible: ref.watch(unreadNotificationCountProvider) > 0,
-                            label: Text(ref.watch(unreadNotificationCountProvider).toString()),
-                            child: Icon(LucideIcons.bell, color: theme.colorScheme.onSurface),
+                        child: Tooltip(
+                          message: l10n.notifications,
+                          child: Container(
+                            padding: EdgeInsets.all(8.w),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(color: Colors.black.withValues(alpha: 0.05)),
+                            ),
+                            child: Badge(
+                              isLabelVisible: ref.watch(unreadNotificationCountProvider) > 0,
+                              label: Text(ref.watch(unreadNotificationCountProvider).toString()),
+                              child: Icon(LucideIcons.bell, color: theme.colorScheme.onSurface),
+                            ),
                           ),
                         ),
                       ),

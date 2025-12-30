@@ -42,7 +42,7 @@ class TourStartDialog extends ConsumerWidget {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.3),
                     blurRadius: 20,
                     spreadRadius: 2,
                   ),

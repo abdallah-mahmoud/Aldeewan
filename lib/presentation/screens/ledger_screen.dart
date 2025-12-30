@@ -363,6 +363,7 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
             onPressed: () => _showAddPersonModal(context),
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Theme.of(context).colorScheme.onPrimary,
+            tooltip: l10n.addPerson,
             child: const Icon(Icons.add),
           );
         },

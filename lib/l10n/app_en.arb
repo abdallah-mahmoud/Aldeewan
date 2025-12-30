@@ -279,6 +279,14 @@
   "deleteGoalConfirmation": "Are you sure you want to delete this goal?",
   "goalDetails": "Goal Details",
   "budgetDetails": "Budget Details",
+  "videoTutorials": "Video Tutorials",
+  "faq": "FAQ",
+  
+  "hijriCalendar": "Islamic Hijri Calendar",
+  "showHijriDate": "Show Hijri Date",
+  "hijriAdjustment": "Hijri Date Adjustment",
+  "hijriAdjustmentDesc": "Adjust Hijri date by + or - days if needed",
+  "days": "Days",
   "deadline": "Deadline",
   "saved": "Saved",
   "target": "Target",
@@ -570,6 +578,19 @@
   "appFeatures": "App Features",
   "termsOfService": "Terms of Service",
   "privacyPolicy": "Privacy Policy",
-  "aboutAldeewanDescription": "Aldeewan is your ultimate financial companion, designed to help you track your money, manage debts, and achieve your financial goals with ease and intelligence."
+  "aboutAldeewanDescription": "Aldeewan is your ultimate financial companion, designed to help you track your money, manage debts, and achieve your financial goals with ease and intelligence.",
+  "backupEncrypt": "Encrypt Backup",
+  "backupEncryptSubtitle": "Protect with password",
+  "enterPassword": "Enter Password",
+  "passwordRequired": "Password is required",
+  "restoreStrategyTitle": "Restore Method",
+  "restoreStrategyDesc": "How would you like to restore this file?",
+  "restoreMerge": "Merge Data",
+  "restoreMergeDesc": "Add to current data. Updates existing items.",
+  "restoreReplace": "Replace All",
+  "restoreReplaceDesc": "Danger: Deletes all current data.",
+  "restoreReplaceWarning": "This will PERMANENTLY DELETE all current data. Are you sure?",
+  "invalidPassword": "Invalid Password",
+  "schemaVersionMismatch": "Backup is from a newer version of the app. Please update Aldeewan."
 }
 

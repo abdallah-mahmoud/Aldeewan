@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:aldeewan_mobile/domain/entities/person.dart';
@@ -48,6 +49,7 @@ class _PersonFormState extends ConsumerState<PersonForm> {
         createdAt: widget.person?.createdAt ?? DateTime.now(),
       );
       widget.onSave(person);
+      HapticFeedback.lightImpact();
       ToastService.showSuccess(context, l10n.savedSuccessfully);
       Navigator.of(context).pop();
     }

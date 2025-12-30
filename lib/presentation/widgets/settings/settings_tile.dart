@@ -8,6 +8,7 @@ class SettingsTile extends StatelessWidget {
   final Widget? trailing;
   final VoidCallback? onTap;
   final bool isDestructive;
+  final String? tooltip;
 
   const SettingsTile({
     super.key,
@@ -18,13 +19,14 @@ class SettingsTile extends StatelessWidget {
     this.trailing,
     this.onTap,
     this.isDestructive = false,
+    this.tooltip,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
-    return ListTile(
+    Widget tile = ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       onTap: onTap,
       leading: Container(
@@ -57,5 +59,14 @@ class SettingsTile extends StatelessWidget {
           : null,
       trailing: trailing ?? (onTap != null ? const Icon(Icons.chevron_right, size: 20, color: Colors.grey) : null),
     );
+
+    if (tooltip != null) {
+      return Tooltip(
+        message: tooltip!,
+        child: tile,
+      );
+    }
+    
+    return tile;
   }
 }

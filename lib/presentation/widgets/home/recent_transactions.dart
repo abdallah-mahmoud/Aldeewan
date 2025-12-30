@@ -1,29 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
+
 import 'package:aldeewan_mobile/utils/currency_formatter.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
-import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
-import 'package:aldeewan_mobile/config/app_colors.dart';
+import 'package:aldeewan_mobile/presentation/providers/recent_transactions_provider.dart';
 import 'package:aldeewan_mobile/utils/animation_extensions.dart';
+import 'package:aldeewan_mobile/presentation/widgets/dual_date_text.dart';
+import 'package:aldeewan_mobile/config/app_colors.dart';
 
 class RecentTransactions extends ConsumerWidget {
   const RecentTransactions({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final ledgerState = ref.watch(ledgerProvider).value;
-    final transactions = ledgerState?.transactions ?? [];
+    // Optimized: Watch the pre-sorted list from provider
+    final limited = ref.watch(recentTransactionsProvider);
+    
     final l10n = AppLocalizations.of(context)!;
     final currency = ref.watch(currencyProvider);
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-
-    if (transactions.isEmpty) {
+    if (limited.isEmpty) {
       // Compact empty state for home screen - no large animation
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -47,9 +48,6 @@ class RecentTransactions extends ConsumerWidget {
       );
     }
 
-    final recent = List<Transaction>.from(transactions)
-      ..sort((a, b) => b.date.compareTo(a.date));
-    final limited = recent.take(5).toList();
 
     return ListView.separated(
       shrinkWrap: true,
@@ -96,8 +94,8 @@ class RecentTransactions extends ConsumerWidget {
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              subtitle: Text(
-                DateFormat.yMMMd().format(tx.date),
+              subtitle: DualDateText(
+                date: tx.date,
                 style: theme.textTheme.bodySmall,
               ),
               trailing: Text(

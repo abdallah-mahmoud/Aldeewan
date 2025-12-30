@@ -12,6 +12,7 @@ import 'package:aldeewan_mobile/presentation/widgets/charts/income_expense_bar_c
 import 'package:aldeewan_mobile/presentation/widgets/expense_pie_chart.dart';
 import 'package:aldeewan_mobile/config/app_colors.dart';
 import 'package:aldeewan_mobile/presentation/widgets/common/filter_action_tile.dart';
+import 'package:aldeewan_mobile/utils/date_formatter_service.dart';
 
 class CashFlowReport extends ConsumerStatefulWidget {
   const CashFlowReport({super.key});
@@ -41,6 +42,7 @@ class _CashFlowReportState extends ConsumerState<CashFlowReport> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).toString();
     final currency = ref.watch(currencyProvider);
     final formatter = NumberFormat('#,##0.##');
 
@@ -53,7 +55,7 @@ class _CashFlowReportState extends ConsumerState<CashFlowReport> {
             label: l10n.dateRange,
             value: _dateRange == null
                 ? l10n.selectDateRange
-                : '${DateFormat.yMMMd().format(_dateRange!.start)} - ${DateFormat.yMMMd().format(_dateRange!.end)}',
+                : '${DateFormatterService.formatDate(_dateRange!.start, locale)} - ${DateFormatterService.formatDate(_dateRange!.end, locale)}',
             icon: LucideIcons.calendar,
             onTap: () async {
               final picked = await showDateRangePicker(
@@ -91,7 +93,7 @@ class _CashFlowReportState extends ConsumerState<CashFlowReport> {
             ),
             const SizedBox(height: 8),
             Text(
-              l10n.period(DateFormat.yMMMd().format(_dateRange!.start), DateFormat.yMMMd().format(_dateRange!.end)),
+              l10n.period(DateFormatterService.formatDate(_dateRange!.start, locale), DateFormatterService.formatDate(_dateRange!.end, locale)),
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -215,6 +217,7 @@ class _CashFlowReportState extends ConsumerState<CashFlowReport> {
     if (_dateRange == null) return;
     if (!mounted) return;
     final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).toString();
 
     final rows = <List<dynamic>>[
       ['Date', 'Type', 'Note', 'Income', 'Expense'],
@@ -251,7 +254,7 @@ class _CashFlowReportState extends ConsumerState<CashFlowReport> {
       fileName: fileName,
       rows: rows,
       subject: l10n.cashFlowReport,
-      text: 'Here is the cash flow report from ${DateFormat.yMMMd().format(_dateRange!.start)} to ${DateFormat.yMMMd().format(_dateRange!.end)}.',
+      text: 'Here is the cash flow report from ${DateFormatterService.formatDate(_dateRange!.start, locale)} to ${DateFormatterService.formatDate(_dateRange!.end, locale)}.',
     );
   }
 }

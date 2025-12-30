@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,8 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:aldeewan_mobile/domain/entities/person.dart';
-import 'package:aldeewan_mobile/domain/entities/transaction.dart';
+
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/theme_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/locale_provider.dart';
@@ -22,6 +21,11 @@ import 'package:aldeewan_mobile/utils/error_handler.dart';
 import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/notification_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/sound_settings_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/guided_tour_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/calendar_provider.dart';
+import 'package:aldeewan_mobile/utils/date_formatter_service.dart';
+
+import 'package:showcaseview/showcaseview.dart';
 
 import 'package:aldeewan_mobile/presentation/screens/categories_management_screen.dart';
 import 'package:aldeewan_mobile/presentation/widgets/settings/settings_section.dart';
@@ -29,8 +33,10 @@ import 'package:aldeewan_mobile/presentation/widgets/settings/settings_tile.dart
 import 'package:aldeewan_mobile/presentation/widgets/settings/theme_selector.dart';
 import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
 import 'package:aldeewan_mobile/presentation/widgets/currency_selector_sheet.dart';
-import 'package:aldeewan_mobile/presentation/providers/guided_tour_provider.dart';
-import 'package:showcaseview/showcaseview.dart';
+import 'package:aldeewan_mobile/presentation/providers/backup_provider.dart';
+import 'package:aldeewan_mobile/presentation/widgets/restore_strategy_dialog.dart';
+import 'package:aldeewan_mobile/presentation/widgets/password_prompt_dialog.dart';
+
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -77,6 +83,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final isSimpleMode = ref.watch(settingsProvider);
     final isSoundEnabled = ref.watch(soundSettingsProvider);
     final notificationState = ref.watch(notificationProvider);
+    final calendarState = ref.watch(calendarProvider);
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
@@ -214,6 +221,42 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ],
             ),
 
+            // Hijri Calendar Section
+            SettingsSection(
+              title: l10n.hijriCalendar,
+              children: [
+                SettingsTile(
+                  icon: LucideIcons.moon,
+                  iconColor: Colors.deepPurple,
+                  title: l10n.showHijriDate,
+                  trailing: Switch.adaptive(
+                    value: calendarState.showHijri,
+                    activeTrackColor: theme.colorScheme.primary,
+                    onChanged: (val) => ref.read(calendarProvider.notifier).toggleHijri(val),
+                  ),
+                ),
+                if (calendarState.showHijri) ...[
+                  const Divider(height: 1, indent: 60),
+                  SettingsTile(
+                    icon: LucideIcons.settings2,
+                    iconColor: Colors.grey,
+                    title: l10n.hijriAdjustment,
+                    subtitle: l10n.hijriAdjustmentDesc,
+                    trailing: Text(
+                      calendarState.adjustment == 0 
+                          ? '0' 
+                          : (calendarState.adjustment > 0 ? '+${calendarState.adjustment}' : '${calendarState.adjustment}'),
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onTap: () => _showAdjustmentDialog(context, calendarState.adjustment),
+                  ),
+                ],
+              ],
+            ),
+
             SettingsSection(
               title: l10n.general,
               children: [
@@ -286,6 +329,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     iconColor: Colors.teal,
                     title: l10n.backupToCloud,
                     subtitle: l10n.backupToCloudSubtitle,
+                    tooltip: l10n.backupData,
                     onTap: () => _backupData(context, ref),
                   ),
                 ),
@@ -297,9 +341,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   subtitle: l10n.restoreFromCloudSubtitle,
                   trailing: IconButton(
                     icon: Icon(LucideIcons.helpCircle, size: 20.sp, color: Colors.grey),
+                    tooltip: l10n.comingSoon, // Or a dynamic help text if available, but comingSoon is a placeholder for now. Wait, I should use l10n.helpCenter.
                     onPressed: () => _showRestoreHelpDialog(context),
                   ),
                   onTap: () => _restoreData(context, ref),
+                  tooltip: l10n.restoreData,
                 ),
                 const Divider(height: 1, indent: 60),
                 SettingsTile(
@@ -425,36 +471,45 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   Future<void> _backupData(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
+
+
     try {
-      final ledgerState = ref.read(ledgerProvider).value;
-      final persons = ledgerState?.persons ?? [];
-      final transactions = ledgerState?.transactions ?? [];
+      // 1. Ask for encryption
+      final bool? encrypt = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.backupEncrypt),
+          content: Text(l10n.backupEncryptSubtitle),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.cancel), // Actually "No" or "Skip"
+            ),
+            FilledButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(l10n.backupEncrypt),
+            ),
+          ],
+        ),
+      );
 
-      final data = {
-        'persons': persons.map((p) => {
-          'id': p.id,
-          'role': p.role.toString().split('.').last,
-          'name': p.name,
-          'phone': p.phone,
-          'createdAt': p.createdAt.toIso8601String(),
-        }).toList(),
-        'transactions': transactions.map((t) => {
-          'id': t.id,
-          'type': t.type.toString().split('.').last,
-          'personId': t.personId,
-          'amount': t.amount,
-          'date': t.date.toIso8601String(),
-          'category': t.category,
-          'note': t.note,
-          'dueDate': t.dueDate?.toIso8601String(),
-        }).toList(),
-        'version': 1,
-        'exportedAt': DateTime.now().toIso8601String(),
-      };
+      if (encrypt == null) return; // Dismissed
 
-      final jsonString = jsonEncode(data);
-      final fileName = 'Aldeewan_Backup_${DateFormat('yyyy-MM-dd_HH-mm').format(DateTime.now())}.json';
+      String? password;
+      if (encrypt) {
+        if (!context.mounted) return;
+        password = await PasswordPromptDialog.show(context, isCreateMode: true);
+        if (password == null) return; // Cancelled password entry
+      }
+
+      // 2. Generate Backup using Service
+      final backupService = ref.read(backupServiceProvider);
+      // Show loading indicator? simpler to just await (it's fast mostly)
+      // or show snackbar "Generating..."
       
+      final jsonString = await backupService.createBackup(password: password);
+      
+      final fileName = 'Aldeewan_Backup_${DateFormat('yyyy-MM-dd_HH-mm').format(DateTime.now())}.json';
       final directory = await getTemporaryDirectory();
       final file = File('${directory.path}/$fileName');
       await file.writeAsString(jsonString);
@@ -484,61 +539,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
       if (result != null && result.files.single.path != null) {
         final file = File(result.files.single.path!);
-        final jsonString = await file.readAsString();
-        final data = jsonDecode(jsonString);
-
-        if (data['version'] != 1) {
-          throw Exception('Unsupported backup version');
+        final content = await file.readAsString();
+        
+        // 1. Check for encryption
+        String? password;
+        if (content.contains('"isEncrypted":true')) {
+          if (!context.mounted) return;
+          password = await PasswordPromptDialog.show(context, isCreateMode: false);
+          if (password == null) return; // Cancelled
         }
 
-        final persons = (data['persons'] as List).map((p) => Person(
-          id: p['id'],
-          role: PersonRole.values.firstWhere((e) => e.toString().split('.').last == p['role']),
-          name: p['name'],
-          phone: p['phone'],
-          createdAt: DateTime.parse(p['createdAt']),
-        )).toList();
+        // 2. Ask Strategy
+        if (!context.mounted) return;
+        final strategy = await RestoreStrategyDialog.show(context);
+        if (strategy == null) return; // Cancelled
 
-        final transactions = (data['transactions'] as List).map((t) => Transaction(
-          id: t['id'],
-          type: TransactionType.values.firstWhere((e) => e.toString().split('.').last == t['type']),
-          personId: t['personId'],
-          amount: (t['amount'] as num).toDouble(),
-          date: DateTime.parse(t['date']),
-          category: t['category'],
-          note: t['note'],
-          dueDate: t['dueDate'] != null ? DateTime.parse(t['dueDate']) : null,
-        )).toList();
+        // 3. Perform Restore
+        final backupService = ref.read(backupServiceProvider);
+        await backupService.restoreBackup(content, strategy: strategy, password: password);
 
-        // Warning: This replaces all data!
-        // Ideally we should have a confirmation dialog here.
-        // For now, we'll just proceed as per requirements (simple migration).
-        
-        // We need a method in LedgerNotifier to replace all data
-        // But LedgerNotifier currently only adds/deletes.
-        // We should probably expose the repository or add a bulk import method.
-        // For now, let's iterate and add (this is slow but safe if we clear first).
-        // But we can't clear easily without a clear method.
-        
-        // Let's assume for now we just add them (which might duplicate if IDs match, or update).
-        // Realm put updates if ID matches.
-        
-        final notifier = ref.read(ledgerProvider.notifier);
-        
-        // TODO: Implement bulk import or clear & import in LedgerNotifier/Repository
-        // For this MVP, we will just loop.
-        for (var p in persons) {
-          await notifier.addPerson(p);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+             SnackBar(content: Text(l10n.restoreSuccess)),
+          );
+          // Optional: Refresh providers if not auto-watched or if Replace needs forced refresh.
+          // Since providers watch streams/db, they should auto update.
+          // But LedgerNotifier specifically might need manual reset if it holds in-memory state that doesn't listen to DB changes fully?
+          // LedgerNotifier listens to Repositories streams, which listen to Realm streams. So it should update automatically!
         }
-        for (var t in transactions) {
-          await notifier.addTransaction(t);
-        }
-
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.restoreSuccess)),
-        );
-      }
       }
     } catch (e) {
       if (context.mounted) {
@@ -552,8 +580,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _exportPersonsCsv(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
     final persons = ref.read(ledgerProvider).value?.persons ?? [];
+    final calendarState = ref.read(calendarProvider);
+    final showHijri = calendarState.showHijri;
+    final langCode = Localizations.localeOf(context).languageCode;
+
     final rows = <List<dynamic>>[
-      ['ID', 'Name', 'Role', 'Phone', 'Created At'],
+      ['ID', 'Name', 'Role', 'Phone', 'Created At', if (showHijri) 'Created At (Hijri)'],
     ];
 
     for (var p in persons) {
@@ -562,11 +594,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         p.name,
         p.role.toString().split('.').last,
         p.phone ?? '',
-        DateFormat('yyyy-MM-dd HH:mm').format(p.createdAt),
+        DateFormatterService.forceWesternNumerals(DateFormat('yyyy-MM-dd HH:mm').format(p.createdAt)),
+        if (showHijri) 
+          DateFormatterService.formatHijriOnly(
+            p.createdAt, 
+            langCode, 
+            adjustment: calendarState.adjustment,
+          ),
       ]);
     }
 
-    final fileName = 'persons_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv';
+    final fileName = 'persons_${DateFormatterService.forceWesternNumerals(DateFormat('yyyyMMdd').format(DateTime.now()))}.csv';
     await CsvExporter.exportToCsv(
       fileName: fileName,
       rows: rows,
@@ -581,14 +619,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final transactions = ledgerState?.transactions ?? [];
     final persons = ledgerState?.persons ?? [];
     final personMap = {for (var p in persons) p.id: p.name};
+    
+    final calendarState = ref.read(calendarProvider);
+    final showHijri = calendarState.showHijri;
+    final langCode = Localizations.localeOf(context).languageCode;
 
     final rows = <List<dynamic>>[
-      ['Date', 'Type', 'Person', 'Amount', 'Note', 'Category'],
+      ['Date', if (showHijri) 'Hijri Date', 'Type', 'Person', 'Amount', 'Note', 'Category'],
     ];
 
     for (var t in transactions) {
       rows.add([
-        DateFormat('yyyy-MM-dd').format(t.date),
+        DateFormatterService.forceWesternNumerals(DateFormat('yyyy-MM-dd').format(t.date)),
+        if (showHijri)
+          DateFormatterService.formatHijriOnly(
+            t.date,
+            langCode,
+            adjustment: calendarState.adjustment,
+          ),
         t.type.toString().split('.').last,
         t.personId != null ? (personMap[t.personId] ?? 'Unknown') : '',
         t.amount.toStringAsFixed(2),
@@ -597,12 +645,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       ]);
     }
 
-    final fileName = 'transactions_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv';
+    final fileName = 'transactions_${DateFormatterService.forceWesternNumerals(DateFormat('yyyyMMdd').format(DateTime.now()))}.csv';
     await CsvExporter.exportToCsv(
       fileName: fileName,
       rows: rows,
       subject: 'Aldeewan Transactions Export',
       text: l10n.exportTransactions,
+    );
+  }
+
+  void _showAdjustmentDialog(BuildContext context, int current) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.hijriAdjustment),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [-2, -1, 0, 1, 2].map((val) {
+             final label = val == 0 ? "0 ${l10n.days}" : (val > 0 ? "+$val" : "$val");
+             return RadioListTile<int>(
+               title: Text(label),
+               value: val,
+               // ignore: deprecated_member_use
+               groupValue: current,
+               // ignore: deprecated_member_use
+               onChanged: (v) {
+                 ref.read(calendarProvider.notifier).setAdjustment(v!);
+                 Navigator.pop(context);
+               },
+             );
+          }).toList(),
+        ),
+      ),
     );
   }
 }

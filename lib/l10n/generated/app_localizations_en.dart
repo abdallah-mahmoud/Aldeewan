@@ -774,6 +774,28 @@ class AppLocalizationsEn extends AppLocalizations {
   String get budgetDetails => 'Budget Details';
 
   @override
+  String get videoTutorials => 'Video Tutorials';
+
+  @override
+  String get faq => 'FAQ';
+
+  @override
+  String get hijriCalendar => 'Islamic Hijri Calendar';
+
+  @override
+  String get showHijriDate => 'Show Hijri Date';
+
+  @override
+  String get hijriAdjustment => 'Hijri Date Adjustment';
+
+  @override
+  String get hijriAdjustmentDesc =>
+      'Adjust Hijri date by + or - days if needed';
+
+  @override
+  String get days => 'Days';
+
+  @override
   String get deadline => 'Deadline';
 
   @override
@@ -1350,4 +1372,45 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get aboutAldeewanDescription =>
       'Aldeewan is your ultimate financial companion, designed to help you track your money, manage debts, and achieve your financial goals with ease and intelligence.';
+
+  @override
+  String get backupEncrypt => 'Encrypt Backup';
+
+  @override
+  String get backupEncryptSubtitle => 'Protect with password';
+
+  @override
+  String get enterPassword => 'Enter Password';
+
+  @override
+  String get passwordRequired => 'Password is required';
+
+  @override
+  String get restoreStrategyTitle => 'Restore Method';
+
+  @override
+  String get restoreStrategyDesc => 'How would you like to restore this file?';
+
+  @override
+  String get restoreMerge => 'Merge Data';
+
+  @override
+  String get restoreMergeDesc => 'Add to current data. Updates existing items.';
+
+  @override
+  String get restoreReplace => 'Replace All';
+
+  @override
+  String get restoreReplaceDesc => 'Danger: Deletes all current data.';
+
+  @override
+  String get restoreReplaceWarning =>
+      'This will PERMANENTLY DELETE all current data. Are you sure?';
+
+  @override
+  String get invalidPassword => 'Invalid Password';
+
+  @override
+  String get schemaVersionMismatch =>
+      'Backup is from a newer version of the app. Please update Aldeewan.';
 }

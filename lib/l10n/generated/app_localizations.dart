@@ -1556,6 +1556,48 @@ abstract class AppLocalizations {
   /// **'Budget Details'**
   String get budgetDetails;
 
+  /// No description provided for @videoTutorials.
+  ///
+  /// In en, this message translates to:
+  /// **'Video Tutorials'**
+  String get videoTutorials;
+
+  /// No description provided for @faq.
+  ///
+  /// In en, this message translates to:
+  /// **'FAQ'**
+  String get faq;
+
+  /// No description provided for @hijriCalendar.
+  ///
+  /// In en, this message translates to:
+  /// **'Islamic Hijri Calendar'**
+  String get hijriCalendar;
+
+  /// No description provided for @showHijriDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Hijri Date'**
+  String get showHijriDate;
+
+  /// No description provided for @hijriAdjustment.
+  ///
+  /// In en, this message translates to:
+  /// **'Hijri Date Adjustment'**
+  String get hijriAdjustment;
+
+  /// No description provided for @hijriAdjustmentDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Adjust Hijri date by + or - days if needed'**
+  String get hijriAdjustmentDesc;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'Days'**
+  String get days;
+
   /// No description provided for @deadline.
   ///
   /// In en, this message translates to:
@@ -2591,6 +2633,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Aldeewan is your ultimate financial companion, designed to help you track your money, manage debts, and achieve your financial goals with ease and intelligence.'**
   String get aboutAldeewanDescription;
+
+  /// No description provided for @backupEncrypt.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypt Backup'**
+  String get backupEncrypt;
+
+  /// No description provided for @backupEncryptSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Protect with password'**
+  String get backupEncryptSubtitle;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Password'**
+  String get enterPassword;
+
+  /// No description provided for @passwordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is required'**
+  String get passwordRequired;
+
+  /// No description provided for @restoreStrategyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Method'**
+  String get restoreStrategyTitle;
+
+  /// No description provided for @restoreStrategyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'How would you like to restore this file?'**
+  String get restoreStrategyDesc;
+
+  /// No description provided for @restoreMerge.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge Data'**
+  String get restoreMerge;
+
+  /// No description provided for @restoreMergeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to current data. Updates existing items.'**
+  String get restoreMergeDesc;
+
+  /// No description provided for @restoreReplace.
+  ///
+  /// In en, this message translates to:
+  /// **'Replace All'**
+  String get restoreReplace;
+
+  /// No description provided for @restoreReplaceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Danger: Deletes all current data.'**
+  String get restoreReplaceDesc;
+
+  /// No description provided for @restoreReplaceWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This will PERMANENTLY DELETE all current data. Are you sure?'**
+  String get restoreReplaceWarning;
+
+  /// No description provided for @invalidPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Password'**
+  String get invalidPassword;
+
+  /// No description provided for @schemaVersionMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup is from a newer version of the app. Please update Aldeewan.'**
+  String get schemaVersionMismatch;
 }
 
 class _AppLocalizationsDelegate

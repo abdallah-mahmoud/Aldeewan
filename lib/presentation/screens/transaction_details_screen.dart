@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:lucide_icons/lucide_icons.dart';
@@ -12,6 +13,8 @@ import 'package:aldeewan_mobile/data/services/sound_service.dart';
 import 'package:aldeewan_mobile/utils/transaction_label_mapper.dart';
 import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
 import 'package:aldeewan_mobile/presentation/widgets/cash_entry_form.dart';
+import 'package:aldeewan_mobile/presentation/widgets/dual_date_text.dart';
+import 'package:aldeewan_mobile/presentation/widgets/common/info_row.dart';
 
 class TransactionDetailsScreen extends ConsumerWidget {
   final Transaction transaction;
@@ -33,13 +36,23 @@ class TransactionDetailsScreen extends ConsumerWidget {
       appBar: AppBar(
         title: Text(l10n.transactionDetails),
         actions: [
-          IconButton(
-            icon: const Icon(LucideIcons.trash2),
-            onPressed: () => _confirmDelete(context, ref, l10n),
+          Semantics(
+            label: l10n.deleteTransaction,
+            button: true,
+            child: IconButton(
+              icon: const Icon(LucideIcons.trash2),
+              tooltip: l10n.delete,
+              onPressed: () => _confirmDelete(context, ref, l10n),
+            ),
           ),
-          IconButton(
-            icon: const Icon(LucideIcons.pencil),
-            onPressed: () => _showEditModal(context, ref),
+          Semantics(
+            label: l10n.editTransaction,
+            button: true,
+            child: IconButton(
+              icon: const Icon(LucideIcons.pencil),
+              tooltip: l10n.edit,
+              onPressed: () => _showEditModal(context, ref),
+            ),
           ),
         ],
       ),
@@ -126,18 +139,25 @@ class TransactionDetailsScreen extends ConsumerWidget {
             const SizedBox(height: 48),
 
             // Details Grid
-            _buildDetailRow(context, LucideIcons.calendar, l10n.date,
-                DateFormat.yMMMMEEEEd().format(transaction.date)),
+            InfoRow(
+              icon: LucideIcons.calendar,
+              label: l10n.date,
+              customValue: DualDateText(
+                date: transaction.date,
+                style: theme.textTheme.bodyLarge,
+                format: 'yMMMMEEEEd',
+              ),
+            ),
             if (transaction.category != null) ...[
               const SizedBox(height: 24),
-              _buildDetailRow(context, LucideIcons.tag, l10n.category, CategoryHelper.getLocalizedCategory(transaction.category!, l10n)),
+              InfoRow(
+                icon: LucideIcons.tag,
+                label: l10n.category,
+                value: CategoryHelper.getLocalizedCategory(transaction.category!, l10n),
+              ),
             ],
             if (transaction.personId != null) ...[
               const SizedBox(height: 24),
-              // We need to fetch person name. Since we don't have it in transaction, 
-              // we might need to look it up or pass it. 
-              // For now, let's try to look it up from ledgerProvider if possible, 
-              // or just show "Person ID" if not found (should be found).
               Consumer(
                 builder: (context, ref, _) {
                   final ledger = ref.watch(ledgerProvider);
@@ -146,8 +166,11 @@ class TransactionDetailsScreen extends ConsumerWidget {
                       final person = state.persons
                           .where((p) => p.id == transaction.personId)
                           .firstOrNull;
-                      return _buildDetailRow(
-                          context, LucideIcons.user, l10n.person, person?.name ?? 'Unknown');
+                      return InfoRow(
+                        icon: LucideIcons.user,
+                        label: l10n.person,
+                        value: person?.name ?? 'Unknown',
+                      );
                     },
                     orElse: () => const SizedBox.shrink(),
                   );
@@ -156,7 +179,11 @@ class TransactionDetailsScreen extends ConsumerWidget {
             ],
             if (transaction.note != null && transaction.note!.isNotEmpty) ...[
               const SizedBox(height: 24),
-              _buildDetailRow(context, LucideIcons.stickyNote, l10n.note, transaction.note!),
+              InfoRow(
+                icon: LucideIcons.stickyNote,
+                label: l10n.note,
+                value: transaction.note!,
+              ),
             ],
           ],
         ),
@@ -164,34 +191,7 @@ class TransactionDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildDetailRow(BuildContext context, IconData icon, String label, String value) {
-    final theme = Theme.of(context);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 20, color: theme.colorScheme.onSurfaceVariant),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: theme.textTheme.bodyLarge,
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
+
 
   Widget _buildDirectionIndicator(BuildContext context, Transaction tx, AppLocalizations l10n, String? personName) {
     final theme = Theme.of(context);
@@ -283,6 +283,7 @@ class TransactionDetailsScreen extends ConsumerWidget {
               
               // 2. Perform delete action
               ref.read(soundServiceProvider).playDelete();
+              HapticFeedback.heavyImpact();
               await ref.read(ledgerProvider.notifier).deleteTransaction(transaction.id);
               
               // 3. Navigate back using the screen's navigator (captured before dialog)

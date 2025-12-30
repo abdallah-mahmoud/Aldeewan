@@ -8,20 +8,20 @@ import 'package:aldeewan_mobile/domain/entities/transaction.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 import 'package:aldeewan_mobile/presentation/widgets/empty_state.dart';
+
+import 'package:aldeewan_mobile/presentation/widgets/cashbook/cashbook_list_item.dart';
 import 'package:aldeewan_mobile/presentation/widgets/cash_entry_form.dart';
 import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/providers/category_provider.dart';
-import 'package:aldeewan_mobile/presentation/screens/transaction_details_screen.dart';
 import 'package:aldeewan_mobile/config/app_colors.dart';
 import 'package:aldeewan_mobile/presentation/providers/cashbook_provider.dart';
-import 'package:aldeewan_mobile/utils/category_helper.dart';
 import 'package:aldeewan_mobile/data/services/sound_service.dart';
 import 'package:aldeewan_mobile/presentation/widgets/debounced_search_bar.dart';
-import 'package:aldeewan_mobile/utils/transaction_label_mapper.dart';
-import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
+
 import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
 import 'package:aldeewan_mobile/presentation/widgets/showcase_wrapper.dart';
 import 'package:aldeewan_mobile/presentation/providers/guided_tour_provider.dart';
+import 'package:aldeewan_mobile/presentation/providers/filtered_transactions_provider.dart';
 import 'package:showcaseview/showcaseview.dart';
 
 class CashbookScreen extends ConsumerStatefulWidget {
@@ -31,7 +31,10 @@ class CashbookScreen extends ConsumerStatefulWidget {
   ConsumerState<CashbookScreen> createState() => _CashbookScreenState();
 }
 
+
+
 class _CashbookScreenState extends ConsumerState<CashbookScreen> {  // REMOVED ShowcaseTourMixin
+
   bool _initialActionHandled = false;
   
   // Pagination: initial display count, increases on "Load More"
@@ -131,79 +134,30 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {  // REMOVED S
 
   @override
   Widget build(BuildContext context) {
-    final cashbookAsync = ref.watch(cashbookProvider);
-    final ledgerAsync = ref.watch(ledgerProvider); // Needed for person name lookup in list items
-    final filter = ref.watch(cashFilterProvider);
-    final datePreset = ref.watch(dateRangePresetProvider);
+
+    final computedAsync = ref.watch(filteredTransactionsProvider);
+    final ledgerAsync = ref.watch(ledgerProvider); // Display lookup
     final currency = ref.watch(currencyProvider);
-    final categories = ref.watch(categoryProvider);
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final numberFormat = NumberFormat('#,##0.##');
+    final localCategories = ref.watch(categoryProvider);
+    
+    // UI state watchers that don't affect filtering (since filtering is now in provider)
+    // Note: Search & Filter updates trigger provider rebuild
     final searchQuery = ref.watch(cashbookSearchProvider);
-    final isSimpleMode = ref.watch(settingsProvider);
+    final datePreset = ref.watch(dateRangePresetProvider);
+    final filter = ref.watch(cashFilterProvider);
 
-    return cashbookAsync.when(
+    return computedAsync.when(
       loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
       error: (e, s) => Scaffold(body: Center(child: Text(AppLocalizations.of(context)!.errorOccurred(e.toString())))),
-      data: (cashbookState) {
-        // 1. Get filtered list from state (already filtered by date/type/filters)
-        var filteredList = cashbookState.transactions;
-        
-        // 2. Apply Search Locally
-        if (searchQuery.isNotEmpty) {
-          final lowerQuery = searchQuery.toLowerCase();
-          filteredList = filteredList.where((tx) {
-            // Search by note
-            if ((tx.note ?? '').toLowerCase().contains(lowerQuery)) return true;
-            
-            // Search by category (EN + AR localized)
-            final categoryEN = (tx.category ?? '').toLowerCase();
-            final categoryAR = CategoryHelper.getLocalizedCategory(tx.category ?? '', l10n).toLowerCase();
-            if (categoryEN.contains(lowerQuery) || categoryAR.contains(lowerQuery)) return true;
-            
-            // Search by person name
-            if (tx.personId != null) {
-              try {
-                final persons = ledgerAsync.value?.persons ?? [];
-                final person = persons.firstWhere((p) => p.id == tx.personId);
-                if (person.name.toLowerCase().contains(lowerQuery)) return true;
-              } catch (_) {}
-            }
-            
-            // Search by amount (raw + formatted)
-            final amountStr = tx.amount.toString();
-            final formattedAmount = numberFormat.format(tx.amount);
-            if (amountStr.contains(lowerQuery) || formattedAmount.contains(lowerQuery)) return true;
-            
-            // Search by transaction type (bilingual EN/AR)
-            final typeLabel = TransactionLabelMapper.getLabel(tx.type, isSimpleMode, l10n);
-            if (typeLabel.toLowerCase().contains(lowerQuery)) return true;
-            
-            return false;
-          }).toList();
-        }
-
-        // 3. Recalculate Totals Locally based on filtered list
-        double totalIn = 0;
-        double totalOut = 0;
-        
-        for (final t in filteredList) {
-          final isIncome = t.type == TransactionType.paymentReceived ||
-              t.type == TransactionType.cashSale ||
-              t.type == TransactionType.cashIncome ||
-              t.type == TransactionType.debtTaken;
-              
-          if (isIncome) {
-            totalIn += t.amount;
-          } else {
-            totalOut += t.amount;
-          }
-        }
-        final net = totalIn - totalOut;
-
-        // Use filtered values for UI
-        final filteredTransactions = filteredList;
+      data: (computedState) {
+        // Pre-computed data from provider
+        final filteredTransactions = computedState.transactions;
+        final totalIn = computedState.totalIn;
+        final totalOut = computedState.totalOut;
+        final net = computedState.net;
 
 
 
@@ -443,7 +397,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {  // REMOVED S
                           l10n: l10n,
                           filteredTransactions: filteredTransactions,
                           ledgerAsync: ledgerAsync,
-                          categories: categories,
+                          categories: localCategories,
                           currency: currency,
                           numberFormat: numberFormat,
                         ),
@@ -454,6 +408,7 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {  // REMOVED S
           ? null
           : FloatingActionButton(
               onPressed: () => _showAddCashEntryModal(context, ref),
+              tooltip: l10n.addTransaction,
               child: Icon(Icons.add, size: 24.sp),
             ),
     );
@@ -504,11 +459,6 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {  // REMOVED S
         }
         
         final tx = displayedTransactions[index];
-        // Income = cash came in (including borrowed money)
-        final isIncome = tx.type == TransactionType.paymentReceived ||
-            tx.type == TransactionType.cashSale ||
-            tx.type == TransactionType.cashIncome ||
-            tx.type == TransactionType.debtTaken;
         
         String? personName;
         if (tx.personId != null) {
@@ -522,93 +472,13 @@ class _CashbookScreenState extends ConsumerState<CashbookScreen> {  // REMOVED S
         // Find category
         final category = categories.where((c) => c.name == tx.category).firstOrNull;
 
-        return Padding(
-          padding: EdgeInsets.only(bottom: 8.h),
-          child: Card(
-            margin: EdgeInsets.zero,
-            elevation: 0,
-            color: theme.cardTheme.color,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.r),
-              side: BorderSide(color: theme.dividerColor.withValues(alpha: 0.05)),
-            ),
-            child: ListTile(
-              contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => TransactionDetailsScreen(transaction: tx),
-                  ),
-                );
-              },
-              leading: Container(
-                padding: EdgeInsets.all(10.w),
-                decoration: BoxDecoration(
-                  color: category != null 
-                      ? category.color.withValues(alpha: 0.1)
-                      : (isIncome ? AppColors.success.withValues(alpha: 0.1) : AppColors.error.withValues(alpha: 0.1)),
-                  borderRadius: BorderRadius.circular(12.r),
-                ),
-                child: Icon(
-                  category != null ? category.icon : (isIncome ? LucideIcons.arrowDownLeft : LucideIcons.arrowUpRight),
-                  color: category != null ? category.color : (isIncome ? AppColors.success : AppColors.error),
-                  size: 20.sp,
-                ),
-              ),
-              title: Text(
-                category != null ? CategoryHelper.getLocalizedCategory(category.name, l10n) : _getTransactionLabel(tx.type, l10n),
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 4.h),
-                  Row(
-                    children: [
-                      Text(
-                        DateFormat.yMMMd().format(tx.date),
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      if (personName != null) ...[
-                        SizedBox(width: 8.w),
-                        Icon(LucideIcons.user, size: 12.sp, color: theme.colorScheme.onSurfaceVariant),
-                        SizedBox(width: 4.w),
-                        Expanded(
-                          child: Text(
-                            personName,
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurfaceVariant,
-                              fontStyle: FontStyle.italic,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                  if (tx.note != null && tx.note!.isNotEmpty) ...[
-                    SizedBox(height: 2.h),
-                    Text(
-                      tx.note!,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ],
-              ),
-              trailing: Text(
-                '$currency ${numberFormat.format(tx.amount)}',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: isIncome ? AppColors.success : AppColors.error,
-                ),
-              ),
-            ),
-          ),
+        return CashbookListItem(
+          transaction: tx,
+          personName: personName,
+          category: category,
+          currency: currency,
+          numberFormat: numberFormat,
+          getTransactionLabel: _getTransactionLabel,
         );
       },
     );

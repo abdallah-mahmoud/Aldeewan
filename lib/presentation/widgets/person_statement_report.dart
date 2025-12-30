@@ -15,6 +15,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
 import 'package:aldeewan_mobile/utils/transaction_label_mapper.dart';
 import 'package:aldeewan_mobile/presentation/widgets/common/filter_action_tile.dart';
+import 'package:aldeewan_mobile/utils/date_formatter_service.dart';
 
 class PersonStatementReport extends ConsumerStatefulWidget {
   const PersonStatementReport({super.key});
@@ -47,6 +48,7 @@ class _PersonStatementReportState extends ConsumerState<PersonStatementReport> {
     final currency = ref.watch(currencyProvider);
     final notifier = ref.read(ledgerProvider.notifier);
     final l10n = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).toString();
     final formatter = NumberFormat('#,##0.##');
     final isSimpleMode = ref.watch(settingsProvider);
 
@@ -70,7 +72,7 @@ class _PersonStatementReportState extends ConsumerState<PersonStatementReport> {
                 label: l10n.dateRange,
                 value: _dateRange == null
                     ? l10n.selectDateRange
-                    : '${DateFormat.yMMMd().format(_dateRange!.start)} - ${DateFormat.yMMMd().format(_dateRange!.end)}',
+                    : '${DateFormatterService.formatDate(_dateRange!.start, locale)} - ${DateFormatterService.formatDate(_dateRange!.end, locale)}',
                 icon: LucideIcons.calendar,
                 onTap: () async {
                   final picked = await showDateRangePicker(
@@ -110,7 +112,7 @@ class _PersonStatementReportState extends ConsumerState<PersonStatementReport> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  l10n.period(DateFormat.yMMMd().format(_dateRange!.start), DateFormat.yMMMd().format(_dateRange!.end)),
+                  l10n.period(DateFormatterService.formatDate(_dateRange!.start, locale), DateFormatterService.formatDate(_dateRange!.end, locale)),
                   style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),
@@ -130,7 +132,7 @@ class _PersonStatementReportState extends ConsumerState<PersonStatementReport> {
                       final tx = _statementTransactions[index];
                       return ListTile(
                         title: Text(TransactionLabelMapper.getLabel(tx.type, isSimpleMode, l10n)),
-                        subtitle: Text(DateFormat.yMMMd().format(tx.date)),
+                        subtitle: Text(DateFormatterService.formatDate(tx.date, locale)),
                         trailing: Text('$currency ${formatter.format(tx.amount)}'),
                       );
                     },

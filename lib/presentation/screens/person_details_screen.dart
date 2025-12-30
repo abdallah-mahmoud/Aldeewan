@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:intl/intl.dart';
+
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:aldeewan_mobile/domain/entities/person.dart';
@@ -12,6 +12,7 @@ import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/widgets/transaction_form.dart';
 import 'package:aldeewan_mobile/presentation/widgets/person_form.dart';
 import 'package:aldeewan_mobile/presentation/widgets/delete_person_dialog.dart';
+import 'package:aldeewan_mobile/presentation/widgets/dual_date_text.dart';
 import 'package:aldeewan_mobile/config/app_colors.dart';
 import 'package:aldeewan_mobile/utils/transaction_label_mapper.dart';
 import 'package:aldeewan_mobile/presentation/providers/settings_provider.dart';
@@ -277,7 +278,10 @@ class PersonDetailsScreen extends ConsumerWidget {
                                 TransactionLabelMapper.getLabel(tx.type, isSimpleMode, l10n),
                                 style: const TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              subtitle: Text(DateFormat.yMMMd().format(tx.date)),
+                              subtitle: DualDateText(
+                                date: tx.date,
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
                               trailing: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.end,

@@ -9,6 +9,8 @@ import 'package:aldeewan_mobile/l10n/generated/app_localizations.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
 import 'package:aldeewan_mobile/utils/error_handler.dart';
 import 'package:aldeewan_mobile/presentation/widgets/tip_card.dart';
+import 'package:aldeewan_mobile/presentation/providers/calendar_provider.dart';
+import 'package:aldeewan_mobile/utils/date_formatter_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 class AnalyticsScreen extends ConsumerStatefulWidget {
@@ -61,6 +63,7 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
         actions: [
           if (_tabController.index == 0)
             PopupMenuButton<String>(
+              tooltip: l10n.exportCsv,
               onSelected: (value) {
                 if (value == 'export_persons') {
                   _exportPersonsCsv(context, ref);
@@ -135,8 +138,12 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
   Future<void> _exportPersonsCsv(BuildContext context, WidgetRef ref) async {
     try {
       final persons = ref.read(ledgerProvider).value?.persons ?? [];
+      final calendarState = ref.read(calendarProvider);
+      final showHijri = calendarState.showHijri;
+      final langCode = Localizations.localeOf(context).languageCode;
+
       final rows = <List<dynamic>>[
-        ['ID', 'Name', 'Role', 'Phone', 'Created At'],
+        ['ID', 'Name', 'Role', 'Phone', 'Created At', if (showHijri) 'Created At (Hijri)'],
       ];
 
       for (var p in persons) {
@@ -145,11 +152,17 @@ class _AnalyticsScreenState extends ConsumerState<AnalyticsScreen> with SingleTi
           p.name,
           p.role.toString().split('.').last,
           p.phone ?? '',
-          DateFormat('yyyy-MM-dd HH:mm').format(p.createdAt),
+          DateFormatterService.forceWesternNumerals(DateFormat('yyyy-MM-dd HH:mm').format(p.createdAt)),
+          if (showHijri)
+            DateFormatterService.formatHijriOnly(
+              p.createdAt,
+              langCode,
+              adjustment: calendarState.adjustment,
+            ),
         ]);
       }
 
-      final fileName = 'persons_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv';
+      final fileName = 'persons_${DateFormatterService.forceWesternNumerals(DateFormat('yyyyMMdd').format(DateTime.now()))}.csv';
       await CsvExporter.exportToCsv(
         fileName: fileName,
         rows: rows,

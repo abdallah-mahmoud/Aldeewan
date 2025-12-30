@@ -770,6 +770,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get budgetDetails => 'تفاصيل الميزانية';
 
   @override
+  String get videoTutorials => 'فيديو تعليمي';
+
+  @override
+  String get faq => 'الأسئلة الشائعة';
+
+  @override
+  String get hijriCalendar => 'التقويم الهجري الإسلامي';
+
+  @override
+  String get showHijriDate => 'عرض التاريخ الهجري';
+
+  @override
+  String get hijriAdjustment => 'تعديل التاريخ الهجري';
+
+  @override
+  String get hijriAdjustmentDesc => 'تعديل التاريخ الهجري بزيادة أو نقص أيام';
+
+  @override
+  String get days => 'أيام';
+
+  @override
   String get deadline => 'الموعد النهائي';
 
   @override
@@ -1343,4 +1364,46 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get aboutAldeewanDescription =>
       'تطبيق الديوان هو رفيقك المالي الأمثل، صُمم لمساعدتك في تتبع أموالك، إدارة الديون، وتحقيق أهدافك المالية بكل سهولة وذكاء.';
+
+  @override
+  String get backupEncrypt => 'تشفير النسخة الاحتياطية';
+
+  @override
+  String get backupEncryptSubtitle => 'حماية بكلمة مرور';
+
+  @override
+  String get enterPassword => 'أدخل كلمة المرور';
+
+  @override
+  String get passwordRequired => 'كلمة المرور مطلوبة';
+
+  @override
+  String get restoreStrategyTitle => 'طريقة الاستعادة';
+
+  @override
+  String get restoreStrategyDesc => 'كيف تود استعادة هذا الملف؟';
+
+  @override
+  String get restoreMerge => 'دمج البيانات';
+
+  @override
+  String get restoreMergeDesc =>
+      'إضافة للبيانات الحالية. يتم تحديث العناصر الموجودة.';
+
+  @override
+  String get restoreReplace => 'استبدال الكل';
+
+  @override
+  String get restoreReplaceDesc => 'خطر: سيتم حذف جميع البيانات الحالية.';
+
+  @override
+  String get restoreReplaceWarning =>
+      'سيتم حذف جميع البيانات الحالية نهائياً. هل أنت متأكد؟';
+
+  @override
+  String get invalidPassword => 'كلمة المرور غير صحيحة';
+
+  @override
+  String get schemaVersionMismatch =>
+      'النسخة الاحتياطية من إصدار أحدث للتطبيق. يرجى تحديث الديوان.';
 }

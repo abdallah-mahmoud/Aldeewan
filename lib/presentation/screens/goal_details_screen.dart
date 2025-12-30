@@ -10,6 +10,7 @@ import 'package:aldeewan_mobile/presentation/providers/currency_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/notification_history_provider.dart';
 import 'package:aldeewan_mobile/presentation/providers/ledger_provider.dart';
 import 'package:aldeewan_mobile/presentation/widgets/empty_state.dart';
+import 'package:aldeewan_mobile/presentation/widgets/dual_date_text.dart';
 
 import 'package:aldeewan_mobile/utils/input_formatters.dart';
 import 'package:aldeewan_mobile/utils/icon_helper.dart';
@@ -282,7 +283,10 @@ class GoalDetailsScreen extends ConsumerWidget {
                         (tx.note ?? '').isNotEmpty ? tx.note! : l10n.goalContribution,
                         style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
                       ),
-                      subtitle: Text(DateFormat.yMMMd(Localizations.localeOf(context).toString()).format(tx.date)),
+                      subtitle: DualDateText(
+                        date: tx.date,
+                        style: theme.textTheme.bodySmall,
+                      ),
                       trailing: Text(
                         '$currency ${formatter.format(tx.amount)}',
                         style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
