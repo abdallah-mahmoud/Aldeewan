@@ -54,6 +54,7 @@ key.properties
 # Documentation
 # docs/
 
-
-
 .pub_cache/
+
+# FVM Version Cache
+.fvm/
