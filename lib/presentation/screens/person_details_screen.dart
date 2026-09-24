@@ -138,6 +138,17 @@ class PersonDetailsScreen extends ConsumerWidget {
                   icon: const Icon(LucideIcons.messageCircle),
                   onPressed: () => _launchWhatsApp(person.phone),
                 ),
+              if (person.isArchived)
+                IconButton(
+                  icon: const Icon(LucideIcons.archiveRestore),
+                  tooltip: l10n.unarchive,
+                  onPressed: () async {
+                    await notifier.unarchivePerson(person.id);
+                    if (context.mounted) {
+                      ToastService.showSuccess(context, l10n.personUnarchived);
+                    }
+                  },
+                ),
               IconButton(
                 icon: const Icon(LucideIcons.edit),
                 onPressed: () => _showEditPersonModal(context, ref, person),
@@ -159,6 +170,49 @@ class PersonDetailsScreen extends ConsumerWidget {
           ),
           body: Column(
             children: [
+              if (person.isArchived)
+                Padding(
+                  padding: EdgeInsets.fromLTRB(16.w, 12.h, 16.w, 0),
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.5),
+                      borderRadius: BorderRadius.circular(12.r),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(LucideIcons.archive, size: 20.sp, color: Theme.of(context).colorScheme.primary),
+                        SizedBox(width: 12.w),
+                        Expanded(
+                          child: Text(
+                            l10n.archivedPersons,
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        ),
+                        FilledButton.tonalIcon(
+                          onPressed: () async {
+                            await notifier.unarchivePerson(person.id);
+                            if (context.mounted) {
+                              ToastService.showSuccess(context, l10n.personUnarchived);
+                            }
+                          },
+                          icon: Icon(LucideIcons.archiveRestore, size: 16.sp),
+                          label: Text(l10n.unarchive),
+                          style: FilledButton.styleFrom(
+                            visualDensity: VisualDensity.compact,
+                            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Card(

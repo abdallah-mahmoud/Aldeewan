@@ -138,6 +138,19 @@ class LocalDatabaseSource {
     }
   }
 
+  /// Restores an archived person back to active state.
+  ///
+  /// - [personId]: The unique ID of the person to unarchive.
+  Future<void> unarchivePerson(String personId) async {
+    final realm = await db;
+    final person = realm.find<PersonModel>(personId);
+    if (person != null) {
+      realm.write(() {
+        person.isArchived = false;
+      });
+    }
+  }
+
   /// Permanently deletes a person from the database.
   ///
   /// - [personId]: The unique ID of the person to delete.

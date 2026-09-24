@@ -120,6 +120,11 @@ class LedgerNotifier extends StateNotifier<AsyncValue<LedgerState>> {
     await ref.read(personRepositoryProvider).archivePerson(id);
   }
 
+  /// Restore an archived person back to active state
+  Future<void> unarchivePerson(String id) async {
+    await ref.read(personRepositoryProvider).unarchivePerson(id);
+  }
+
   /// Delete person only (leaves orphan transactions - use with caution)
   Future<void> deletePerson(String id) async {
     await ref.read(personRepositoryProvider).deletePerson(id);

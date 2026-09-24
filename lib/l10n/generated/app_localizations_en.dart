@@ -1305,6 +1305,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get archive => 'Archive';
 
   @override
+  String get unarchive => 'Restore';
+
+  @override
+  String get personUnarchived => 'Person restored successfully';
+
+  @override
   String get deleteAll => 'Delete All';
 
   @override

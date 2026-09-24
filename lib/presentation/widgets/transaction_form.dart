@@ -97,7 +97,7 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
       // Check Balance Constraint for payment and lending transactions
       // (You can't pay or lend more than you have)
       if (_type == TransactionType.paymentMade || _type == TransactionType.debtGiven) {
-        final currentBalance = ref.read(dashboardStatsProvider).net;
+        final currentBalance = ref.read(totalCashBalanceProvider);
         if (currentBalance < amount) {
           final currency = ref.read(currencyProvider);
           final formatter = NumberFormat('#,##0.##');

@@ -185,12 +185,13 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                 final ledgerAsync = ref.watch(ledgerProvider);
                 final currentPersons = ledgerAsync.value?.persons ?? [];
                 
-                // Filter persons based on action type
+                // Filter persons based on action type (only active persons)
+                final activePersons = currentPersons.where((p) => !p.isArchived).toList();
                 final filteredPersons = action == 'debt' 
-                    ? currentPersons.where((p) => p.role == PersonRole.customer).toList()
+                    ? activePersons.where((p) => p.role == PersonRole.customer).toList()
                     : action == 'payment'
-                        ? currentPersons.where((p) => p.role == PersonRole.supplier).toList()
-                        : currentPersons;
+                        ? activePersons.where((p) => p.role == PersonRole.supplier).toList()
+                        : activePersons;
                 
                 return ListView.builder(
                   itemCount: filteredPersons.length,
@@ -437,6 +438,22 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
                 ),
               ),
               SizedBox(width: 8.w),
+              // Archive toggle button
+              IconButton(
+                icon: Icon(
+                  showArchived ? LucideIcons.archiveRestore : LucideIcons.archive,
+                  color: showArchived ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+                ),
+                tooltip: l10n.showArchived,
+                style: showArchived
+                    ? IconButton.styleFrom(
+                        backgroundColor: theme.colorScheme.primaryContainer,
+                      )
+                    : null,
+                onPressed: () {
+                  ref.read(showArchivedProvider.notifier).state = !showArchived;
+                },
+              ),
               // Clear filter button (show when any filter is active)
               if (balanceFilter == 'owes' || searchQuery.isNotEmpty || showArchived)
                 IconButton(
@@ -518,6 +535,38 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
             ],
           ),
         ),
+        // Active archived filter banner
+        if (showArchived)
+          Padding(
+            padding: EdgeInsets.fromLTRB(16.w, 0, 16.w, 8.h),
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+                borderRadius: BorderRadius.circular(8.r),
+                border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2)),
+              ),
+              child: Row(
+                children: [
+                  Icon(LucideIcons.archive, size: 14.sp, color: theme.colorScheme.primary),
+                  SizedBox(width: 8.w),
+                  Expanded(
+                    child: Text(
+                      l10n.showArchived,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onPrimaryContainer,
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () => ref.read(showArchivedProvider.notifier).state = false,
+                    child: Icon(Icons.close, size: 14.sp, color: theme.colorScheme.onPrimaryContainer),
+                  ),
+                ],
+              ),
+            ),
+          ),
         // Person balance tip
         const PersonBalanceTip(),
         // List or empty state - Tour Step 5
@@ -568,21 +617,57 @@ class _LedgerScreenState extends ConsumerState<LedgerScreen> with SingleTickerPr
               width: 48.w,
               height: 48.h,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
+                color: person.isArchived
+                    ? Theme.of(context).colorScheme.surfaceContainerHighest
+                    : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12.r),
               ),
               alignment: Alignment.center,
               child: Text(
                 person.name.isNotEmpty ? person.name[0].toUpperCase() : '?',
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.primary,
+                  color: person.isArchived
+                      ? Theme.of(context).colorScheme.onSurfaceVariant
+                      : Theme.of(context).colorScheme.primary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            title: Text(
-              person.name,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            title: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    person.name,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: person.isArchived
+                          ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)
+                          : null,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (person.isArchived) ...[
+                  SizedBox(width: 8.w),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      borderRadius: BorderRadius.circular(4.r),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.2),
+                      ),
+                    ),
+                    child: Text(
+                      l10n.archivedPersons,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontSize: 9.sp,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
             ),
             subtitle: person.phone != null && person.phone!.isNotEmpty
                 ? Row(

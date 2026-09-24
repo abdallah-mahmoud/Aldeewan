@@ -1297,6 +1297,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get archive => 'أرشفة';
 
   @override
+  String get unarchive => 'استعادة';
+
+  @override
+  String get personUnarchived => 'تمت استعادة الشخص بنجاح';
+
+  @override
   String get deleteAll => 'حذف الكل';
 
   @override

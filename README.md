@@ -1,6 +1,6 @@
-﻿# 📱 تطبيق الديوان (Aldeewan Mobile)
+# 📱 تطبيق الديوان (Aldeewan Mobile)
 
-![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.2.1-blue.svg)
 ![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B.svg?logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.x-0175C2.svg?logo=dart)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
@@ -12,7 +12,7 @@
 <p align="center">
   <b>نظام محاسبي ذكي وشامل لإدارة الديون والمصروفات والإيرادات</b>
   <br>
-  <i>الإصدار 2.2.0 - أداء أسرع، أمان سحابي، وتجربة مستخدم متكاملة</i>
+  <i>الإصدار 2.2.1 - أداء أسرع، أمان سحابي، واستعادة المؤرشفين، وتجربة مستخدم متكاملة</i>
 </p>
 
 ---

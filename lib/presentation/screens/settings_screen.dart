@@ -402,7 +402,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               child: Column(
                 children: [
                   Text(
-                    l10n.appVersionInfo('2.2.0'),
+                    l10n.appVersionInfo('2.2.1'),
                     style: theme.textTheme.bodySmall?.copyWith(color: Colors.grey),
                   ),
                   SizedBox(height: 4.h),

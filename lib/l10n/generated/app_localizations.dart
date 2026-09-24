@@ -2514,6 +2514,18 @@ abstract class AppLocalizations {
   /// **'Archive'**
   String get archive;
 
+  /// No description provided for @unarchive.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get unarchive;
+
+  /// No description provided for @personUnarchived.
+  ///
+  /// In en, this message translates to:
+  /// **'Person restored successfully'**
+  String get personUnarchived;
+
   /// No description provided for @deleteAll.
   ///
   /// In en, this message translates to:

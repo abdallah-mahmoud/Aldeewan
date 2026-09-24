@@ -13,13 +13,22 @@ class HeroSection extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final currency = ref.watch(currencyProvider);
     final range = ref.watch(summaryRangeProvider);
-    
-    // Use monthly income/expense for Net Position (actual cash flow)
-    final monthlyIncome = ref.watch(monthlyIncomeProvider);
-    final monthlyExpense = ref.watch(monthlyExpenseProvider);
-    final netPosition = monthlyIncome - monthlyExpense;
 
-    final netSubtitle = netPosition >= 0 ? l10n.profitThisMonth : l10n.lossThisMonth;
+    // Compute hero amount based on selected range
+    final double heroAmount;
+    final String heroSubtitle;
+
+    if (range == SummaryRange.all) {
+      // All-time cumulative cash in hand (persistent, never resets)
+      heroAmount = ref.watch(totalCashBalanceProvider);
+      heroSubtitle = l10n.allTime;
+    } else {
+      // This month's net cash flow
+      final monthlyIncome = ref.watch(monthlyIncomeProvider);
+      final monthlyExpense = ref.watch(monthlyExpenseProvider);
+      heroAmount = monthlyIncome - monthlyExpense;
+      heroSubtitle = heroAmount >= 0 ? l10n.profitThisMonth : l10n.lossThisMonth;
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -48,10 +57,10 @@ class HeroSection extends ConsumerWidget {
         // Hero net balance card
         HeroBalanceCard(
           title: l10n.netPosition,
-          subtitle: netSubtitle,
-          rawAmount: netPosition,
+          subtitle: heroSubtitle,
+          rawAmount: heroAmount,
           currencyCode: currency,
-          isPositive: netPosition >= 0,
+          isPositive: heroAmount >= 0,
         ),
       ],
     );

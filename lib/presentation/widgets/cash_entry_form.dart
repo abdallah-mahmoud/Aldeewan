@@ -116,7 +116,7 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
 
       // Check Balance Constraint - block expense if insufficient funds
       if (_type == TransactionType.cashExpense) {
-        final currentBalance = ref.read(dashboardStatsProvider).net;
+        final currentBalance = ref.read(totalCashBalanceProvider);
         if (currentBalance < amount) {
           final currency = ref.read(currencyProvider);
           final formatter = NumberFormat('#,##0.##');

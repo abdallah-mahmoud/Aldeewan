@@ -7,6 +7,7 @@ abstract class PersonRepository {
   Future<void> addPerson(Person person);
   Future<void> updatePerson(Person person);
   Future<void> archivePerson(String id);
+  Future<void> unarchivePerson(String id);
   Future<void> deletePerson(String id);
   Future<void> deletePersonWithTransactions(String id);
   Future<int> getTransactionCount(String id);

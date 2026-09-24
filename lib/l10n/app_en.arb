@@ -521,8 +521,10 @@
     }
   },
   "personArchived": "Person archived successfully",
+  "personUnarchived": "Person restored successfully",
   "personDeleted": "Person deleted successfully",
   "archive": "Archive",
+  "unarchive": "Restore",
   "deleteAll": "Delete All",
   "archivedPersons": "Archived",
   "showArchived": "Show Archived",

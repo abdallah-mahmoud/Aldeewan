@@ -47,6 +47,40 @@ final monthlyExpenseProvider = Provider<double>((ref) {
   return ref.read(getMonthlyExpenseUseCaseProvider)(s.transactions);
 });
 
+/// All-time cumulative cash balance (filter-independent).
+///
+/// Computes total cash physically in hand across all history.
+/// - Excludes [isOpeningBalance] transactions (old debts don't affect cash).
+/// - Includes [debtGiven] (cash out) and [debtTaken] (cash in).
+/// - Never resets at month rollover.
+///
+/// Used by: Hero Card ("All" filter), form validation (expense/payment guards).
+final totalCashBalanceProvider = Provider<double>((ref) {
+  final s = ref.watch(ledgerProvider).value;
+  if (s == null) return 0.0;
+
+  double balance = 0.0;
+  for (final t in s.transactions) {
+    // Opening balances record historical debt — they never moved actual cash
+    if (t.isOpeningBalance) continue;
+
+    // Cash inflows
+    if (t.type == TransactionType.cashSale ||
+        t.type == TransactionType.cashIncome ||
+        t.type == TransactionType.paymentReceived ||
+        t.type == TransactionType.debtTaken) {
+      balance += t.amount;
+    }
+    // Cash outflows
+    else if (t.type == TransactionType.cashExpense ||
+             t.type == TransactionType.paymentMade ||
+             t.type == TransactionType.debtGiven) {
+      balance -= t.amount;
+    }
+  }
+  return balance;
+});
+
 class DashboardStats {
   final double totalIncome;
   final double totalExpense;

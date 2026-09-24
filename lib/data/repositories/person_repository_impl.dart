@@ -56,6 +56,11 @@ class PersonRepositoryImpl implements PersonRepository {
   }
 
   @override
+  Future<void> unarchivePerson(String id) async {
+    await _dataSource.unarchivePerson(id);
+  }
+
+  @override
   Future<void> deletePerson(String id) async {
     await _dataSource.deletePerson(id);
   }
