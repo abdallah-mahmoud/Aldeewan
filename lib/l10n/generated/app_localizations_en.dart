@@ -1299,6 +1299,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get personArchived => 'Person archived successfully';
 
   @override
+  String get personUnarchived => 'Person restored successfully';
+
+  @override
   String get personDeleted => 'Person deleted successfully';
 
   @override
@@ -1306,9 +1309,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get unarchive => 'Restore';
-
-  @override
-  String get personUnarchived => 'Person restored successfully';
 
   @override
   String get deleteAll => 'Delete All';

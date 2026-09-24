@@ -1291,6 +1291,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get personArchived => 'تم أرشفة الشخص بنجاح';
 
   @override
+  String get personUnarchived => 'تمت استعادة الشخص بنجاح';
+
+  @override
   String get personDeleted => 'تم حذف الشخص بنجاح';
 
   @override
@@ -1298,9 +1301,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get unarchive => 'استعادة';
-
-  @override
-  String get personUnarchived => 'تمت استعادة الشخص بنجاح';
 
   @override
   String get deleteAll => 'حذف الكل';
