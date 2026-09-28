@@ -81,9 +81,17 @@ class _TransactionFormState extends ConsumerState<TransactionForm> {
       lastDate: DateTime(2101),
     );
     if (!mounted) return;
-    if (picked != null && picked != _date) {
+    if (picked != null) {
+      final now = DateTime.now();
       setState(() {
-        _date = picked;
+        _date = DateTime(
+          picked.year,
+          picked.month,
+          picked.day,
+          now.hour,
+          now.minute,
+          now.second,
+        );
       });
     }
   }

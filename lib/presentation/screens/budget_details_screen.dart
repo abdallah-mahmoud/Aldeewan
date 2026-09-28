@@ -110,7 +110,7 @@ class BudgetDetailsScreen extends ConsumerWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '${DateFormat.yMMMd().format(budget.startDate)} - ${DateFormat.yMMMd().format(budget.endDate)}',
+                              '${DateFormat.yMMMd().format(budget.startDate.toLocal())} - ${DateFormat.yMMMd().format(budget.endDate.toLocal())}',
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                               ),
@@ -321,8 +321,8 @@ class BudgetDetailsScreen extends ConsumerWidget {
   void _showEditBudgetDialog(BuildContext context, WidgetRef ref, BudgetModel budget) {
     final l10n = AppLocalizations.of(context)!;
     final limitController = TextEditingController(text: budget.amountLimit.toString());
-    DateTime startDate = budget.startDate;
-    DateTime endDate = budget.endDate;
+    DateTime startDate = budget.startDate.toLocal();
+    DateTime endDate = budget.endDate.toLocal();
 
     showDialog(
       context: context,
@@ -352,7 +352,8 @@ class BudgetDetailsScreen extends ConsumerWidget {
                         lastDate: DateTime(2100),
                       );
                       if (picked != null) {
-                        setState(() => startDate = picked);
+                        final now = DateTime.now();
+                        setState(() => startDate = DateTime(picked.year, picked.month, picked.day, now.hour, now.minute, now.second));
                       }
                     },
                   ),
@@ -368,7 +369,7 @@ class BudgetDetailsScreen extends ConsumerWidget {
                         lastDate: DateTime(2100),
                       );
                       if (picked != null) {
-                        setState(() => endDate = picked);
+                        setState(() => endDate = DateTime(picked.year, picked.month, picked.day, 23, 59, 59));
                       }
                     },
                   ),

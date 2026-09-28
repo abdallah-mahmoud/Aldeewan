@@ -112,7 +112,7 @@ class GoalDetailsScreen extends ConsumerWidget {
                             if (goal.deadline != null) ...[
                               const SizedBox(height: 4),
                               Text(
-                                '${l10n.deadline}: ${DateFormat.yMMMd().format(goal.deadline!)}',
+                                '${l10n.deadline}: ${DateFormat.yMMMd().format(goal.deadline!.toLocal())}',
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: Colors.white.withValues(alpha: 0.9),
                                 ),
@@ -310,7 +310,7 @@ class GoalDetailsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final nameController = TextEditingController(text: goal.name);
     final targetController = TextEditingController(text: goal.targetAmount.toString());
-    DateTime? deadline = goal.deadline;
+    DateTime? deadline = goal.deadline?.toLocal();
 
     showDialog(
       context: context,
@@ -345,7 +345,8 @@ class GoalDetailsScreen extends ConsumerWidget {
                         lastDate: DateTime(2100),
                       );
                       if (picked != null) {
-                        setState(() => deadline = picked);
+                        final now = DateTime.now();
+                        setState(() => deadline = DateTime(picked.year, picked.month, picked.day, now.hour, now.minute, now.second));
                       }
                     },
                   ),

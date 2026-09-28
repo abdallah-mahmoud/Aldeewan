@@ -12,12 +12,13 @@ class DateFormatterService {
     int hijriAdjustment = 0,
     String? format,
   }) {
+    final localDate = date.toLocal();
     final locale = Localizations.localeOf(context).toString();
     final langCode = Localizations.localeOf(context).languageCode;
     
     // Default format yMMMd (e.g., Dec 29, 2025)
     final dateFormat = format ?? 'yMMMd';
-    String gregorian = DateFormat(dateFormat, locale).format(date);
+    String gregorian = DateFormat(dateFormat, locale).format(localDate);
     
     // Force Western numerals for Gregorian
     gregorian = forceWesternNumerals(gregorian);
@@ -29,7 +30,7 @@ class DateFormatterService {
     HijriCalendar.setLocal(langCode);
     
     // Apply adjustment for Hijri calculation
-    final adjustedDate = date.add(Duration(days: hijriAdjustment));
+    final adjustedDate = localDate.add(Duration(days: hijriAdjustment));
     final hijri = HijriCalendar.fromDate(adjustedDate);
     
     String hijriStr = hijri.toFormat("dd MMMM yyyy");
@@ -42,7 +43,8 @@ class DateFormatterService {
 
   /// Formats a Gregorian date with forced Western numerals
   static String formatDate(DateTime date, String locale, {String format = 'yMMMd'}) {
-    final formatted = DateFormat(format, locale).format(date);
+    final localDate = date.toLocal();
+    final formatted = DateFormat(format, locale).format(localDate);
     return forceWesternNumerals(formatted);
   }
   
@@ -53,8 +55,9 @@ class DateFormatterService {
     int adjustment = 0,
     String format = "dd MMMM yyyy",
   }) {
+    final localDate = date.toLocal();
     HijriCalendar.setLocal(langCode);
-    final adjustedDate = date.add(Duration(days: adjustment));
+    final adjustedDate = localDate.add(Duration(days: adjustment));
     final hijri = HijriCalendar.fromDate(adjustedDate);
     
     String formatted = hijri.toFormat(format);

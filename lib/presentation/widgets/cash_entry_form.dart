@@ -102,9 +102,18 @@ class _CashEntryFormState extends ConsumerState<CashEntryForm> {
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
-    if (picked != null && picked != _date) {
+    if (!mounted) return;
+    if (picked != null) {
+      final now = DateTime.now();
       setState(() {
-        _date = picked;
+        _date = DateTime(
+          picked.year,
+          picked.month,
+          picked.day,
+          now.hour,
+          now.minute,
+          now.second,
+        );
       });
     }
   }

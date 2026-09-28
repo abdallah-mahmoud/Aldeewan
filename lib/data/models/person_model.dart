@@ -22,7 +22,7 @@ extension PersonModelMapper on PersonModel {
       role: PersonRole.values.firstWhere((e) => e.name == role, orElse: () => PersonRole.customer),
       name: name,
       phone: phone,
-      createdAt: createdAt,
+      createdAt: createdAt.toLocal(),
       isArchived: isArchived,
     );
   }
